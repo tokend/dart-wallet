@@ -5,10 +5,8 @@ import 'package:dart_wallet/dart_wallet.dart';
 void main() {
   test('adds one to input values', () {
     var list = List.generate(4, (index) => index + 1);
-    print(list);
     var sublist = list.sublist(1,3);
-    print(sublist);
-    print(list);
+    print((DateTime.now().millisecondsSinceEpoch / 1000).ceil());
 
     final calculator = Calculator();
     expect(calculator.addOne(2), 3);

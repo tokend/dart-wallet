@@ -16,10 +16,12 @@ dependencies:
       url: https://github.com/tokend/dart-crypto-kit
       ref: dev
   secure_random: ^1.0.0
+  cryptography: ^2.0.1
   base32: 2.0.0
   base16: ^2.0.2
   tuple: ^2.0.0
   utility: any
+  reflectable: ^3.0.1
 
 dev_dependencies:
   flutter_test:
