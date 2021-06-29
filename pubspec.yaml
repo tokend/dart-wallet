@@ -21,17 +21,25 @@ dependencies:
   base16: ^2.0.2
   tuple: ^2.0.0
   utility: any
-  reflectable: ^3.0.1
+  reflectable: any
+  retrofit: ^2.0.0
+  japx: ^2.0.3
+  json_annotation: ^3.1.1
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  build_runner: any
+  json_serializable: ^3.5.1
+
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
 
 # The following section is specific to Flutter.
 flutter:
+  assets:
+    - assets/test_assets.json
 
 # To add assets to your package, add an assets section, like this:
 # assets:
