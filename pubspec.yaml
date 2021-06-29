@@ -23,6 +23,8 @@ dependencies:
   utility: any
   reflectable: any
   retrofit: ^2.0.0
+  logger: ^1.0.0
+  dio: any
   japx: ^2.0.3
   json_annotation: ^3.1.1
 
@@ -31,6 +33,7 @@ dev_dependencies:
     sdk: flutter
   build_runner: any
   json_serializable: ^3.5.1
+  retrofit_generator: any
 
 
 # For information on the generic Dart part of this file, see the
