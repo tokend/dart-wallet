@@ -5,7 +5,7 @@ author:
 homepage:
 
 environment:
-  sdk: ">=2.7.0 <3.0.0"
+  sdk: ">=2.13.0 <3.0.0"
   flutter: ">=1.17.0"
 
 dependencies:
@@ -24,16 +24,17 @@ dependencies:
   reflectable: any
   retrofit: ^2.0.0
   logger: ^1.0.0
-  dio: any
+  dio: ^4.0.0
   japx: ^2.0.3
-  json_annotation: ^3.1.1
+  json_annotation: ^4.0.1
+  json_serializable: ^4.0.3
+
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  build_runner: any
-  json_serializable: ^3.5.1
-  retrofit_generator: any
+  retrofit_generator: ^2.0.0
+  build_runner: ^2.0.5
 
 
 # For information on the generic Dart part of this file, see the

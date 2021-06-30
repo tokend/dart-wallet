@@ -17,25 +17,26 @@ class NetworkParams {
 
   ///Multiplier for precised amount conversions
   ///See [precision]
-  int precisionMultiplier;
+  late int precisionMultiplier;
 
   ///Identifier of the network
-  Uint8List networkId;
+  late Uint8List networkId;
 
   ///Offset between device and server time in seconds
-  int timeOffsetSeconds;
+  int? timeOffsetSeconds;
 
   ///Calculated current time on server as a UNIX timestamp
   ///See [timeOffsetSeconds]
   int get nowTimestamp =>
-      (DateTime.now().millisecondsSinceEpoch / 1000).ceil() + timeOffsetSeconds;
+      (DateTime.now().millisecondsSinceEpoch / 1000).ceil() +
+      timeOffsetSeconds!;
 
   ///[passphrase] network passphrase
   /// [precision] decimal places in amounts, [DEFAULT_PRECISION] by default
   /// [timeOffsetSeconds] offset between device and server time in seconds, 0 by default
   NetworkParams(this.passphrase,
       {this.precision = DEFAULT_PRECISION, this.timeOffsetSeconds}) {
-    this.precisionMultiplier = pow(10, precision);
+    this.precisionMultiplier = pow(10, precision).toInt();
     this.networkId =
         Hashing().sha256hashing(Uint8List.fromList(passphrase.codeUnits));
     this.timeOffsetSeconds = timeOffsetSeconds;

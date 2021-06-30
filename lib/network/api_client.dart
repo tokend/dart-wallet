@@ -3,7 +3,7 @@ import 'package:retrofit/http.dart';
 
 part 'api_client.g.dart';
 
-@RestApi(baseUrl: "")
+@RestApi(baseUrl: "https://api.demo.tokend.io/v3")
 abstract class APIClient{
   factory APIClient(Dio dio) = _APIClient;
 

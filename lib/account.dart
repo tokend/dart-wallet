@@ -9,7 +9,7 @@ import 'package:dart_wallet/base32check.dart';
 /// @see <a href="https://en.wikipedia.org/wiki/Elliptic_Curve_Digital_Signature_Algorithm/">ECDSA</a>
 /// @see <a href="https://ed25519.cr.yp.to/">Ed25519</a>
 class Account {
-  EcDSAKeyPair ecDSAKeyPair;
+  late EcDSAKeyPair ecDSAKeyPair;
 
   Account(EcDSAKeyPair keyPair) {
     this.ecDSAKeyPair = keyPair;
