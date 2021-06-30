@@ -32,6 +32,6 @@ extension XdrOpaquePrimitive on Uint8List {
   }
 
   Uint8List fromXdr(XdrDataInputStream stream) {
-    return stream.readIntArray();
+    return Uint8List.fromList(stream.readIntArray());
   }
 }

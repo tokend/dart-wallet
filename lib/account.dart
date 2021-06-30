@@ -9,7 +9,7 @@ import 'package:dart_wallet/base32check.dart';
 /// @see <a href="https://en.wikipedia.org/wiki/Elliptic_Curve_Digital_Signature_Algorithm/">ECDSA</a>
 /// @see <a href="https://ed25519.cr.yp.to/">Ed25519</a>
 class Account {
-  EcDSAKeyPair ecDSAKeyPair;
+  late EcDSAKeyPair ecDSAKeyPair;
 
   Account(EcDSAKeyPair keyPair) {
     this.ecDSAKeyPair = keyPair;
@@ -24,8 +24,8 @@ class Account {
   /// Returns private key seed encoded by [Base32Check].
   ///
   /// See <a href="https://tokend.gitbook.io/knowledge-base/technical-details/key-entities/accounts#account-secret-seed">Secret seed in the Knowledge base</a>
-  String get secretSeed =>
-      Base32Check.encodeSecretSeed(ecDSAKeyPair.privateKey);
+  String get secretSeed => Base32Check.encodeSecretSeed(
+      Uint8List.fromList(ecDSAKeyPair.privateKey!));
 
   /// Returns public key bytes.
   Uint8List get publicKey => ecDSAKeyPair.publicKey.bytes;
@@ -37,7 +37,7 @@ class Account {
   ///
   /// @see canSign
   Future<Uint8List> sign(Uint8List data) async {
-    return await ecDSAKeyPair.sign(data);
+    return Uint8List.fromList(new List.from(await ecDSAKeyPair.sign(data)));
   }
 
   destroy() {

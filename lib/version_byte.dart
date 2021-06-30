@@ -11,7 +11,7 @@ class VersionByte {
     return value;
   }
 
-  static VersionByte valueOf(int value) {
+  static VersionByte? valueOf(int value) {
     if (value == ACCOUNT_ID) {
       return VersionByte(ACCOUNT_ID);
     } else if (value == SEED) {
