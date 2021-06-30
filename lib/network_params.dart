@@ -1,7 +1,7 @@
 import 'dart:math';
 import 'dart:typed_data';
 
-import 'package:dart_wallet/utils/Hashing.dart';
+import 'package:dart_wallet/utils/hashing.dart';
 
 /// Holds network-specific parameters.
 class NetworkParams {

@@ -11,21 +11,29 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  stellar: ^0.3.2
   dart_crypto_kit:
     git:
       url: https://github.com/tokend/dart-crypto-kit
       ref: dev
   secure_random: ^1.0.0
-  cryptography: ^2.0.1
+  cryptography: any
   base32: 2.0.0
   base16: ^2.0.2
   tuple: ^2.0.0
   utility: any
-  reflectable: ^3.0.1
+  reflectable: any
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
+
+dependency_overrides:
+  convert: any
+  logging: any
+  eventsource: any
+  source_span: any
+  fixnum: any
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

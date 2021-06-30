@@ -47,6 +47,4 @@ class Account {
   bool isDestroyed() {
     return ecDSAKeyPair.isDestroyed();
   }
-
-
 }
