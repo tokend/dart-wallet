@@ -19,16 +19,16 @@ class Account {
   ///
   /// See <a href="https://tokend.gitbook.io/knowledge-base/technical-details/key-entities/accounts#account-id">AccountID in the Knowledge base</a>
   String get accountId =>
-      Base32Check.encodeAccountId(ecDSAKeyPair.publicKey.bytes);
+      Base32Check.encodeAccountId(Uint8List.fromList(ecDSAKeyPair.publicKey.bytes));
 
   /// Returns private key seed encoded by [Base32Check].
   ///
   /// See <a href="https://tokend.gitbook.io/knowledge-base/technical-details/key-entities/accounts#account-secret-seed">Secret seed in the Knowledge base</a>
   String get secretSeed =>
-      Base32Check.encodeSecretSeed(ecDSAKeyPair.privateKey);
+      Base32Check.encodeSecretSeed(Uint8List.fromList(ecDSAKeyPair.privateKey));
 
   /// Returns public key bytes.
-  Uint8List get publicKey => ecDSAKeyPair.publicKey.bytes;
+  Uint8List get publicKey => Uint8List.fromList(ecDSAKeyPair.publicKey.bytes);
 
   //TODO xdrPubKey
   /// Signs provided data with the account's private key.
@@ -36,8 +36,8 @@ class Account {
   /// @throws SignUnavailableException if account is not capable of signing.
   ///
   /// @see canSign
-  Future<Uint8List> sign(Uint8List data) async {
-    return await ecDSAKeyPair.sign(data);
+  Future<Uint8List> sign(Uint8List data) async{
+    return Uint8List.fromList(new List<int>.from(await ecDSAKeyPair.sign(data)));
   }
 
   destroy() {

@@ -16,5 +16,5 @@ void main() async {
   final resultJson = Japx.decode(jsonDecode(json));
   // print(resultJson);
   final assetsModel = AssetsModel.fromMap(resultJson['data'][0]);
-  print(assetsModel.id);
+  print(assetsModel);
 }

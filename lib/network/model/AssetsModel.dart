@@ -13,6 +13,6 @@ class AssetsModel {
 
   @override
   String toString() {
-    return 'User email: $id and name: $type';
+    return 'Asset id: $id and type: $type';
   }
 }
