@@ -28,7 +28,7 @@ packages:
       name: async
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "2.5.0"
+    version: "2.7.0"
   base16:
     dependency: "direct main"
     description:
@@ -105,7 +105,7 @@ packages:
       name: built_value
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "8.1.0"
+    version: "8.1.1"
   characters:
     dependency: transitive
     description:
@@ -313,7 +313,7 @@ packages:
       name: meta
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "1.3.0"
+    version: "1.4.0"
   mime:
     dependency: transitive
     description:
@@ -361,10 +361,10 @@ packages:
     description:
       path: "."
       ref: master
-      resolved-ref: "015d6a99bd521444ca90e8825e79538597a2e6d9"
+      resolved-ref: "7ed4037aad3f2abaad272941277e125b44a64ace"
       url: "https://github.com/bcgit/pc-dart.git"
     source: git
-    version: "3.1.3"
+    version: "3.2.0-rc0"
   pool:
     dependency: transitive
     description:
@@ -488,7 +488,7 @@ packages:
       name: test_api
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.2.19"
+    version: "0.4.0"
   timing:
     dependency: transitive
     description:
@@ -553,5 +553,5 @@ packages:
     source: hosted
     version: "3.1.0"
 sdks:
-  dart: ">=2.12.0 <3.0.0"
+  dart: ">=2.13.0 <3.0.0"
   flutter: ">=1.17.0"
