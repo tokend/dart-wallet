@@ -5,7 +5,7 @@ import 'package:stellar/stellar.dart';
 
 import 'utils/dependencies.dart';
 
-typedef Value = Uint8List;
+typedef VALUE = Uint8List;
 // === xdr source ============================================================
 
 //  struct SCPBallot
@@ -15,30 +15,31 @@ typedef Value = Uint8List;
 //  };
 
 //  ===========================================================================
-class SCPBallot extends XdrEncodable {
-  Uint32 counter;
-  Value value;
+class SCPBallot extends XdrEncodable  {
+  UINT32 counter;
+  VALUE value;
 
   SCPBallot(
-    this.counter,
-    this.value,
-  );
+      this.counter,
+      this.value,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     counter.toXdr(stream);
     value.toXdr(stream);
   }
 }
-
 class SCPStatementType extends XdrEncodable {
   static const PREPARE = 0;
   static const CONFIRM = 1;
   static const EXTERNALIZE = 2;
   static const NOMINATE = 3;
-  var value;
-
+  int value;
   SCPStatementType(this.value);
+  @override toXdr(XdrDataOutputStream stream) {
+    value.toXdr(stream);
+  }
+
 }
 // === xdr source ============================================================
 
@@ -50,26 +51,25 @@ class SCPStatementType extends XdrEncodable {
 //  };
 
 //  ===========================================================================
-class SCPNomination extends XdrEncodable {
-  Hash quorumSetHash;
-  List<Value> votes;
-  List<Value> accepted;
+class SCPNomination extends XdrEncodable  {
+  HASH quorumSetHash;
+  List<VALUE> votes;
+  List<VALUE> accepted;
 
   SCPNomination(
-    this.quorumSetHash,
-    this.votes,
-    this.accepted,
-  );
+      this.quorumSetHash,
+      this.votes,
+      this.accepted,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     quorumSetHash.toXdr(stream);
     votes.length.toXdr(stream);
-    votes.forEach((element) {
+    votes.forEach ((element) {
       element.toXdr(stream);
     });
     accepted.length.toXdr(stream);
-    accepted.forEach((element) {
+    accepted.forEach ((element) {
       element.toXdr(stream);
     });
   }
@@ -116,79 +116,62 @@ class SCPNomination extends XdrEncodable {
 //  };
 
 //  ===========================================================================
-class SCPStatement extends XdrEncodable {
-  NodeID nodeID;
-  Uint64 slotIndex;
+class SCPStatement extends XdrEncodable  {
+  NODEID nodeID;
+  UINT64 slotIndex;
   SCPStatementPledges pledges;
 
   SCPStatement(
-    this.nodeID,
-    this.slotIndex,
-    this.pledges,
-  );
+      this.nodeID,
+      this.slotIndex,
+      this.pledges,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     nodeID.toXdr(stream);
     slotIndex.toXdr(stream);
     pledges.toXdr(stream);
   }
 }
-
 abstract class SCPStatementPledges extends XdrEncodable {
   SCPStatementType discriminant;
-
   SCPStatementPledges(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class SCPStatementPledgesPrepare extends SCPStatementPledges {
-  SCPStatementPledgesPrepare(this.prepare)
-      : super(SCPStatementType(SCPStatementType.PREPARE));
+  SCPStatementPledgesPrepare(this.prepare) : super(SCPStatementType(SCPStatementType.PREPARE));
   late SCPStatementPreparePrepare prepare;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     prepare.toXdr(stream);
   }
 }
 
 class SCPStatementPledgesConfirm extends SCPStatementPledges {
-  SCPStatementPledgesConfirm(this.confirm)
-      : super(SCPStatementType(SCPStatementType.CONFIRM));
+  SCPStatementPledgesConfirm(this.confirm) : super(SCPStatementType(SCPStatementType.CONFIRM));
   late SCPStatementConfirmConfirm confirm;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     confirm.toXdr(stream);
   }
 }
 
 class SCPStatementPledgesExternalize extends SCPStatementPledges {
-  SCPStatementPledgesExternalize(this.externalize)
-      : super(SCPStatementType(SCPStatementType.EXTERNALIZE));
+  SCPStatementPledgesExternalize(this.externalize) : super(SCPStatementType(SCPStatementType.EXTERNALIZE));
   late SCPStatementExternalizeExternalize externalize;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     externalize.toXdr(stream);
   }
 }
 
 class SCPStatementPledgesNominate extends SCPStatementPledges {
-  SCPStatementPledgesNominate(this.nominate)
-      : super(SCPStatementType(SCPStatementType.NOMINATE));
+  SCPStatementPledgesNominate(this.nominate) : super(SCPStatementType(SCPStatementType.NOMINATE));
   late SCPNomination nominate;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     nominate.toXdr(stream);
   }
@@ -206,25 +189,24 @@ class SCPStatementPledgesNominate extends SCPStatementPledges {
 //          }
 
 //  ===========================================================================
-class SCPStatementPreparePrepare extends XdrEncodable {
-  Hash quorumSetHash;
+class SCPStatementPreparePrepare extends XdrEncodable  {
+  HASH quorumSetHash;
   SCPBallot ballot;
   SCPBallot? prepared;
   SCPBallot? preparedPrime;
-  Uint32 nC;
-  Uint32 nH;
+  UINT32 nC;
+  UINT32 nH;
 
   SCPStatementPreparePrepare(
-    this.quorumSetHash,
-    this.ballot,
-    this.prepared,
-    this.preparedPrime,
-    this.nC,
-    this.nH,
-  );
+      this.quorumSetHash,
+      this.ballot,
+      this.prepared,
+      this.preparedPrime,
+      this.nC,
+      this.nH,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     quorumSetHash.toXdr(stream);
     ballot.toXdr(stream);
     if (prepared != null) {
@@ -255,23 +237,22 @@ class SCPStatementPreparePrepare extends XdrEncodable {
 //          }
 
 //  ===========================================================================
-class SCPStatementConfirmConfirm extends XdrEncodable {
+class SCPStatementConfirmConfirm extends XdrEncodable  {
   SCPBallot ballot;
-  Uint32 nPrepared;
-  Uint32 nCommit;
-  Uint32 nH;
-  Hash quorumSetHash;
+  UINT32 nPrepared;
+  UINT32 nCommit;
+  UINT32 nH;
+  HASH quorumSetHash;
 
   SCPStatementConfirmConfirm(
-    this.ballot,
-    this.nPrepared,
-    this.nCommit,
-    this.nH,
-    this.quorumSetHash,
-  );
+      this.ballot,
+      this.nPrepared,
+      this.nCommit,
+      this.nH,
+      this.quorumSetHash,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     ballot.toXdr(stream);
     nPrepared.toXdr(stream);
     nCommit.toXdr(stream);
@@ -289,19 +270,18 @@ class SCPStatementConfirmConfirm extends XdrEncodable {
 //          }
 
 //  ===========================================================================
-class SCPStatementExternalizeExternalize extends XdrEncodable {
+class SCPStatementExternalizeExternalize extends XdrEncodable  {
   SCPBallot commit;
-  Uint32 nH;
-  Hash commitQuorumSetHash;
+  UINT32 nH;
+  HASH commitQuorumSetHash;
 
   SCPStatementExternalizeExternalize(
-    this.commit,
-    this.nH,
-    this.commitQuorumSetHash,
-  );
+      this.commit,
+      this.nH,
+      this.commitQuorumSetHash,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     commit.toXdr(stream);
     nH.toXdr(stream);
     commitQuorumSetHash.toXdr(stream);
@@ -316,17 +296,16 @@ class SCPStatementExternalizeExternalize extends XdrEncodable {
 //  };
 
 //  ===========================================================================
-class SCPEnvelope extends XdrEncodable {
+class SCPEnvelope extends XdrEncodable  {
   SCPStatement statement;
-  Signature signature;
+  SIGNATURE signature;
 
   SCPEnvelope(
-    this.statement,
-    this.signature,
-  );
+      this.statement,
+      this.signature,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     statement.toXdr(stream);
     signature.toXdr(stream);
   }
@@ -341,26 +320,25 @@ class SCPEnvelope extends XdrEncodable {
 //  };
 
 //  ===========================================================================
-class SCPQuorumSet extends XdrEncodable {
-  Uint32 threshold;
+class SCPQuorumSet extends XdrEncodable  {
+  UINT32 threshold;
   List<PublicKey> validators;
   List<SCPQuorumSet> innerSets;
 
   SCPQuorumSet(
-    this.threshold,
-    this.validators,
-    this.innerSets,
-  );
+      this.threshold,
+      this.validators,
+      this.innerSets,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     threshold.toXdr(stream);
     validators.length.toXdr(stream);
-    validators.forEach((element) {
+    validators.forEach ((element) {
       element.toXdr(stream);
     });
     innerSets.length.toXdr(stream);
-    innerSets.forEach((element) {
+    innerSets.forEach ((element) {
       element.toXdr(stream);
     });
   }
@@ -382,39 +360,33 @@ class SCPQuorumSet extends XdrEncodable {
 //  };
 
 //  ===========================================================================
-class AccountKYCEntry extends XdrEncodable {
-  AccountID accountID;
-  Longstring KYCData;
+class AccountKYCEntry extends XdrEncodable  {
+  ACCOUNTID accountID;
+  LONGSTRING KYCData;
   AccountKYCEntryExt ext;
 
   AccountKYCEntry(
-    this.accountID,
-    this.KYCData,
-    this.ext,
-  );
+      this.accountID,
+      this.KYCData,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     accountID.toXdr(stream);
     KYCData.toXdr(stream);
     ext.toXdr(stream);
   }
 }
-
 abstract class AccountKYCEntryExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   AccountKYCEntryExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class AccountKYCEntryExtEmptyVersion extends AccountKYCEntryExt {
-  AccountKYCEntryExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+  AccountKYCEntryExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
 // === xdr source ============================================================
 
@@ -432,39 +404,33 @@ class AccountKYCEntryExtEmptyVersion extends AccountKYCEntryExt {
 //  };
 
 //  ===========================================================================
-class AccountLimitsEntry extends XdrEncodable {
-  AccountID accountID;
+class AccountLimitsEntry extends XdrEncodable  {
+  ACCOUNTID accountID;
   Limits limits;
   AccountLimitsEntryExt ext;
 
   AccountLimitsEntry(
-    this.accountID,
-    this.limits,
-    this.ext,
-  );
+      this.accountID,
+      this.limits,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     accountID.toXdr(stream);
     limits.toXdr(stream);
     ext.toXdr(stream);
   }
 }
-
 abstract class AccountLimitsEntryExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   AccountLimitsEntryExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class AccountLimitsEntryExtEmptyVersion extends AccountLimitsEntryExt {
-  AccountLimitsEntryExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+  AccountLimitsEntryExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
 // === xdr source ============================================================
 
@@ -486,45 +452,39 @@ class AccountLimitsEntryExtEmptyVersion extends AccountLimitsEntryExt {
 //  };
 
 //  ===========================================================================
-class AccountRoleEntry extends XdrEncodable {
-  Uint64 id;
-  List<Uint64> ruleIDs;
-  Longstring details;
+class AccountRoleEntry extends XdrEncodable  {
+  UINT64 id;
+  List<UINT64> ruleIDs;
+  LONGSTRING details;
   AccountRoleEntryExt ext;
 
   AccountRoleEntry(
-    this.id,
-    this.ruleIDs,
-    this.details,
-    this.ext,
-  );
+      this.id,
+      this.ruleIDs,
+      this.details,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     id.toXdr(stream);
     ruleIDs.length.toXdr(stream);
-    ruleIDs.forEach((element) {
+    ruleIDs.forEach ((element) {
       element.toXdr(stream);
     });
     details.toXdr(stream);
     ext.toXdr(stream);
   }
 }
-
 abstract class AccountRoleEntryExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   AccountRoleEntryExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class AccountRoleEntryExtEmptyVersion extends AccountRoleEntryExt {
-  AccountRoleEntryExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+  AccountRoleEntryExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
 // === xdr source ============================================================
 
@@ -549,25 +509,24 @@ class AccountRoleEntryExtEmptyVersion extends AccountRoleEntryExt {
 //  };
 
 //  ===========================================================================
-class AccountRuleEntry extends XdrEncodable {
-  Uint64 id;
+class AccountRuleEntry extends XdrEncodable  {
+  UINT64 id;
   AccountRuleResource resource;
   AccountRuleAction action;
   bool forbids;
-  Longstring details;
+  LONGSTRING details;
   AccountRuleEntryExt ext;
 
   AccountRuleEntry(
-    this.id,
-    this.resource,
-    this.action,
-    this.forbids,
-    this.details,
-    this.ext,
-  );
+      this.id,
+      this.resource,
+      this.action,
+      this.forbids,
+      this.details,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     id.toXdr(stream);
     resource.toXdr(stream);
     action.toXdr(stream);
@@ -576,21 +535,16 @@ class AccountRuleEntry extends XdrEncodable {
     ext.toXdr(stream);
   }
 }
-
 abstract class AccountRuleEntryExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   AccountRuleEntryExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class AccountRuleEntryExtEmptyVersion extends AccountRuleEntryExt {
-  AccountRuleEntryExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+  AccountRuleEntryExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
 // === xdr source ============================================================
 
@@ -612,23 +566,22 @@ class AccountRuleEntryExtEmptyVersion extends AccountRuleEntryExt {
 //  };
 
 //  ===========================================================================
-class AccountSpecificRuleEntry extends XdrEncodable {
-  Uint64 id;
+class AccountSpecificRuleEntry extends XdrEncodable  {
+  UINT64 id;
   LedgerKey ledgerKey;
-  AccountID? accountID;
+  ACCOUNTID? accountID;
   bool forbids;
   AccountSpecificRuleEntryExt ext;
 
   AccountSpecificRuleEntry(
-    this.id,
-    this.ledgerKey,
-    this.accountID,
-    this.forbids,
-    this.ext,
-  );
+      this.id,
+      this.ledgerKey,
+      this.accountID,
+      this.forbids,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     id.toXdr(stream);
     ledgerKey.toXdr(stream);
     if (accountID != null) {
@@ -641,22 +594,16 @@ class AccountSpecificRuleEntry extends XdrEncodable {
     ext.toXdr(stream);
   }
 }
-
 abstract class AccountSpecificRuleEntryExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   AccountSpecificRuleEntryExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
-class AccountSpecificRuleEntryExtEmptyVersion
-    extends AccountSpecificRuleEntryExt {
-  AccountSpecificRuleEntryExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+class AccountSpecificRuleEntryExtEmptyVersion extends AccountSpecificRuleEntryExt {
+  AccountSpecificRuleEntryExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
 // === xdr source ============================================================
 
@@ -677,23 +624,22 @@ class AccountSpecificRuleEntryExtEmptyVersion
 //  };
 
 //  ===========================================================================
-class Limits extends XdrEncodable {
-  Int64 dailyOut;
-  Int64 weeklyOut;
-  Int64 monthlyOut;
-  Int64 annualOut;
+class Limits extends XdrEncodable  {
+  INT64 dailyOut;
+  INT64 weeklyOut;
+  INT64 monthlyOut;
+  INT64 annualOut;
   LimitsExt ext;
 
   Limits(
-    this.dailyOut,
-    this.weeklyOut,
-    this.monthlyOut,
-    this.annualOut,
-    this.ext,
-  );
+      this.dailyOut,
+      this.weeklyOut,
+      this.monthlyOut,
+      this.annualOut,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     dailyOut.toXdr(stream);
     weeklyOut.toXdr(stream);
     monthlyOut.toXdr(stream);
@@ -701,14 +647,10 @@ class Limits extends XdrEncodable {
     ext.toXdr(stream);
   }
 }
-
 abstract class LimitsExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   LimitsExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
@@ -741,23 +683,22 @@ class LimitsExtEmptyVersion extends LimitsExt {
 //  };
 
 //  ===========================================================================
-class AccountEntry extends XdrEncodable {
-  AccountID accountID;
-  AccountID? referrer;
-  Uint64 sequentialID;
-  Uint64 roleID;
+class AccountEntry extends XdrEncodable  {
+  ACCOUNTID accountID;
+  ACCOUNTID? referrer;
+  UINT64 sequentialID;
+  UINT64 roleID;
   AccountEntryExt ext;
 
   AccountEntry(
-    this.accountID,
-    this.referrer,
-    this.sequentialID,
-    this.roleID,
-    this.ext,
-  );
+      this.accountID,
+      this.referrer,
+      this.sequentialID,
+      this.roleID,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     accountID.toXdr(stream);
     if (referrer != null) {
       true.toXdr(stream);
@@ -770,30 +711,27 @@ class AccountEntry extends XdrEncodable {
     ext.toXdr(stream);
   }
 }
-
 abstract class AccountEntryExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   AccountEntryExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class AccountEntryExtEmptyVersion extends AccountEntryExt {
-  AccountEntryExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+  AccountEntryExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
-
 class AssetPairPolicy extends XdrEncodable {
   static const TRADEABLE_SECONDARY_MARKET = 1;
   static const PHYSICAL_PRICE_RESTRICTION = 2;
   static const CURRENT_PRICE_RESTRICTION = 4;
-  var value;
-
+  int value;
   AssetPairPolicy(this.value);
+  @override toXdr(XdrDataOutputStream stream) {
+    value.toXdr(stream);
+  }
+
 }
 // === xdr source ============================================================
 
@@ -832,29 +770,28 @@ class AssetPairPolicy extends XdrEncodable {
 //  };
 
 //  ===========================================================================
-class AssetPairEntry extends XdrEncodable {
-  AssetCode base;
-  AssetCode quote;
-  Int64 currentPrice;
-  Int64 physicalPrice;
-  Int64 physicalPriceCorrection;
-  Int64 maxPriceStep;
-  Int32 policies;
+class AssetPairEntry extends XdrEncodable  {
+  ASSETCODE base;
+  ASSETCODE quote;
+  INT64 currentPrice;
+  INT64 physicalPrice;
+  INT64 physicalPriceCorrection;
+  INT64 maxPriceStep;
+  INT32 policies;
   AssetPairEntryExt ext;
 
   AssetPairEntry(
-    this.base,
-    this.quote,
-    this.currentPrice,
-    this.physicalPrice,
-    this.physicalPriceCorrection,
-    this.maxPriceStep,
-    this.policies,
-    this.ext,
-  );
+      this.base,
+      this.quote,
+      this.currentPrice,
+      this.physicalPrice,
+      this.physicalPriceCorrection,
+      this.maxPriceStep,
+      this.policies,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     base.toXdr(stream);
     quote.toXdr(stream);
     currentPrice.toXdr(stream);
@@ -865,23 +802,17 @@ class AssetPairEntry extends XdrEncodable {
     ext.toXdr(stream);
   }
 }
-
 abstract class AssetPairEntryExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   AssetPairEntryExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class AssetPairEntryExtEmptyVersion extends AssetPairEntryExt {
-  AssetPairEntryExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+  AssetPairEntryExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
-
 class AssetPolicy extends XdrEncodable {
   static const TRANSFERABLE = 1;
   static const BASE_ASSET = 2;
@@ -891,9 +822,12 @@ class AssetPolicy extends XdrEncodable {
   static const CAN_BE_BASE_IN_ATOMIC_SWAP = 32;
   static const CAN_BE_QUOTE_IN_ATOMIC_SWAP = 64;
   static const SWAPPABLE = 128;
-  var value;
-
+  int value;
   AssetPolicy(this.value);
+  @override toXdr(XdrDataOutputStream stream) {
+    value.toXdr(stream);
+  }
+
 }
 // === xdr source ============================================================
 
@@ -927,37 +861,36 @@ class AssetPolicy extends XdrEncodable {
 //  };
 
 //  ===========================================================================
-class AssetEntry extends XdrEncodable {
-  AssetCode code;
-  AccountID owner;
-  AccountID preissuedAssetSigner;
-  Longstring details;
-  Uint64 maxIssuanceAmount;
-  Uint64 availableForIssueance;
-  Uint64 issued;
-  Uint64 pendingIssuance;
-  Uint32 policies;
-  Uint64 type;
-  Uint32 trailingDigitsCount;
+class AssetEntry extends XdrEncodable  {
+  ASSETCODE code;
+  ACCOUNTID owner;
+  ACCOUNTID preissuedAssetSigner;
+  LONGSTRING details;
+  UINT64 maxIssuanceAmount;
+  UINT64 availableForIssueance;
+  UINT64 issued;
+  UINT64 pendingIssuance;
+  UINT32 policies;
+  UINT64 type;
+  UINT32 trailingDigitsCount;
   EmptyExt ext;
 
   AssetEntry(
-    this.code,
-    this.owner,
-    this.preissuedAssetSigner,
-    this.details,
-    this.maxIssuanceAmount,
-    this.availableForIssueance,
-    this.issued,
-    this.pendingIssuance,
-    this.policies,
-    this.type,
-    this.trailingDigitsCount,
-    this.ext,
-  );
+      this.code,
+      this.owner,
+      this.preissuedAssetSigner,
+      this.details,
+      this.maxIssuanceAmount,
+      this.availableForIssueance,
+      this.issued,
+      this.pendingIssuance,
+      this.policies,
+      this.type,
+      this.trailingDigitsCount,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     code.toXdr(stream);
     owner.toXdr(stream);
     preissuedAssetSigner.toXdr(stream);
@@ -991,40 +924,33 @@ class AssetEntry extends XdrEncodable {
 //  };
 
 //  ===========================================================================
-class AtomicSwapAskQuoteAsset extends XdrEncodable {
-  AssetCode quoteAsset;
-  Uint64 price;
+class AtomicSwapAskQuoteAsset extends XdrEncodable  {
+  ASSETCODE quoteAsset;
+  UINT64 price;
   AtomicSwapAskQuoteAssetExt ext;
 
   AtomicSwapAskQuoteAsset(
-    this.quoteAsset,
-    this.price,
-    this.ext,
-  );
+      this.quoteAsset,
+      this.price,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     quoteAsset.toXdr(stream);
     price.toXdr(stream);
     ext.toXdr(stream);
   }
 }
-
 abstract class AtomicSwapAskQuoteAssetExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   AtomicSwapAskQuoteAssetExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
-class AtomicSwapAskQuoteAssetExtEmptyVersion
-    extends AtomicSwapAskQuoteAssetExt {
-  AtomicSwapAskQuoteAssetExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+class AtomicSwapAskQuoteAssetExtEmptyVersion extends AtomicSwapAskQuoteAssetExt {
+  AtomicSwapAskQuoteAssetExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
 // === xdr source ============================================================
 
@@ -1054,35 +980,34 @@ class AtomicSwapAskQuoteAssetExtEmptyVersion
 //  };
 
 //  ===========================================================================
-class AtomicSwapAskEntry extends XdrEncodable {
-  Uint64 id;
-  AccountID ownerID;
-  AssetCode baseAsset;
-  BalanceID baseBalance;
-  Uint64 amount;
-  Uint64 lockedAmount;
-  Uint64 createdAt;
+class AtomicSwapAskEntry extends XdrEncodable  {
+  UINT64 id;
+  ACCOUNTID ownerID;
+  ASSETCODE baseAsset;
+  BALANCEID baseBalance;
+  UINT64 amount;
+  UINT64 lockedAmount;
+  UINT64 createdAt;
   bool isCancelled;
-  Longstring details;
+  LONGSTRING details;
   List<AtomicSwapAskQuoteAsset> quoteAssets;
   AtomicSwapAskEntryExt ext;
 
   AtomicSwapAskEntry(
-    this.id,
-    this.ownerID,
-    this.baseAsset,
-    this.baseBalance,
-    this.amount,
-    this.lockedAmount,
-    this.createdAt,
-    this.isCancelled,
-    this.details,
-    this.quoteAssets,
-    this.ext,
-  );
+      this.id,
+      this.ownerID,
+      this.baseAsset,
+      this.baseBalance,
+      this.amount,
+      this.lockedAmount,
+      this.createdAt,
+      this.isCancelled,
+      this.details,
+      this.quoteAssets,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     id.toXdr(stream);
     ownerID.toXdr(stream);
     baseAsset.toXdr(stream);
@@ -1093,27 +1018,22 @@ class AtomicSwapAskEntry extends XdrEncodable {
     isCancelled.toXdr(stream);
     details.toXdr(stream);
     quoteAssets.length.toXdr(stream);
-    quoteAssets.forEach((element) {
+    quoteAssets.forEach ((element) {
       element.toXdr(stream);
     });
     ext.toXdr(stream);
   }
 }
-
 abstract class AtomicSwapAskEntryExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   AtomicSwapAskEntryExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class AtomicSwapAskEntryExtEmptyVersion extends AtomicSwapAskEntryExt {
-  AtomicSwapAskEntryExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+  AtomicSwapAskEntryExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
 // === xdr source ============================================================
 
@@ -1138,27 +1058,26 @@ class AtomicSwapAskEntryExtEmptyVersion extends AtomicSwapAskEntryExt {
 //  };
 
 //  ===========================================================================
-class BalanceEntry extends XdrEncodable {
-  BalanceID balanceID;
-  Uint64 sequentialID;
-  AssetCode asset;
-  AccountID accountID;
-  Uint64 amount;
-  Uint64 locked;
+class BalanceEntry extends XdrEncodable  {
+  BALANCEID balanceID;
+  UINT64 sequentialID;
+  ASSETCODE asset;
+  ACCOUNTID accountID;
+  UINT64 amount;
+  UINT64 locked;
   BalanceEntryExt ext;
 
   BalanceEntry(
-    this.balanceID,
-    this.sequentialID,
-    this.asset,
-    this.accountID,
-    this.amount,
-    this.locked,
-    this.ext,
-  );
+      this.balanceID,
+      this.sequentialID,
+      this.asset,
+      this.accountID,
+      this.amount,
+      this.locked,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     balanceID.toXdr(stream);
     sequentialID.toXdr(stream);
     asset.toXdr(stream);
@@ -1168,23 +1087,17 @@ class BalanceEntry extends XdrEncodable {
     ext.toXdr(stream);
   }
 }
-
 abstract class BalanceEntryExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   BalanceEntryExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class BalanceEntryExtEmptyVersion extends BalanceEntryExt {
-  BalanceEntryExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+  BalanceEntryExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
-
 class ContractState extends XdrEncodable {
   static const NO_CONFIRMATIONS = 0;
   static const CUSTOMER_CONFIRMED = 1;
@@ -1192,9 +1105,12 @@ class ContractState extends XdrEncodable {
   static const DISPUTING = 4;
   static const REVERTING_RESOLVE = 8;
   static const NOT_REVERTING_RESOLVE = 16;
-  var value;
-
+  int value;
   ContractState(this.value);
+  @override toXdr(XdrDataOutputStream stream) {
+    value.toXdr(stream);
+  }
+
 }
 // === xdr source ============================================================
 
@@ -1223,35 +1139,34 @@ class ContractState extends XdrEncodable {
 //  };
 
 //  ===========================================================================
-class ContractEntry extends XdrEncodable {
-  Uint64 contractID;
-  AccountID contractor;
-  AccountID customer;
-  AccountID escrow;
-  Uint64 startTime;
-  Uint64 endTime;
-  List<Uint64> invoiceRequestsIDs;
-  Longstring initialDetails;
-  Uint32 state;
-  Longstring customerDetails;
+class ContractEntry extends XdrEncodable  {
+  UINT64 contractID;
+  ACCOUNTID contractor;
+  ACCOUNTID customer;
+  ACCOUNTID escrow;
+  UINT64 startTime;
+  UINT64 endTime;
+  List<UINT64> invoiceRequestsIDs;
+  LONGSTRING initialDetails;
+  UINT32 state;
+  LONGSTRING customerDetails;
   ContractEntryExt ext;
 
   ContractEntry(
-    this.contractID,
-    this.contractor,
-    this.customer,
-    this.escrow,
-    this.startTime,
-    this.endTime,
-    this.invoiceRequestsIDs,
-    this.initialDetails,
-    this.state,
-    this.customerDetails,
-    this.ext,
-  );
+      this.contractID,
+      this.contractor,
+      this.customer,
+      this.escrow,
+      this.startTime,
+      this.endTime,
+      this.invoiceRequestsIDs,
+      this.initialDetails,
+      this.state,
+      this.customerDetails,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     contractID.toXdr(stream);
     contractor.toXdr(stream);
     customer.toXdr(stream);
@@ -1259,7 +1174,7 @@ class ContractEntry extends XdrEncodable {
     startTime.toXdr(stream);
     endTime.toXdr(stream);
     invoiceRequestsIDs.length.toXdr(stream);
-    invoiceRequestsIDs.forEach((element) {
+    invoiceRequestsIDs.forEach ((element) {
       element.toXdr(stream);
     });
     initialDetails.toXdr(stream);
@@ -1268,21 +1183,16 @@ class ContractEntry extends XdrEncodable {
     ext.toXdr(stream);
   }
 }
-
 abstract class ContractEntryExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   ContractEntryExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class ContractEntryExtEmptyVersion extends ContractEntryExt {
-  ContractEntryExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+  ContractEntryExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
 // === xdr source ============================================================
 
@@ -1302,23 +1212,22 @@ class ContractEntryExtEmptyVersion extends ContractEntryExt {
 //  };
 
 //  ===========================================================================
-class DataEntry extends XdrEncodable {
-  Uint64 id;
-  Uint64 type;
-  Longstring value;
-  AccountID owner;
+class DataEntry extends XdrEncodable  {
+  UINT64 id;
+  UINT64 type;
+  LONGSTRING value;
+  ACCOUNTID owner;
   EmptyExt ext;
 
   DataEntry(
-    this.id,
-    this.type,
-    this.value,
-    this.owner,
-    this.ext,
-  );
+      this.id,
+      this.type,
+      this.value,
+      this.owner,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     id.toXdr(stream);
     type.toXdr(stream);
     value.toXdr(stream);
@@ -1348,27 +1257,26 @@ class DataEntry extends XdrEncodable {
 //  };
 
 //  ===========================================================================
-class DeferredPaymentEntry extends XdrEncodable {
-  Uint64 id;
-  Uint64 amount;
-  Longstring details;
-  AccountID source;
-  BalanceID sourceBalance;
-  AccountID destination;
+class DeferredPaymentEntry extends XdrEncodable  {
+  UINT64 id;
+  UINT64 amount;
+  LONGSTRING details;
+  ACCOUNTID source;
+  BALANCEID sourceBalance;
+  ACCOUNTID destination;
   EmptyExt ext;
 
   DeferredPaymentEntry(
-    this.id,
-    this.amount,
-    this.details,
-    this.source,
-    this.sourceBalance,
-    this.destination,
-    this.ext,
-  );
+      this.id,
+      this.amount,
+      this.details,
+      this.source,
+      this.sourceBalance,
+      this.destination,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     id.toXdr(stream);
     amount.toXdr(stream);
     details.toXdr(stream);
@@ -1402,31 +1310,30 @@ class DeferredPaymentEntry extends XdrEncodable {
 //  };
 
 //  ===========================================================================
-class ExternalSystemAccountIDPoolEntry extends XdrEncodable {
-  Uint64 poolEntryID;
-  Int32 externalSystemType;
-  Longstring data;
-  AccountID? accountID;
-  Uint64 expiresAt;
-  Uint64 bindedAt;
-  Uint64 parent;
+class ExternalSystemAccountIDPoolEntry extends XdrEncodable  {
+  UINT64 poolEntryID;
+  INT32 externalSystemType;
+  LONGSTRING data;
+  ACCOUNTID? accountID;
+  UINT64 expiresAt;
+  UINT64 bindedAt;
+  UINT64 parent;
   bool isDeleted;
   ExternalSystemAccountIDPoolEntryExt ext;
 
   ExternalSystemAccountIDPoolEntry(
-    this.poolEntryID,
-    this.externalSystemType,
-    this.data,
-    this.accountID,
-    this.expiresAt,
-    this.bindedAt,
-    this.parent,
-    this.isDeleted,
-    this.ext,
-  );
+      this.poolEntryID,
+      this.externalSystemType,
+      this.data,
+      this.accountID,
+      this.expiresAt,
+      this.bindedAt,
+      this.parent,
+      this.isDeleted,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     poolEntryID.toXdr(stream);
     externalSystemType.toXdr(stream);
     data.toXdr(stream);
@@ -1443,22 +1350,16 @@ class ExternalSystemAccountIDPoolEntry extends XdrEncodable {
     ext.toXdr(stream);
   }
 }
-
 abstract class ExternalSystemAccountIDPoolEntryExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   ExternalSystemAccountIDPoolEntryExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
-class ExternalSystemAccountIDPoolEntryExtEmptyVersion
-    extends ExternalSystemAccountIDPoolEntryExt {
-  ExternalSystemAccountIDPoolEntryExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+class ExternalSystemAccountIDPoolEntryExtEmptyVersion extends ExternalSystemAccountIDPoolEntryExt {
+  ExternalSystemAccountIDPoolEntryExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
 // === xdr source ============================================================
 
@@ -1478,45 +1379,37 @@ class ExternalSystemAccountIDPoolEntryExtEmptyVersion
 //  };
 
 //  ===========================================================================
-class ExternalSystemAccountID extends XdrEncodable {
-  AccountID accountID;
-  Int32 externalSystemType;
-  Longstring data;
+class ExternalSystemAccountID extends XdrEncodable  {
+  ACCOUNTID accountID;
+  INT32 externalSystemType;
+  LONGSTRING data;
   ExternalSystemAccountIDExt ext;
 
   ExternalSystemAccountID(
-    this.accountID,
-    this.externalSystemType,
-    this.data,
-    this.ext,
-  );
+      this.accountID,
+      this.externalSystemType,
+      this.data,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     accountID.toXdr(stream);
     externalSystemType.toXdr(stream);
     data.toXdr(stream);
     ext.toXdr(stream);
   }
 }
-
 abstract class ExternalSystemAccountIDExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   ExternalSystemAccountIDExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
-class ExternalSystemAccountIDExtEmptyVersion
-    extends ExternalSystemAccountIDExt {
-  ExternalSystemAccountIDExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+class ExternalSystemAccountIDExtEmptyVersion extends ExternalSystemAccountIDExt {
+  ExternalSystemAccountIDExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
-
 class FeeType extends XdrEncodable {
   static const PAYMENT_FEE = 0;
   static const OFFER_FEE = 1;
@@ -1529,25 +1422,32 @@ class FeeType extends XdrEncodable {
   static const ATOMIC_SWAP_SALE_FEE = 8;
   static const ATOMIC_SWAP_PURCHASE_FEE = 9;
   static const SWAP_FEE = 10;
-  var value;
-
+  int value;
   FeeType(this.value);
-}
+  @override toXdr(XdrDataOutputStream stream) {
+    value.toXdr(stream);
+  }
 
+}
 class EmissionFeeType extends XdrEncodable {
   static const PRIMARY_MARKET = 1;
   static const SECONDARY_MARKET = 2;
-  var value;
-
+  int value;
   EmissionFeeType(this.value);
-}
+  @override toXdr(XdrDataOutputStream stream) {
+    value.toXdr(stream);
+  }
 
+}
 class PaymentFeeType extends XdrEncodable {
   static const OUTGOING = 1;
   static const INCOMING = 2;
-  var value;
-
+  int value;
   PaymentFeeType(this.value);
+  @override toXdr(XdrDataOutputStream stream) {
+    value.toXdr(stream);
+  }
+
 }
 // === xdr source ============================================================
 
@@ -1591,35 +1491,34 @@ class PaymentFeeType extends XdrEncodable {
 //  };
 
 //  ===========================================================================
-class FeeEntry extends XdrEncodable {
+class FeeEntry extends XdrEncodable  {
   FeeType feeType;
-  AssetCode asset;
-  Int64 fixedFee;
-  Int64 percentFee;
-  AccountID? accountID;
-  Uint64? accountRole;
-  Int64 subtype;
-  Int64 lowerBound;
-  Int64 upperBound;
-  Hash hash;
+  ASSETCODE asset;
+  INT64 fixedFee;
+  INT64 percentFee;
+  ACCOUNTID? accountID;
+  UINT64? accountRole;
+  INT64 subtype;
+  INT64 lowerBound;
+  INT64 upperBound;
+  HASH hash;
   FeeEntryExt ext;
 
   FeeEntry(
-    this.feeType,
-    this.asset,
-    this.fixedFee,
-    this.percentFee,
-    this.accountID,
-    this.accountRole,
-    this.subtype,
-    this.lowerBound,
-    this.upperBound,
-    this.hash,
-    this.ext,
-  );
+      this.feeType,
+      this.asset,
+      this.fixedFee,
+      this.percentFee,
+      this.accountID,
+      this.accountRole,
+      this.subtype,
+      this.lowerBound,
+      this.upperBound,
+      this.hash,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     feeType.toXdr(stream);
     asset.toXdr(stream);
     fixedFee.toXdr(stream);
@@ -1643,14 +1542,10 @@ class FeeEntry extends XdrEncodable {
     ext.toXdr(stream);
   }
 }
-
 abstract class FeeEntryExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   FeeEntryExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
@@ -1658,58 +1553,47 @@ abstract class FeeEntryExt extends XdrEncodable {
 class FeeEntryExtEmptyVersion extends FeeEntryExt {
   FeeEntryExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
-
 class KeyValueEntryType extends XdrEncodable {
   static const UINT32 = 1;
   static const STRING = 2;
   static const UINT64 = 3;
-  var value;
-
+  int value;
   KeyValueEntryType(this.value);
-}
+  @override toXdr(XdrDataOutputStream stream) {
+    value.toXdr(stream);
+  }
 
+}
 abstract class KeyValueEntryValue extends XdrEncodable {
   KeyValueEntryType discriminant;
-
   KeyValueEntryValue(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class KeyValueEntryValueUint32 extends KeyValueEntryValue {
-  KeyValueEntryValueUint32(this.ui32Value)
-      : super(KeyValueEntryType(KeyValueEntryType.UINT32));
-  late Uint32 ui32Value;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  KeyValueEntryValueUint32(this.ui32Value) : super(KeyValueEntryType(KeyValueEntryType.UINT32));
+  late UINT32 ui32Value;
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     ui32Value.toXdr(stream);
   }
 }
 
 class KeyValueEntryValueString extends KeyValueEntryValue {
-  KeyValueEntryValueString(this.stringValue)
-      : super(KeyValueEntryType(KeyValueEntryType.STRING));
+  KeyValueEntryValueString(this.stringValue) : super(KeyValueEntryType(KeyValueEntryType.STRING));
   late String stringValue;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     stringValue.toXdr(stream);
   }
 }
 
 class KeyValueEntryValueUint64 extends KeyValueEntryValue {
-  KeyValueEntryValueUint64(this.ui64Value)
-      : super(KeyValueEntryType(KeyValueEntryType.UINT64));
-  late Uint64 ui64Value;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  KeyValueEntryValueUint64(this.ui64Value) : super(KeyValueEntryType(KeyValueEntryType.UINT64));
+  late UINT64 ui64Value;
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     ui64Value.toXdr(stream);
   }
@@ -1737,39 +1621,33 @@ class KeyValueEntryValueUint64 extends KeyValueEntryValue {
 //      };
 
 //  ===========================================================================
-class KeyValueEntry extends XdrEncodable {
-  Longstring key;
+class KeyValueEntry extends XdrEncodable  {
+  LONGSTRING key;
   KeyValueEntryValue value;
   KeyValueEntryExt ext;
 
   KeyValueEntry(
-    this.key,
-    this.value,
-    this.ext,
-  );
+      this.key,
+      this.value,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     key.toXdr(stream);
     value.toXdr(stream);
     ext.toXdr(stream);
   }
 }
-
 abstract class KeyValueEntryExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   KeyValueEntryExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class KeyValueEntryExtEmptyVersion extends KeyValueEntryExt {
-  KeyValueEntryExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+  KeyValueEntryExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
 // === xdr source ============================================================
 
@@ -1791,62 +1669,58 @@ class KeyValueEntryExtEmptyVersion extends KeyValueEntryExt {
 //  };
 
 //  ===========================================================================
-class LicenseEntry extends XdrEncodable {
-  Uint64 adminCount;
-  Uint64 dueDate;
-  Hash ledgerHash;
-  Hash prevLicenseHash;
+class LicenseEntry extends XdrEncodable  {
+  UINT64 adminCount;
+  UINT64 dueDate;
+  HASH ledgerHash;
+  HASH prevLicenseHash;
   List<DecoratedSignature> signatures;
   LicenseEntryExt ext;
 
   LicenseEntry(
-    this.adminCount,
-    this.dueDate,
-    this.ledgerHash,
-    this.prevLicenseHash,
-    this.signatures,
-    this.ext,
-  );
+      this.adminCount,
+      this.dueDate,
+      this.ledgerHash,
+      this.prevLicenseHash,
+      this.signatures,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     adminCount.toXdr(stream);
     dueDate.toXdr(stream);
     ledgerHash.toXdr(stream);
     prevLicenseHash.toXdr(stream);
     signatures.length.toXdr(stream);
-    signatures.forEach((element) {
+    signatures.forEach ((element) {
       element.toXdr(stream);
     });
     ext.toXdr(stream);
   }
 }
-
 abstract class LicenseEntryExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   LicenseEntryExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class LicenseEntryExtEmptyVersion extends LicenseEntryExt {
-  LicenseEntryExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+  LicenseEntryExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
-
 class StatsOpType extends XdrEncodable {
   static const PAYMENT_OUT = 1;
   static const WITHDRAW = 2;
   static const SPEND = 3;
   static const DEPOSIT = 4;
   static const PAYOUT = 5;
-  var value;
-
+  int value;
   StatsOpType(this.value);
+  @override toXdr(XdrDataOutputStream stream) {
+    value.toXdr(stream);
+  }
+
 }
 // === xdr source ============================================================
 
@@ -1889,35 +1763,34 @@ class StatsOpType extends XdrEncodable {
 //  };
 
 //  ===========================================================================
-class LimitsV2Entry extends XdrEncodable {
-  Uint64 id;
-  Uint64? accountRole;
-  AccountID? accountID;
+class LimitsV2Entry extends XdrEncodable  {
+  UINT64 id;
+  UINT64? accountRole;
+  ACCOUNTID? accountID;
   StatsOpType statsOpType;
-  AssetCode assetCode;
+  ASSETCODE assetCode;
   bool isConvertNeeded;
-  Uint64 dailyOut;
-  Uint64 weeklyOut;
-  Uint64 monthlyOut;
-  Uint64 annualOut;
+  UINT64 dailyOut;
+  UINT64 weeklyOut;
+  UINT64 monthlyOut;
+  UINT64 annualOut;
   LimitsV2EntryExt ext;
 
   LimitsV2Entry(
-    this.id,
-    this.accountRole,
-    this.accountID,
-    this.statsOpType,
-    this.assetCode,
-    this.isConvertNeeded,
-    this.dailyOut,
-    this.weeklyOut,
-    this.monthlyOut,
-    this.annualOut,
-    this.ext,
-  );
+      this.id,
+      this.accountRole,
+      this.accountID,
+      this.statsOpType,
+      this.assetCode,
+      this.isConvertNeeded,
+      this.dailyOut,
+      this.weeklyOut,
+      this.monthlyOut,
+      this.annualOut,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     id.toXdr(stream);
     if (accountRole != null) {
       true.toXdr(stream);
@@ -1941,21 +1814,16 @@ class LimitsV2Entry extends XdrEncodable {
     ext.toXdr(stream);
   }
 }
-
 abstract class LimitsV2EntryExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   LimitsV2EntryExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class LimitsV2EntryExtEmptyVersion extends LimitsV2EntryExt {
-  LimitsV2EntryExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+  LimitsV2EntryExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
 // === xdr source ============================================================
 
@@ -1989,43 +1857,42 @@ class LimitsV2EntryExtEmptyVersion extends LimitsV2EntryExt {
 //  };
 
 //  ===========================================================================
-class OfferEntry extends XdrEncodable {
-  Uint64 offerID;
-  Uint64 orderBookID;
-  AccountID ownerID;
+class OfferEntry extends XdrEncodable  {
+  UINT64 offerID;
+  UINT64 orderBookID;
+  ACCOUNTID ownerID;
   bool isBuy;
-  AssetCode base;
-  AssetCode quote;
-  BalanceID baseBalance;
-  BalanceID quoteBalance;
-  Int64 baseAmount;
-  Int64 quoteAmount;
-  Uint64 createdAt;
-  Int64 fee;
-  Int64 percentFee;
-  Int64 price;
+  ASSETCODE base;
+  ASSETCODE quote;
+  BALANCEID baseBalance;
+  BALANCEID quoteBalance;
+  INT64 baseAmount;
+  INT64 quoteAmount;
+  UINT64 createdAt;
+  INT64 fee;
+  INT64 percentFee;
+  INT64 price;
   OfferEntryExt ext;
 
   OfferEntry(
-    this.offerID,
-    this.orderBookID,
-    this.ownerID,
-    this.isBuy,
-    this.base,
-    this.quote,
-    this.baseBalance,
-    this.quoteBalance,
-    this.baseAmount,
-    this.quoteAmount,
-    this.createdAt,
-    this.fee,
-    this.percentFee,
-    this.price,
-    this.ext,
-  );
+      this.offerID,
+      this.orderBookID,
+      this.ownerID,
+      this.isBuy,
+      this.base,
+      this.quote,
+      this.baseBalance,
+      this.quoteBalance,
+      this.baseAmount,
+      this.quoteAmount,
+      this.createdAt,
+      this.fee,
+      this.percentFee,
+      this.price,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     offerID.toXdr(stream);
     orderBookID.toXdr(stream);
     ownerID.toXdr(stream);
@@ -2043,21 +1910,16 @@ class OfferEntry extends XdrEncodable {
     ext.toXdr(stream);
   }
 }
-
 abstract class OfferEntryExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   OfferEntryExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class OfferEntryExtEmptyVersion extends OfferEntryExt {
-  OfferEntryExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+  OfferEntryExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
 // === xdr source ============================================================
 
@@ -2077,58 +1939,50 @@ class OfferEntryExtEmptyVersion extends OfferEntryExt {
 //  };
 
 //  ===========================================================================
-class PendingStatisticsEntry extends XdrEncodable {
-  Uint64 statisticsID;
-  Uint64 requestID;
-  Uint64 amount;
+class PendingStatisticsEntry extends XdrEncodable  {
+  UINT64 statisticsID;
+  UINT64 requestID;
+  UINT64 amount;
   PendingStatisticsEntryExt ext;
 
   PendingStatisticsEntry(
-    this.statisticsID,
-    this.requestID,
-    this.amount,
-    this.ext,
-  );
+      this.statisticsID,
+      this.requestID,
+      this.amount,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     statisticsID.toXdr(stream);
     requestID.toXdr(stream);
     amount.toXdr(stream);
     ext.toXdr(stream);
   }
 }
-
 abstract class PendingStatisticsEntryExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   PendingStatisticsEntryExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class PendingStatisticsEntryExtEmptyVersion extends PendingStatisticsEntryExt {
-  PendingStatisticsEntryExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+  PendingStatisticsEntryExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
-
 class PollType extends XdrEncodable {
   static const SINGLE_CHOICE = 0;
-  var value;
-
+  int value;
   PollType(this.value);
-}
+  @override toXdr(XdrDataOutputStream stream) {
+    value.toXdr(stream);
+  }
 
+}
 abstract class PollData extends XdrEncodable {
   PollType discriminant;
-
   PollData(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
@@ -2136,9 +1990,7 @@ abstract class PollData extends XdrEncodable {
 class PollDataSingleChoice extends PollData {
   PollDataSingleChoice(this.ext) : super(PollType(PollType.SINGLE_CHOICE));
   late EmptyExt ext;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     ext.toXdr(stream);
   }
@@ -2168,35 +2020,34 @@ class PollDataSingleChoice extends PollData {
 //  };
 
 //  ===========================================================================
-class PollEntry extends XdrEncodable {
-  Uint64 id;
-  Uint32 permissionType;
-  Uint32 numberOfChoices;
+class PollEntry extends XdrEncodable  {
+  UINT64 id;
+  UINT32 permissionType;
+  UINT32 numberOfChoices;
   PollData data;
-  Uint64 startTime;
-  Uint64 endTime;
-  AccountID ownerID;
-  AccountID resultProviderID;
+  UINT64 startTime;
+  UINT64 endTime;
+  ACCOUNTID ownerID;
+  ACCOUNTID resultProviderID;
   bool voteConfirmationRequired;
-  Longstring details;
+  LONGSTRING details;
   EmptyExt ext;
 
   PollEntry(
-    this.id,
-    this.permissionType,
-    this.numberOfChoices,
-    this.data,
-    this.startTime,
-    this.endTime,
-    this.ownerID,
-    this.resultProviderID,
-    this.voteConfirmationRequired,
-    this.details,
-    this.ext,
-  );
+      this.id,
+      this.permissionType,
+      this.numberOfChoices,
+      this.data,
+      this.startTime,
+      this.endTime,
+      this.ownerID,
+      this.resultProviderID,
+      this.voteConfirmationRequired,
+      this.details,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     id.toXdr(stream);
     permissionType.toXdr(stream);
     numberOfChoices.toXdr(stream);
@@ -2227,41 +2078,34 @@ class PollEntry extends XdrEncodable {
 //  };
 
 //  ===========================================================================
-class ReferenceEntry extends XdrEncodable {
-  AccountID sender;
-  String64 reference;
+class ReferenceEntry extends XdrEncodable  {
+  ACCOUNTID sender;
+  STRING64 reference;
   ReferenceEntryExt ext;
 
   ReferenceEntry(
-    this.sender,
-    this.reference,
-    this.ext,
-  );
+      this.sender,
+      this.reference,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     sender.toXdr(stream);
     reference.toXdr(stream);
     ext.toXdr(stream);
   }
 }
-
 abstract class ReferenceEntryExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   ReferenceEntryExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class ReferenceEntryExtEmptyVersion extends ReferenceEntryExt {
-  ReferenceEntryExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+  ReferenceEntryExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
-
 class ReviewableRequestType extends XdrEncodable {
   static const NONE = 0;
   static const ANY = 1;
@@ -2289,9 +2133,12 @@ class ReviewableRequestType extends XdrEncodable {
   static const DATA_REMOVE = 24;
   static const CREATE_DEFERRED_PAYMENT = 25;
   static const CLOSE_DEFERRED_PAYMENT = 26;
-  var value;
-
+  int value;
   ReviewableRequestType(this.value);
+  @override toXdr(XdrDataOutputStream stream) {
+    value.toXdr(stream);
+  }
+
 }
 // === xdr source ============================================================
 
@@ -2313,38 +2160,33 @@ class ReviewableRequestType extends XdrEncodable {
 //  };
 
 //  ===========================================================================
-class TasksExt extends XdrEncodable {
-  Uint32 allTasks;
-  Uint32 pendingTasks;
-  List<Longstring> externalDetails;
+class TasksExt extends XdrEncodable  {
+  UINT32 allTasks;
+  UINT32 pendingTasks;
+  List<LONGSTRING> externalDetails;
   TasksExtExt ext;
 
   TasksExt(
-    this.allTasks,
-    this.pendingTasks,
-    this.externalDetails,
-    this.ext,
-  );
+      this.allTasks,
+      this.pendingTasks,
+      this.externalDetails,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     allTasks.toXdr(stream);
     pendingTasks.toXdr(stream);
     externalDetails.length.toXdr(stream);
-    externalDetails.forEach((element) {
+    externalDetails.forEach ((element) {
       element.toXdr(stream);
     });
     ext.toXdr(stream);
   }
 }
-
 abstract class TasksExtExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   TasksExtExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
@@ -2427,33 +2269,32 @@ class TasksExtExtEmptyVersion extends TasksExtExt {
 //  };
 
 //  ===========================================================================
-class ReviewableRequestEntry extends XdrEncodable {
-  Uint64 requestID;
-  Hash hash;
-  AccountID requestor;
-  Longstring rejectReason;
-  AccountID reviewer;
-  String64? reference;
-  Int64 createdAt;
+class ReviewableRequestEntry extends XdrEncodable  {
+  UINT64 requestID;
+  HASH hash;
+  ACCOUNTID requestor;
+  LONGSTRING rejectReason;
+  ACCOUNTID reviewer;
+  STRING64? reference;
+  INT64 createdAt;
   ReviewableRequestEntryBody body;
   TasksExt tasks;
   ReviewableRequestEntryExt ext;
 
   ReviewableRequestEntry(
-    this.requestID,
-    this.hash,
-    this.requestor,
-    this.rejectReason,
-    this.reviewer,
-    this.reference,
-    this.createdAt,
-    this.body,
-    this.tasks,
-    this.ext,
-  );
+      this.requestID,
+      this.hash,
+      this.requestor,
+      this.rejectReason,
+      this.reviewer,
+      this.reference,
+      this.createdAt,
+      this.body,
+      this.tasks,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     requestID.toXdr(stream);
     hash.toXdr(stream);
     requestor.toXdr(stream);
@@ -2471,322 +2312,225 @@ class ReviewableRequestEntry extends XdrEncodable {
     ext.toXdr(stream);
   }
 }
-
 abstract class ReviewableRequestEntryBody extends XdrEncodable {
   ReviewableRequestType discriminant;
-
   ReviewableRequestEntryBody(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class ReviewableRequestEntryBodyCreateAsset extends ReviewableRequestEntryBody {
-  ReviewableRequestEntryBodyCreateAsset(this.assetCreationRequest)
-      : super(ReviewableRequestType(ReviewableRequestType.CREATE_ASSET));
+  ReviewableRequestEntryBodyCreateAsset(this.assetCreationRequest) : super(ReviewableRequestType(ReviewableRequestType.CREATE_ASSET));
   late AssetCreationRequest assetCreationRequest;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     assetCreationRequest.toXdr(stream);
   }
 }
 
 class ReviewableRequestEntryBodyUpdateAsset extends ReviewableRequestEntryBody {
-  ReviewableRequestEntryBodyUpdateAsset(this.assetUpdateRequest)
-      : super(ReviewableRequestType(ReviewableRequestType.UPDATE_ASSET));
+  ReviewableRequestEntryBodyUpdateAsset(this.assetUpdateRequest) : super(ReviewableRequestType(ReviewableRequestType.UPDATE_ASSET));
   late AssetUpdateRequest assetUpdateRequest;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     assetUpdateRequest.toXdr(stream);
   }
 }
 
-class ReviewableRequestEntryBodyCreatePreIssuance
-    extends ReviewableRequestEntryBody {
-  ReviewableRequestEntryBodyCreatePreIssuance(this.preIssuanceRequest)
-      : super(ReviewableRequestType(ReviewableRequestType.CREATE_PRE_ISSUANCE));
+class ReviewableRequestEntryBodyCreatePreIssuance extends ReviewableRequestEntryBody {
+  ReviewableRequestEntryBodyCreatePreIssuance(this.preIssuanceRequest) : super(ReviewableRequestType(ReviewableRequestType.CREATE_PRE_ISSUANCE));
   late PreIssuanceRequest preIssuanceRequest;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     preIssuanceRequest.toXdr(stream);
   }
 }
 
-class ReviewableRequestEntryBodyCreateIssuance
-    extends ReviewableRequestEntryBody {
-  ReviewableRequestEntryBodyCreateIssuance(this.issuanceRequest)
-      : super(ReviewableRequestType(ReviewableRequestType.CREATE_ISSUANCE));
+class ReviewableRequestEntryBodyCreateIssuance extends ReviewableRequestEntryBody {
+  ReviewableRequestEntryBodyCreateIssuance(this.issuanceRequest) : super(ReviewableRequestType(ReviewableRequestType.CREATE_ISSUANCE));
   late IssuanceRequest issuanceRequest;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     issuanceRequest.toXdr(stream);
   }
 }
 
-class ReviewableRequestEntryBodyCreateWithdraw
-    extends ReviewableRequestEntryBody {
-  ReviewableRequestEntryBodyCreateWithdraw(this.withdrawalRequest)
-      : super(ReviewableRequestType(ReviewableRequestType.CREATE_WITHDRAW));
+class ReviewableRequestEntryBodyCreateWithdraw extends ReviewableRequestEntryBody {
+  ReviewableRequestEntryBodyCreateWithdraw(this.withdrawalRequest) : super(ReviewableRequestType(ReviewableRequestType.CREATE_WITHDRAW));
   late WithdrawalRequest withdrawalRequest;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     withdrawalRequest.toXdr(stream);
   }
 }
 
 class ReviewableRequestEntryBodyCreateSale extends ReviewableRequestEntryBody {
-  ReviewableRequestEntryBodyCreateSale(this.saleCreationRequest)
-      : super(ReviewableRequestType(ReviewableRequestType.CREATE_SALE));
+  ReviewableRequestEntryBodyCreateSale(this.saleCreationRequest) : super(ReviewableRequestType(ReviewableRequestType.CREATE_SALE));
   late SaleCreationRequest saleCreationRequest;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     saleCreationRequest.toXdr(stream);
   }
 }
 
-class ReviewableRequestEntryBodyUpdateLimits
-    extends ReviewableRequestEntryBody {
-  ReviewableRequestEntryBodyUpdateLimits(this.limitsUpdateRequest)
-      : super(ReviewableRequestType(ReviewableRequestType.UPDATE_LIMITS));
+class ReviewableRequestEntryBodyUpdateLimits extends ReviewableRequestEntryBody {
+  ReviewableRequestEntryBodyUpdateLimits(this.limitsUpdateRequest) : super(ReviewableRequestType(ReviewableRequestType.UPDATE_LIMITS));
   late LimitsUpdateRequest limitsUpdateRequest;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     limitsUpdateRequest.toXdr(stream);
   }
 }
 
-class ReviewableRequestEntryBodyCreateAmlAlert
-    extends ReviewableRequestEntryBody {
-  ReviewableRequestEntryBodyCreateAmlAlert(this.amlAlertRequest)
-      : super(ReviewableRequestType(ReviewableRequestType.CREATE_AML_ALERT));
+class ReviewableRequestEntryBodyCreateAmlAlert extends ReviewableRequestEntryBody {
+  ReviewableRequestEntryBodyCreateAmlAlert(this.amlAlertRequest) : super(ReviewableRequestType(ReviewableRequestType.CREATE_AML_ALERT));
   late AMLAlertRequest amlAlertRequest;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     amlAlertRequest.toXdr(stream);
   }
 }
 
 class ReviewableRequestEntryBodyChangeRole extends ReviewableRequestEntryBody {
-  ReviewableRequestEntryBodyChangeRole(this.changeRoleRequest)
-      : super(ReviewableRequestType(ReviewableRequestType.CHANGE_ROLE));
+  ReviewableRequestEntryBodyChangeRole(this.changeRoleRequest) : super(ReviewableRequestType(ReviewableRequestType.CHANGE_ROLE));
   late ChangeRoleRequest changeRoleRequest;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     changeRoleRequest.toXdr(stream);
   }
 }
 
-class ReviewableRequestEntryBodyUpdateSaleDetails
-    extends ReviewableRequestEntryBody {
-  ReviewableRequestEntryBodyUpdateSaleDetails(this.updateSaleDetailsRequest)
-      : super(ReviewableRequestType(ReviewableRequestType.UPDATE_SALE_DETAILS));
+class ReviewableRequestEntryBodyUpdateSaleDetails extends ReviewableRequestEntryBody {
+  ReviewableRequestEntryBodyUpdateSaleDetails(this.updateSaleDetailsRequest) : super(ReviewableRequestType(ReviewableRequestType.UPDATE_SALE_DETAILS));
   late UpdateSaleDetailsRequest updateSaleDetailsRequest;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     updateSaleDetailsRequest.toXdr(stream);
   }
 }
 
-class ReviewableRequestEntryBodyCreateInvoice
-    extends ReviewableRequestEntryBody {
-  ReviewableRequestEntryBodyCreateInvoice(this.invoiceRequest)
-      : super(ReviewableRequestType(ReviewableRequestType.CREATE_INVOICE));
+class ReviewableRequestEntryBodyCreateInvoice extends ReviewableRequestEntryBody {
+  ReviewableRequestEntryBodyCreateInvoice(this.invoiceRequest) : super(ReviewableRequestType(ReviewableRequestType.CREATE_INVOICE));
   late InvoiceRequest invoiceRequest;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     invoiceRequest.toXdr(stream);
   }
 }
 
-class ReviewableRequestEntryBodyManageContract
-    extends ReviewableRequestEntryBody {
-  ReviewableRequestEntryBodyManageContract(this.contractRequest)
-      : super(ReviewableRequestType(ReviewableRequestType.MANAGE_CONTRACT));
+class ReviewableRequestEntryBodyManageContract extends ReviewableRequestEntryBody {
+  ReviewableRequestEntryBodyManageContract(this.contractRequest) : super(ReviewableRequestType(ReviewableRequestType.MANAGE_CONTRACT));
   late ContractRequest contractRequest;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     contractRequest.toXdr(stream);
   }
 }
 
-class ReviewableRequestEntryBodyCreateAtomicSwapAsk
-    extends ReviewableRequestEntryBody {
-  ReviewableRequestEntryBodyCreateAtomicSwapAsk(this.createAtomicSwapAskRequest)
-      : super(ReviewableRequestType(
-            ReviewableRequestType.CREATE_ATOMIC_SWAP_ASK));
+class ReviewableRequestEntryBodyCreateAtomicSwapAsk extends ReviewableRequestEntryBody {
+  ReviewableRequestEntryBodyCreateAtomicSwapAsk(this.createAtomicSwapAskRequest) : super(ReviewableRequestType(ReviewableRequestType.CREATE_ATOMIC_SWAP_ASK));
   late CreateAtomicSwapAskRequest createAtomicSwapAskRequest;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     createAtomicSwapAskRequest.toXdr(stream);
   }
 }
 
-class ReviewableRequestEntryBodyCreateAtomicSwapBid
-    extends ReviewableRequestEntryBody {
-  ReviewableRequestEntryBodyCreateAtomicSwapBid(this.createAtomicSwapBidRequest)
-      : super(ReviewableRequestType(
-            ReviewableRequestType.CREATE_ATOMIC_SWAP_BID));
+class ReviewableRequestEntryBodyCreateAtomicSwapBid extends ReviewableRequestEntryBody {
+  ReviewableRequestEntryBodyCreateAtomicSwapBid(this.createAtomicSwapBidRequest) : super(ReviewableRequestType(ReviewableRequestType.CREATE_ATOMIC_SWAP_BID));
   late CreateAtomicSwapBidRequest createAtomicSwapBidRequest;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     createAtomicSwapBidRequest.toXdr(stream);
   }
 }
 
 class ReviewableRequestEntryBodyCreatePoll extends ReviewableRequestEntryBody {
-  ReviewableRequestEntryBodyCreatePoll(this.createPollRequest)
-      : super(ReviewableRequestType(ReviewableRequestType.CREATE_POLL));
+  ReviewableRequestEntryBodyCreatePoll(this.createPollRequest) : super(ReviewableRequestType(ReviewableRequestType.CREATE_POLL));
   late CreatePollRequest createPollRequest;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     createPollRequest.toXdr(stream);
   }
 }
 
 class ReviewableRequestEntryBodyKycRecovery extends ReviewableRequestEntryBody {
-  ReviewableRequestEntryBodyKycRecovery(this.kycRecoveryRequest)
-      : super(ReviewableRequestType(ReviewableRequestType.KYC_RECOVERY));
+  ReviewableRequestEntryBodyKycRecovery(this.kycRecoveryRequest) : super(ReviewableRequestType(ReviewableRequestType.KYC_RECOVERY));
   late KYCRecoveryRequest kycRecoveryRequest;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     kycRecoveryRequest.toXdr(stream);
   }
 }
 
 class ReviewableRequestEntryBodyManageOffer extends ReviewableRequestEntryBody {
-  ReviewableRequestEntryBodyManageOffer(this.manageOfferRequest)
-      : super(ReviewableRequestType(ReviewableRequestType.MANAGE_OFFER));
+  ReviewableRequestEntryBodyManageOffer(this.manageOfferRequest) : super(ReviewableRequestType(ReviewableRequestType.MANAGE_OFFER));
   late ManageOfferRequest manageOfferRequest;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     manageOfferRequest.toXdr(stream);
   }
 }
 
-class ReviewableRequestEntryBodyCreatePayment
-    extends ReviewableRequestEntryBody {
-  ReviewableRequestEntryBodyCreatePayment(this.createPaymentRequest)
-      : super(ReviewableRequestType(ReviewableRequestType.CREATE_PAYMENT));
+class ReviewableRequestEntryBodyCreatePayment extends ReviewableRequestEntryBody {
+  ReviewableRequestEntryBodyCreatePayment(this.createPaymentRequest) : super(ReviewableRequestType(ReviewableRequestType.CREATE_PAYMENT));
   late CreatePaymentRequest createPaymentRequest;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     createPaymentRequest.toXdr(stream);
   }
 }
 
-class ReviewableRequestEntryBodyPerformRedemption
-    extends ReviewableRequestEntryBody {
-  ReviewableRequestEntryBodyPerformRedemption(this.redemptionRequest)
-      : super(ReviewableRequestType(ReviewableRequestType.PERFORM_REDEMPTION));
+class ReviewableRequestEntryBodyPerformRedemption extends ReviewableRequestEntryBody {
+  ReviewableRequestEntryBodyPerformRedemption(this.redemptionRequest) : super(ReviewableRequestType(ReviewableRequestType.PERFORM_REDEMPTION));
   late RedemptionRequest redemptionRequest;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     redemptionRequest.toXdr(stream);
   }
 }
 
-class ReviewableRequestEntryBodyDataCreation
-    extends ReviewableRequestEntryBody {
-  ReviewableRequestEntryBodyDataCreation(this.dataCreationRequest)
-      : super(ReviewableRequestType(ReviewableRequestType.DATA_CREATION));
+class ReviewableRequestEntryBodyDataCreation extends ReviewableRequestEntryBody {
+  ReviewableRequestEntryBodyDataCreation(this.dataCreationRequest) : super(ReviewableRequestType(ReviewableRequestType.DATA_CREATION));
   late DataCreationRequest dataCreationRequest;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     dataCreationRequest.toXdr(stream);
   }
 }
 
 class ReviewableRequestEntryBodyDataUpdate extends ReviewableRequestEntryBody {
-  ReviewableRequestEntryBodyDataUpdate(this.dataUpdateRequest)
-      : super(ReviewableRequestType(ReviewableRequestType.DATA_UPDATE));
+  ReviewableRequestEntryBodyDataUpdate(this.dataUpdateRequest) : super(ReviewableRequestType(ReviewableRequestType.DATA_UPDATE));
   late DataUpdateRequest dataUpdateRequest;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     dataUpdateRequest.toXdr(stream);
   }
 }
 
 class ReviewableRequestEntryBodyDataRemove extends ReviewableRequestEntryBody {
-  ReviewableRequestEntryBodyDataRemove(this.dataRemoveRequest)
-      : super(ReviewableRequestType(ReviewableRequestType.DATA_REMOVE));
+  ReviewableRequestEntryBodyDataRemove(this.dataRemoveRequest) : super(ReviewableRequestType(ReviewableRequestType.DATA_REMOVE));
   late DataRemoveRequest dataRemoveRequest;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     dataRemoveRequest.toXdr(stream);
   }
 }
 
-class ReviewableRequestEntryBodyCreateDeferredPayment
-    extends ReviewableRequestEntryBody {
-  ReviewableRequestEntryBodyCreateDeferredPayment(
-      this.createDeferredPaymentRequest)
-      : super(ReviewableRequestType(
-            ReviewableRequestType.CREATE_DEFERRED_PAYMENT));
+class ReviewableRequestEntryBodyCreateDeferredPayment extends ReviewableRequestEntryBody {
+  ReviewableRequestEntryBodyCreateDeferredPayment(this.createDeferredPaymentRequest) : super(ReviewableRequestType(ReviewableRequestType.CREATE_DEFERRED_PAYMENT));
   late CreateDeferredPaymentRequest createDeferredPaymentRequest;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     createDeferredPaymentRequest.toXdr(stream);
   }
 }
 
-class ReviewableRequestEntryBodyCloseDeferredPayment
-    extends ReviewableRequestEntryBody {
-  ReviewableRequestEntryBodyCloseDeferredPayment(
-      this.closeDeferredPaymentRequest)
-      : super(ReviewableRequestType(
-            ReviewableRequestType.CLOSE_DEFERRED_PAYMENT));
+class ReviewableRequestEntryBodyCloseDeferredPayment extends ReviewableRequestEntryBody {
+  ReviewableRequestEntryBodyCloseDeferredPayment(this.closeDeferredPaymentRequest) : super(ReviewableRequestType(ReviewableRequestType.CLOSE_DEFERRED_PAYMENT));
   late CloseDeferredPaymentRequest closeDeferredPaymentRequest;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     closeDeferredPaymentRequest.toXdr(stream);
   }
@@ -2794,28 +2538,26 @@ class ReviewableRequestEntryBodyCloseDeferredPayment
 
 abstract class ReviewableRequestEntryExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   ReviewableRequestEntryExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class ReviewableRequestEntryExtEmptyVersion extends ReviewableRequestEntryExt {
-  ReviewableRequestEntryExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+  ReviewableRequestEntryExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
-
 class SaleType extends XdrEncodable {
   static const BASIC_SALE = 1;
   static const CROWD_FUNDING = 2;
   static const FIXED_PRICE = 3;
   static const IMMEDIATE = 4;
-  var value;
-
+  int value;
   SaleType(this.value);
+  @override toXdr(XdrDataOutputStream stream) {
+    value.toXdr(stream);
+  }
+
 }
 // === xdr source ============================================================
 
@@ -2829,33 +2571,27 @@ class SaleType extends XdrEncodable {
 //  };
 
 //  ===========================================================================
-class FixedPriceSale extends XdrEncodable {
+class FixedPriceSale extends XdrEncodable  {
   FixedPriceSaleExt ext;
 
   FixedPriceSale(
-    this.ext,
-  );
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     ext.toXdr(stream);
   }
 }
-
 abstract class FixedPriceSaleExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   FixedPriceSaleExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class FixedPriceSaleExtEmptyVersion extends FixedPriceSaleExt {
-  FixedPriceSaleExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+  FixedPriceSaleExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
 // === xdr source ============================================================
 
@@ -2869,33 +2605,27 @@ class FixedPriceSaleExtEmptyVersion extends FixedPriceSaleExt {
 //  };
 
 //  ===========================================================================
-class CrowdFundingSale extends XdrEncodable {
+class CrowdFundingSale extends XdrEncodable  {
   CrowdFundingSaleExt ext;
 
   CrowdFundingSale(
-    this.ext,
-  );
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     ext.toXdr(stream);
   }
 }
-
 abstract class CrowdFundingSaleExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   CrowdFundingSaleExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class CrowdFundingSaleExtEmptyVersion extends CrowdFundingSaleExt {
-  CrowdFundingSaleExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+  CrowdFundingSaleExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
 // === xdr source ============================================================
 
@@ -2909,33 +2639,27 @@ class CrowdFundingSaleExtEmptyVersion extends CrowdFundingSaleExt {
 //  };
 
 //  ===========================================================================
-class BasicSale extends XdrEncodable {
+class BasicSale extends XdrEncodable  {
   BasicSaleExt ext;
 
   BasicSale(
-    this.ext,
-  );
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     ext.toXdr(stream);
   }
 }
-
 abstract class BasicSaleExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   BasicSaleExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class BasicSaleExtEmptyVersion extends BasicSaleExt {
-  BasicSaleExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+  BasicSaleExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
 // === xdr source ============================================================
 
@@ -2944,26 +2668,21 @@ class BasicSaleExtEmptyVersion extends BasicSaleExt {
 //  };
 
 //  ===========================================================================
-class ImmediateSale extends XdrEncodable {
+class ImmediateSale extends XdrEncodable  {
   EmptyExt ext;
 
   ImmediateSale(
-    this.ext,
-  );
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     ext.toXdr(stream);
   }
 }
-
 abstract class SaleTypeExt extends XdrEncodable {
   SaleType discriminant;
-
   SaleTypeExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
@@ -2971,45 +2690,34 @@ abstract class SaleTypeExt extends XdrEncodable {
 class SaleTypeExtBasicSale extends SaleTypeExt {
   SaleTypeExtBasicSale(this.basicSale) : super(SaleType(SaleType.BASIC_SALE));
   late BasicSale basicSale;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     basicSale.toXdr(stream);
   }
 }
 
 class SaleTypeExtCrowdFunding extends SaleTypeExt {
-  SaleTypeExtCrowdFunding(this.crowdFundingSale)
-      : super(SaleType(SaleType.CROWD_FUNDING));
+  SaleTypeExtCrowdFunding(this.crowdFundingSale) : super(SaleType(SaleType.CROWD_FUNDING));
   late CrowdFundingSale crowdFundingSale;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     crowdFundingSale.toXdr(stream);
   }
 }
 
 class SaleTypeExtFixedPrice extends SaleTypeExt {
-  SaleTypeExtFixedPrice(this.fixedPriceSale)
-      : super(SaleType(SaleType.FIXED_PRICE));
+  SaleTypeExtFixedPrice(this.fixedPriceSale) : super(SaleType(SaleType.FIXED_PRICE));
   late FixedPriceSale fixedPriceSale;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     fixedPriceSale.toXdr(stream);
   }
 }
 
 class SaleTypeExtImmediate extends SaleTypeExt {
-  SaleTypeExtImmediate(this.immediateSale)
-      : super(SaleType(SaleType.IMMEDIATE));
+  SaleTypeExtImmediate(this.immediateSale) : super(SaleType(SaleType.IMMEDIATE));
   late ImmediateSale immediateSale;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     immediateSale.toXdr(stream);
   }
@@ -3031,23 +2739,22 @@ class SaleTypeExtImmediate extends SaleTypeExt {
 //  };
 
 //  ===========================================================================
-class SaleQuoteAsset extends XdrEncodable {
-  AssetCode quoteAsset;
-  Uint64 price;
-  BalanceID quoteBalance;
-  Uint64 currentCap;
+class SaleQuoteAsset extends XdrEncodable  {
+  ASSETCODE quoteAsset;
+  UINT64 price;
+  BALANCEID quoteBalance;
+  UINT64 currentCap;
   SaleQuoteAssetExt ext;
 
   SaleQuoteAsset(
-    this.quoteAsset,
-    this.price,
-    this.quoteBalance,
-    this.currentCap,
-    this.ext,
-  );
+      this.quoteAsset,
+      this.price,
+      this.quoteBalance,
+      this.currentCap,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     quoteAsset.toXdr(stream);
     price.toXdr(stream);
     quoteBalance.toXdr(stream);
@@ -3055,21 +2762,16 @@ class SaleQuoteAsset extends XdrEncodable {
     ext.toXdr(stream);
   }
 }
-
 abstract class SaleQuoteAssetExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   SaleQuoteAssetExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class SaleQuoteAssetExtEmptyVersion extends SaleQuoteAssetExt {
-  SaleQuoteAssetExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+  SaleQuoteAssetExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
 // === xdr source ============================================================
 
@@ -3103,45 +2805,44 @@ class SaleQuoteAssetExtEmptyVersion extends SaleQuoteAssetExt {
 //  };
 
 //  ===========================================================================
-class SaleEntry extends XdrEncodable {
-  Uint64 saleID;
-  Uint64 saleType;
-  AccountID ownerID;
-  AssetCode baseAsset;
-  Uint64 startTime;
-  Uint64 endTime;
-  AssetCode defaultQuoteAsset;
-  Uint64 softCap;
-  Uint64 hardCap;
-  Uint64 currentCapInBase;
-  Uint64 maxAmountToBeSold;
-  Longstring details;
+class SaleEntry extends XdrEncodable  {
+  UINT64 saleID;
+  UINT64 saleType;
+  ACCOUNTID ownerID;
+  ASSETCODE baseAsset;
+  UINT64 startTime;
+  UINT64 endTime;
+  ASSETCODE defaultQuoteAsset;
+  UINT64 softCap;
+  UINT64 hardCap;
+  UINT64 currentCapInBase;
+  UINT64 maxAmountToBeSold;
+  LONGSTRING details;
   List<SaleQuoteAsset> quoteAssets;
-  BalanceID baseBalance;
+  BALANCEID baseBalance;
   SaleTypeExt saleTypeExt;
   SaleEntryExt ext;
 
   SaleEntry(
-    this.saleID,
-    this.saleType,
-    this.ownerID,
-    this.baseAsset,
-    this.startTime,
-    this.endTime,
-    this.defaultQuoteAsset,
-    this.softCap,
-    this.hardCap,
-    this.currentCapInBase,
-    this.maxAmountToBeSold,
-    this.details,
-    this.quoteAssets,
-    this.baseBalance,
-    this.saleTypeExt,
-    this.ext,
-  );
+      this.saleID,
+      this.saleType,
+      this.ownerID,
+      this.baseAsset,
+      this.startTime,
+      this.endTime,
+      this.defaultQuoteAsset,
+      this.softCap,
+      this.hardCap,
+      this.currentCapInBase,
+      this.maxAmountToBeSold,
+      this.details,
+      this.quoteAssets,
+      this.baseBalance,
+      this.saleTypeExt,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     saleID.toXdr(stream);
     saleType.toXdr(stream);
     ownerID.toXdr(stream);
@@ -3155,7 +2856,7 @@ class SaleEntry extends XdrEncodable {
     maxAmountToBeSold.toXdr(stream);
     details.toXdr(stream);
     quoteAssets.length.toXdr(stream);
-    quoteAssets.forEach((element) {
+    quoteAssets.forEach ((element) {
       element.toXdr(stream);
     });
     baseBalance.toXdr(stream);
@@ -3163,26 +2864,20 @@ class SaleEntry extends XdrEncodable {
     ext.toXdr(stream);
   }
 }
-
 abstract class SaleEntryExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   SaleEntryExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class SaleEntryExtEmptyVersion extends SaleEntryExt {
-  SaleEntryExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+  SaleEntryExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
 
 class SaleEntryExtAddSaleWhitelists extends SaleEntryExt {
-  SaleEntryExtAddSaleWhitelists()
-      : super(LedgerVersion(LedgerVersion.ADD_SALE_WHITELISTS));
+  SaleEntryExtAddSaleWhitelists() : super(LedgerVersion(LedgerVersion.ADD_SALE_WHITELISTS));
 }
 // === xdr source ============================================================
 
@@ -3205,26 +2900,25 @@ class SaleEntryExtAddSaleWhitelists extends SaleEntryExt {
 //  };
 
 //  ===========================================================================
-class SignerRoleEntry extends XdrEncodable {
-  Uint64 id;
-  List<Uint64> ruleIDs;
-  AccountID ownerID;
-  Longstring details;
+class SignerRoleEntry extends XdrEncodable  {
+  UINT64 id;
+  List<UINT64> ruleIDs;
+  ACCOUNTID ownerID;
+  LONGSTRING details;
   SignerRoleEntryExt ext;
 
   SignerRoleEntry(
-    this.id,
-    this.ruleIDs,
-    this.ownerID,
-    this.details,
-    this.ext,
-  );
+      this.id,
+      this.ruleIDs,
+      this.ownerID,
+      this.details,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     id.toXdr(stream);
     ruleIDs.length.toXdr(stream);
-    ruleIDs.forEach((element) {
+    ruleIDs.forEach ((element) {
       element.toXdr(stream);
     });
     ownerID.toXdr(stream);
@@ -3232,21 +2926,16 @@ class SignerRoleEntry extends XdrEncodable {
     ext.toXdr(stream);
   }
 }
-
 abstract class SignerRoleEntryExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   SignerRoleEntryExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class SignerRoleEntryExtEmptyVersion extends SignerRoleEntryExt {
-  SignerRoleEntryExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+  SignerRoleEntryExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
 // === xdr source ============================================================
 
@@ -3274,29 +2963,28 @@ class SignerRoleEntryExtEmptyVersion extends SignerRoleEntryExt {
 //  };
 
 //  ===========================================================================
-class SignerRuleEntry extends XdrEncodable {
-  Uint64 id;
+class SignerRuleEntry extends XdrEncodable  {
+  UINT64 id;
   SignerRuleResource resource;
   SignerRuleAction action;
   bool forbids;
   bool isDefault;
-  Longstring details;
-  AccountID ownerID;
+  LONGSTRING details;
+  ACCOUNTID ownerID;
   SignerRuleEntryExt ext;
 
   SignerRuleEntry(
-    this.id,
-    this.resource,
-    this.action,
-    this.forbids,
-    this.isDefault,
-    this.details,
-    this.ownerID,
-    this.ext,
-  );
+      this.id,
+      this.resource,
+      this.action,
+      this.forbids,
+      this.isDefault,
+      this.details,
+      this.ownerID,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     id.toXdr(stream);
     resource.toXdr(stream);
     action.toXdr(stream);
@@ -3307,21 +2995,16 @@ class SignerRuleEntry extends XdrEncodable {
     ext.toXdr(stream);
   }
 }
-
 abstract class SignerRuleEntryExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   SignerRuleEntryExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class SignerRuleEntryExtEmptyVersion extends SignerRuleEntryExt {
-  SignerRuleEntryExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+  SignerRuleEntryExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
 // === xdr source ============================================================
 
@@ -3347,27 +3030,26 @@ class SignerRuleEntryExtEmptyVersion extends SignerRuleEntryExt {
 //  };
 
 //  ===========================================================================
-class SignerEntry extends XdrEncodable {
+class SignerEntry extends XdrEncodable  {
   PublicKey pubKey;
-  AccountID accountID;
-  Uint32 weight;
-  Uint32 identity;
-  Longstring details;
-  Uint64 roleID;
+  ACCOUNTID accountID;
+  UINT32 weight;
+  UINT32 identity;
+  LONGSTRING details;
+  UINT64 roleID;
   SignerEntryExt ext;
 
   SignerEntry(
-    this.pubKey,
-    this.accountID,
-    this.weight,
-    this.identity,
-    this.details,
-    this.roleID,
-    this.ext,
-  );
+      this.pubKey,
+      this.accountID,
+      this.weight,
+      this.identity,
+      this.details,
+      this.roleID,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     pubKey.toXdr(stream);
     accountID.toXdr(stream);
     weight.toXdr(stream);
@@ -3377,21 +3059,16 @@ class SignerEntry extends XdrEncodable {
     ext.toXdr(stream);
   }
 }
-
 abstract class SignerEntryExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   SignerEntryExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class SignerEntryExtEmptyVersion extends SignerEntryExt {
-  SignerEntryExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+  SignerEntryExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
 // === xdr source ============================================================
 
@@ -3410,39 +3087,33 @@ class SignerEntryExtEmptyVersion extends SignerEntryExt {
 //  };
 
 //  ===========================================================================
-class StampEntry extends XdrEncodable {
-  Hash ledgerHash;
-  Hash licenseHash;
+class StampEntry extends XdrEncodable  {
+  HASH ledgerHash;
+  HASH licenseHash;
   StampEntryExt ext;
 
   StampEntry(
-    this.ledgerHash,
-    this.licenseHash,
-    this.ext,
-  );
+      this.ledgerHash,
+      this.licenseHash,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     ledgerHash.toXdr(stream);
     licenseHash.toXdr(stream);
     ext.toXdr(stream);
   }
 }
-
 abstract class StampEntryExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   StampEntryExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class StampEntryExtEmptyVersion extends StampEntryExt {
-  StampEntryExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+  StampEntryExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
 // === xdr source ============================================================
 
@@ -3471,35 +3142,34 @@ class StampEntryExtEmptyVersion extends StampEntryExt {
 //  };
 
 //  ===========================================================================
-class StatisticsV2Entry extends XdrEncodable {
-  Uint64 id;
-  AccountID accountID;
+class StatisticsV2Entry extends XdrEncodable  {
+  UINT64 id;
+  ACCOUNTID accountID;
   StatsOpType statsOpType;
-  AssetCode assetCode;
+  ASSETCODE assetCode;
   bool isConvertNeeded;
-  Uint64 dailyOutcome;
-  Uint64 weeklyOutcome;
-  Uint64 monthlyOutcome;
-  Uint64 annualOutcome;
-  Int64 updatedAt;
+  UINT64 dailyOutcome;
+  UINT64 weeklyOutcome;
+  UINT64 monthlyOutcome;
+  UINT64 annualOutcome;
+  INT64 updatedAt;
   StatisticsV2EntryExt ext;
 
   StatisticsV2Entry(
-    this.id,
-    this.accountID,
-    this.statsOpType,
-    this.assetCode,
-    this.isConvertNeeded,
-    this.dailyOutcome,
-    this.weeklyOutcome,
-    this.monthlyOutcome,
-    this.annualOutcome,
-    this.updatedAt,
-    this.ext,
-  );
+      this.id,
+      this.accountID,
+      this.statsOpType,
+      this.assetCode,
+      this.isConvertNeeded,
+      this.dailyOutcome,
+      this.weeklyOutcome,
+      this.monthlyOutcome,
+      this.annualOutcome,
+      this.updatedAt,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     id.toXdr(stream);
     accountID.toXdr(stream);
     statsOpType.toXdr(stream);
@@ -3513,21 +3183,16 @@ class StatisticsV2Entry extends XdrEncodable {
     ext.toXdr(stream);
   }
 }
-
 abstract class StatisticsV2EntryExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   StatisticsV2EntryExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class StatisticsV2EntryExtEmptyVersion extends StatisticsV2EntryExt {
-  StatisticsV2EntryExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+  StatisticsV2EntryExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
 // === xdr source ============================================================
 
@@ -3552,27 +3217,26 @@ class StatisticsV2EntryExtEmptyVersion extends StatisticsV2EntryExt {
 //  };
 
 //  ===========================================================================
-class StatisticsEntry extends XdrEncodable {
-  AccountID accountID;
-  Uint64 dailyOutcome;
-  Uint64 weeklyOutcome;
-  Uint64 monthlyOutcome;
-  Uint64 annualOutcome;
-  Int64 updatedAt;
+class StatisticsEntry extends XdrEncodable  {
+  ACCOUNTID accountID;
+  UINT64 dailyOutcome;
+  UINT64 weeklyOutcome;
+  UINT64 monthlyOutcome;
+  UINT64 annualOutcome;
+  INT64 updatedAt;
   StatisticsEntryExt ext;
 
   StatisticsEntry(
-    this.accountID,
-    this.dailyOutcome,
-    this.weeklyOutcome,
-    this.monthlyOutcome,
-    this.annualOutcome,
-    this.updatedAt,
-    this.ext,
-  );
+      this.accountID,
+      this.dailyOutcome,
+      this.weeklyOutcome,
+      this.monthlyOutcome,
+      this.annualOutcome,
+      this.updatedAt,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     accountID.toXdr(stream);
     dailyOutcome.toXdr(stream);
     weeklyOutcome.toXdr(stream);
@@ -3582,21 +3246,16 @@ class StatisticsEntry extends XdrEncodable {
     ext.toXdr(stream);
   }
 }
-
 abstract class StatisticsEntryExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   StatisticsEntryExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class StatisticsEntryExtEmptyVersion extends StatisticsEntryExt {
-  StatisticsEntryExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+  StatisticsEntryExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
 // === xdr source ============================================================
 
@@ -3624,35 +3283,34 @@ class StatisticsEntryExtEmptyVersion extends StatisticsEntryExt {
 //  };
 
 //  ===========================================================================
-class SwapEntry extends XdrEncodable {
-  Uint64 id;
-  Hash secretHash;
-  AccountID source;
-  BalanceID sourceBalance;
-  BalanceID destinationBalance;
-  Longstring details;
-  Uint64 amount;
-  Int64 createdAt;
-  Int64 lockTime;
-  Uint64 fee;
+class SwapEntry extends XdrEncodable  {
+  UINT64 id;
+  HASH secretHash;
+  ACCOUNTID source;
+  BALANCEID sourceBalance;
+  BALANCEID destinationBalance;
+  LONGSTRING details;
+  UINT64 amount;
+  INT64 createdAt;
+  INT64 lockTime;
+  UINT64 fee;
   EmptyExt ext;
 
   SwapEntry(
-    this.id,
-    this.secretHash,
-    this.source,
-    this.sourceBalance,
-    this.destinationBalance,
-    this.details,
-    this.amount,
-    this.createdAt,
-    this.lockTime,
-    this.fee,
-    this.ext,
-  );
+      this.id,
+      this.secretHash,
+      this.source,
+      this.sourceBalance,
+      this.destinationBalance,
+      this.details,
+      this.amount,
+      this.createdAt,
+      this.lockTime,
+      this.fee,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     id.toXdr(stream);
     secretHash.toXdr(stream);
     source.toXdr(stream);
@@ -3675,29 +3333,24 @@ class SwapEntry extends XdrEncodable {
 //  };
 
 //  ===========================================================================
-class SingleChoiceVote extends XdrEncodable {
-  Uint32 choice;
+class SingleChoiceVote extends XdrEncodable  {
+  UINT32 choice;
   EmptyExt ext;
 
   SingleChoiceVote(
-    this.choice,
-    this.ext,
-  );
+      this.choice,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     choice.toXdr(stream);
     ext.toXdr(stream);
   }
 }
-
 abstract class VoteData extends XdrEncodable {
   PollType discriminant;
-
   VoteData(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
@@ -3705,9 +3358,7 @@ abstract class VoteData extends XdrEncodable {
 class VoteDataSingleChoice extends VoteData {
   VoteDataSingleChoice(this.single) : super(PollType(PollType.SINGLE_CHOICE));
   late SingleChoiceVote single;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     single.toXdr(stream);
   }
@@ -3727,36 +3378,37 @@ class VoteDataSingleChoice extends VoteData {
 //  };
 
 //  ===========================================================================
-class VoteEntry extends XdrEncodable {
-  Uint64 pollID;
-  AccountID voterID;
+class VoteEntry extends XdrEncodable  {
+  UINT64 pollID;
+  ACCOUNTID voterID;
   VoteData data;
   EmptyExt ext;
 
   VoteEntry(
-    this.pollID,
-    this.voterID,
-    this.data,
-    this.ext,
-  );
+      this.pollID,
+      this.voterID,
+      this.data,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     pollID.toXdr(stream);
     voterID.toXdr(stream);
     data.toXdr(stream);
     ext.toXdr(stream);
   }
 }
-
 class ThresholdIndexes extends XdrEncodable {
   static const MASTER_WEIGHT = 0;
   static const LOW = 1;
   static const MED = 2;
   static const HIGH = 3;
-  var value;
-
+  int value;
   ThresholdIndexes(this.value);
+  @override toXdr(XdrDataOutputStream stream) {
+    value.toXdr(stream);
+  }
+
 }
 // === xdr source ============================================================
 
@@ -3845,175 +3497,134 @@ class ThresholdIndexes extends XdrEncodable {
 //  };
 
 //  ===========================================================================
-class LedgerEntry extends XdrEncodable {
-  Uint32 lastModifiedLedgerSeq;
+class LedgerEntry extends XdrEncodable  {
+  UINT32 lastModifiedLedgerSeq;
   LedgerEntryData data;
   LedgerEntryExt ext;
 
   LedgerEntry(
-    this.lastModifiedLedgerSeq,
-    this.data,
-    this.ext,
-  );
+      this.lastModifiedLedgerSeq,
+      this.data,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     lastModifiedLedgerSeq.toXdr(stream);
     data.toXdr(stream);
     ext.toXdr(stream);
   }
 }
-
 abstract class LedgerEntryData extends XdrEncodable {
   LedgerEntryType discriminant;
-
   LedgerEntryData(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class LedgerEntryDataAccount extends LedgerEntryData {
-  LedgerEntryDataAccount(this.account)
-      : super(LedgerEntryType(LedgerEntryType.ACCOUNT));
+  LedgerEntryDataAccount(this.account) : super(LedgerEntryType(LedgerEntryType.ACCOUNT));
   late AccountEntry account;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     account.toXdr(stream);
   }
 }
 
 class LedgerEntryDataSigner extends LedgerEntryData {
-  LedgerEntryDataSigner(this.signer)
-      : super(LedgerEntryType(LedgerEntryType.SIGNER));
+  LedgerEntryDataSigner(this.signer) : super(LedgerEntryType(LedgerEntryType.SIGNER));
   late SignerEntry signer;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     signer.toXdr(stream);
   }
 }
 
 class LedgerEntryDataFee extends LedgerEntryData {
-  LedgerEntryDataFee(this.feeState)
-      : super(LedgerEntryType(LedgerEntryType.FEE));
+  LedgerEntryDataFee(this.feeState) : super(LedgerEntryType(LedgerEntryType.FEE));
   late FeeEntry feeState;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     feeState.toXdr(stream);
   }
 }
 
 class LedgerEntryDataBalance extends LedgerEntryData {
-  LedgerEntryDataBalance(this.balance)
-      : super(LedgerEntryType(LedgerEntryType.BALANCE));
+  LedgerEntryDataBalance(this.balance) : super(LedgerEntryType(LedgerEntryType.BALANCE));
   late BalanceEntry balance;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     balance.toXdr(stream);
   }
 }
 
 class LedgerEntryDataAsset extends LedgerEntryData {
-  LedgerEntryDataAsset(this.asset)
-      : super(LedgerEntryType(LedgerEntryType.ASSET));
+  LedgerEntryDataAsset(this.asset) : super(LedgerEntryType(LedgerEntryType.ASSET));
   late AssetEntry asset;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     asset.toXdr(stream);
   }
 }
 
 class LedgerEntryDataReferenceEntry extends LedgerEntryData {
-  LedgerEntryDataReferenceEntry(this.reference)
-      : super(LedgerEntryType(LedgerEntryType.REFERENCE_ENTRY));
+  LedgerEntryDataReferenceEntry(this.reference) : super(LedgerEntryType(LedgerEntryType.REFERENCE_ENTRY));
   late ReferenceEntry reference;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     reference.toXdr(stream);
   }
 }
 
 class LedgerEntryDataStatistics extends LedgerEntryData {
-  LedgerEntryDataStatistics(this.stats)
-      : super(LedgerEntryType(LedgerEntryType.STATISTICS));
+  LedgerEntryDataStatistics(this.stats) : super(LedgerEntryType(LedgerEntryType.STATISTICS));
   late StatisticsEntry stats;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     stats.toXdr(stream);
   }
 }
 
 class LedgerEntryDataAccountLimits extends LedgerEntryData {
-  LedgerEntryDataAccountLimits(this.accountLimits)
-      : super(LedgerEntryType(LedgerEntryType.ACCOUNT_LIMITS));
+  LedgerEntryDataAccountLimits(this.accountLimits) : super(LedgerEntryType(LedgerEntryType.ACCOUNT_LIMITS));
   late AccountLimitsEntry accountLimits;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     accountLimits.toXdr(stream);
   }
 }
 
 class LedgerEntryDataAssetPair extends LedgerEntryData {
-  LedgerEntryDataAssetPair(this.assetPair)
-      : super(LedgerEntryType(LedgerEntryType.ASSET_PAIR));
+  LedgerEntryDataAssetPair(this.assetPair) : super(LedgerEntryType(LedgerEntryType.ASSET_PAIR));
   late AssetPairEntry assetPair;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     assetPair.toXdr(stream);
   }
 }
 
 class LedgerEntryDataOfferEntry extends LedgerEntryData {
-  LedgerEntryDataOfferEntry(this.offer)
-      : super(LedgerEntryType(LedgerEntryType.OFFER_ENTRY));
+  LedgerEntryDataOfferEntry(this.offer) : super(LedgerEntryType(LedgerEntryType.OFFER_ENTRY));
   late OfferEntry offer;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     offer.toXdr(stream);
   }
 }
 
 class LedgerEntryDataReviewableRequest extends LedgerEntryData {
-  LedgerEntryDataReviewableRequest(this.reviewableRequest)
-      : super(LedgerEntryType(LedgerEntryType.REVIEWABLE_REQUEST));
+  LedgerEntryDataReviewableRequest(this.reviewableRequest) : super(LedgerEntryType(LedgerEntryType.REVIEWABLE_REQUEST));
   late ReviewableRequestEntry reviewableRequest;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     reviewableRequest.toXdr(stream);
   }
 }
 
 class LedgerEntryDataExternalSystemAccountId extends LedgerEntryData {
-  LedgerEntryDataExternalSystemAccountId(this.externalSystemAccountID)
-      : super(LedgerEntryType(LedgerEntryType.EXTERNAL_SYSTEM_ACCOUNT_ID));
+  LedgerEntryDataExternalSystemAccountId(this.externalSystemAccountID) : super(LedgerEntryType(LedgerEntryType.EXTERNAL_SYSTEM_ACCOUNT_ID));
   late ExternalSystemAccountID externalSystemAccountID;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     externalSystemAccountID.toXdr(stream);
   }
@@ -4022,179 +3633,133 @@ class LedgerEntryDataExternalSystemAccountId extends LedgerEntryData {
 class LedgerEntryDataSale extends LedgerEntryData {
   LedgerEntryDataSale(this.sale) : super(LedgerEntryType(LedgerEntryType.SALE));
   late SaleEntry sale;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     sale.toXdr(stream);
   }
 }
 
 class LedgerEntryDataKeyValue extends LedgerEntryData {
-  LedgerEntryDataKeyValue(this.keyValue)
-      : super(LedgerEntryType(LedgerEntryType.KEY_VALUE));
+  LedgerEntryDataKeyValue(this.keyValue) : super(LedgerEntryType(LedgerEntryType.KEY_VALUE));
   late KeyValueEntry keyValue;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     keyValue.toXdr(stream);
   }
 }
 
 class LedgerEntryDataAccountKyc extends LedgerEntryData {
-  LedgerEntryDataAccountKyc(this.accountKYC)
-      : super(LedgerEntryType(LedgerEntryType.ACCOUNT_KYC));
+  LedgerEntryDataAccountKyc(this.accountKYC) : super(LedgerEntryType(LedgerEntryType.ACCOUNT_KYC));
   late AccountKYCEntry accountKYC;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     accountKYC.toXdr(stream);
   }
 }
 
 class LedgerEntryDataExternalSystemAccountIdPoolEntry extends LedgerEntryData {
-  LedgerEntryDataExternalSystemAccountIdPoolEntry(
-      this.externalSystemAccountIDPoolEntry)
-      : super(LedgerEntryType(
-            LedgerEntryType.EXTERNAL_SYSTEM_ACCOUNT_ID_POOL_ENTRY));
+  LedgerEntryDataExternalSystemAccountIdPoolEntry(this.externalSystemAccountIDPoolEntry) : super(LedgerEntryType(LedgerEntryType.EXTERNAL_SYSTEM_ACCOUNT_ID_POOL_ENTRY));
   late ExternalSystemAccountIDPoolEntry externalSystemAccountIDPoolEntry;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     externalSystemAccountIDPoolEntry.toXdr(stream);
   }
 }
 
 class LedgerEntryDataLimitsV2 extends LedgerEntryData {
-  LedgerEntryDataLimitsV2(this.limitsV2)
-      : super(LedgerEntryType(LedgerEntryType.LIMITS_V2));
+  LedgerEntryDataLimitsV2(this.limitsV2) : super(LedgerEntryType(LedgerEntryType.LIMITS_V2));
   late LimitsV2Entry limitsV2;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     limitsV2.toXdr(stream);
   }
 }
 
 class LedgerEntryDataStatisticsV2 extends LedgerEntryData {
-  LedgerEntryDataStatisticsV2(this.statisticsV2)
-      : super(LedgerEntryType(LedgerEntryType.STATISTICS_V2));
+  LedgerEntryDataStatisticsV2(this.statisticsV2) : super(LedgerEntryType(LedgerEntryType.STATISTICS_V2));
   late StatisticsV2Entry statisticsV2;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     statisticsV2.toXdr(stream);
   }
 }
 
 class LedgerEntryDataPendingStatistics extends LedgerEntryData {
-  LedgerEntryDataPendingStatistics(this.pendingStatistics)
-      : super(LedgerEntryType(LedgerEntryType.PENDING_STATISTICS));
+  LedgerEntryDataPendingStatistics(this.pendingStatistics) : super(LedgerEntryType(LedgerEntryType.PENDING_STATISTICS));
   late PendingStatisticsEntry pendingStatistics;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     pendingStatistics.toXdr(stream);
   }
 }
 
 class LedgerEntryDataContract extends LedgerEntryData {
-  LedgerEntryDataContract(this.contract)
-      : super(LedgerEntryType(LedgerEntryType.CONTRACT));
+  LedgerEntryDataContract(this.contract) : super(LedgerEntryType(LedgerEntryType.CONTRACT));
   late ContractEntry contract;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     contract.toXdr(stream);
   }
 }
 
 class LedgerEntryDataAtomicSwapAsk extends LedgerEntryData {
-  LedgerEntryDataAtomicSwapAsk(this.atomicSwapAsk)
-      : super(LedgerEntryType(LedgerEntryType.ATOMIC_SWAP_ASK));
+  LedgerEntryDataAtomicSwapAsk(this.atomicSwapAsk) : super(LedgerEntryType(LedgerEntryType.ATOMIC_SWAP_ASK));
   late AtomicSwapAskEntry atomicSwapAsk;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     atomicSwapAsk.toXdr(stream);
   }
 }
 
 class LedgerEntryDataAccountRole extends LedgerEntryData {
-  LedgerEntryDataAccountRole(this.accountRole)
-      : super(LedgerEntryType(LedgerEntryType.ACCOUNT_ROLE));
+  LedgerEntryDataAccountRole(this.accountRole) : super(LedgerEntryType(LedgerEntryType.ACCOUNT_ROLE));
   late AccountRoleEntry accountRole;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     accountRole.toXdr(stream);
   }
 }
 
 class LedgerEntryDataAccountRule extends LedgerEntryData {
-  LedgerEntryDataAccountRule(this.accountRule)
-      : super(LedgerEntryType(LedgerEntryType.ACCOUNT_RULE));
+  LedgerEntryDataAccountRule(this.accountRule) : super(LedgerEntryType(LedgerEntryType.ACCOUNT_RULE));
   late AccountRuleEntry accountRule;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     accountRule.toXdr(stream);
   }
 }
 
 class LedgerEntryDataSignerRule extends LedgerEntryData {
-  LedgerEntryDataSignerRule(this.signerRule)
-      : super(LedgerEntryType(LedgerEntryType.SIGNER_RULE));
+  LedgerEntryDataSignerRule(this.signerRule) : super(LedgerEntryType(LedgerEntryType.SIGNER_RULE));
   late SignerRuleEntry signerRule;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     signerRule.toXdr(stream);
   }
 }
 
 class LedgerEntryDataSignerRole extends LedgerEntryData {
-  LedgerEntryDataSignerRole(this.signerRole)
-      : super(LedgerEntryType(LedgerEntryType.SIGNER_ROLE));
+  LedgerEntryDataSignerRole(this.signerRole) : super(LedgerEntryType(LedgerEntryType.SIGNER_ROLE));
   late SignerRoleEntry signerRole;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     signerRole.toXdr(stream);
   }
 }
 
 class LedgerEntryDataLicense extends LedgerEntryData {
-  LedgerEntryDataLicense(this.license)
-      : super(LedgerEntryType(LedgerEntryType.LICENSE));
+  LedgerEntryDataLicense(this.license) : super(LedgerEntryType(LedgerEntryType.LICENSE));
   late LicenseEntry license;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     license.toXdr(stream);
   }
 }
 
 class LedgerEntryDataStamp extends LedgerEntryData {
-  LedgerEntryDataStamp(this.stamp)
-      : super(LedgerEntryType(LedgerEntryType.STAMP));
+  LedgerEntryDataStamp(this.stamp) : super(LedgerEntryType(LedgerEntryType.STAMP));
   late StampEntry stamp;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     stamp.toXdr(stream);
   }
@@ -4203,9 +3768,7 @@ class LedgerEntryDataStamp extends LedgerEntryData {
 class LedgerEntryDataPoll extends LedgerEntryData {
   LedgerEntryDataPoll(this.poll) : super(LedgerEntryType(LedgerEntryType.POLL));
   late PollEntry poll;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     poll.toXdr(stream);
   }
@@ -4214,21 +3777,16 @@ class LedgerEntryDataPoll extends LedgerEntryData {
 class LedgerEntryDataVote extends LedgerEntryData {
   LedgerEntryDataVote(this.vote) : super(LedgerEntryType(LedgerEntryType.VOTE));
   late VoteEntry vote;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     vote.toXdr(stream);
   }
 }
 
 class LedgerEntryDataAccountSpecificRule extends LedgerEntryData {
-  LedgerEntryDataAccountSpecificRule(this.accountSpecificRule)
-      : super(LedgerEntryType(LedgerEntryType.ACCOUNT_SPECIFIC_RULE));
+  LedgerEntryDataAccountSpecificRule(this.accountSpecificRule) : super(LedgerEntryType(LedgerEntryType.ACCOUNT_SPECIFIC_RULE));
   late AccountSpecificRuleEntry accountSpecificRule;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     accountSpecificRule.toXdr(stream);
   }
@@ -4237,33 +3795,25 @@ class LedgerEntryDataAccountSpecificRule extends LedgerEntryData {
 class LedgerEntryDataSwap extends LedgerEntryData {
   LedgerEntryDataSwap(this.swap) : super(LedgerEntryType(LedgerEntryType.SWAP));
   late SwapEntry swap;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     swap.toXdr(stream);
   }
 }
 
 class LedgerEntryDataDataData extends LedgerEntryData {
-  LedgerEntryDataDataData(this.data)
-      : super(LedgerEntryType(LedgerEntryType.DATA));
+  LedgerEntryDataDataData(this.data) : super(LedgerEntryType(LedgerEntryType.DATA));
   late DataEntry data;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     data.toXdr(stream);
   }
 }
 
 class LedgerEntryDataDeferredPayment extends LedgerEntryData {
-  LedgerEntryDataDeferredPayment(this.deferredPayment)
-      : super(LedgerEntryType(LedgerEntryType.DEFERRED_PAYMENT));
+  LedgerEntryDataDeferredPayment(this.deferredPayment) : super(LedgerEntryType(LedgerEntryType.DEFERRED_PAYMENT));
   late DeferredPaymentEntry deferredPayment;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     deferredPayment.toXdr(stream);
   }
@@ -4271,47 +3821,38 @@ class LedgerEntryDataDeferredPayment extends LedgerEntryData {
 
 abstract class LedgerEntryExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   LedgerEntryExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class LedgerEntryExtEmptyVersion extends LedgerEntryExt {
-  LedgerEntryExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+  LedgerEntryExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
-
 class EnvelopeType extends XdrEncodable {
   static const SCP = 1;
   static const TX = 2;
   static const AUTH = 3;
-  var value;
-
+  int value;
   EnvelopeType(this.value);
-}
+  @override toXdr(XdrDataOutputStream stream) {
+    value.toXdr(stream);
+  }
 
+}
 abstract class LedgerKey extends XdrEncodable {
   LedgerEntryType discriminant;
-
   LedgerKey(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class LedgerKeyAccount extends LedgerKey {
-  LedgerKeyAccount(this.account)
-      : super(LedgerEntryType(LedgerEntryType.ACCOUNT));
+  LedgerKeyAccount(this.account) : super(LedgerEntryType(LedgerEntryType.ACCOUNT));
   late LedgerKeyAccountAccount account;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     account.toXdr(stream);
   }
@@ -4320,9 +3861,7 @@ class LedgerKeyAccount extends LedgerKey {
 class LedgerKeySigner extends LedgerKey {
   LedgerKeySigner(this.signer) : super(LedgerEntryType(LedgerEntryType.SIGNER));
   late LedgerKeySignerSigner signer;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     signer.toXdr(stream);
   }
@@ -4331,21 +3870,16 @@ class LedgerKeySigner extends LedgerKey {
 class LedgerKeyFee extends LedgerKey {
   LedgerKeyFee(this.feeState) : super(LedgerEntryType(LedgerEntryType.FEE));
   late LedgerKeyFeeStateFeeState feeState;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     feeState.toXdr(stream);
   }
 }
 
 class LedgerKeyBalance extends LedgerKey {
-  LedgerKeyBalance(this.balance)
-      : super(LedgerEntryType(LedgerEntryType.BALANCE));
+  LedgerKeyBalance(this.balance) : super(LedgerEntryType(LedgerEntryType.BALANCE));
   late LedgerKeyBalanceBalance balance;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     balance.toXdr(stream);
   }
@@ -4354,94 +3888,70 @@ class LedgerKeyBalance extends LedgerKey {
 class LedgerKeyAsset extends LedgerKey {
   LedgerKeyAsset(this.asset) : super(LedgerEntryType(LedgerEntryType.ASSET));
   late LedgerKeyAssetAsset asset;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     asset.toXdr(stream);
   }
 }
 
 class LedgerKeyReferenceEntry extends LedgerKey {
-  LedgerKeyReferenceEntry(this.reference)
-      : super(LedgerEntryType(LedgerEntryType.REFERENCE_ENTRY));
+  LedgerKeyReferenceEntry(this.reference) : super(LedgerEntryType(LedgerEntryType.REFERENCE_ENTRY));
   late LedgerKeyReferenceReference reference;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     reference.toXdr(stream);
   }
 }
 
 class LedgerKeyStatistics extends LedgerKey {
-  LedgerKeyStatistics(this.stats)
-      : super(LedgerEntryType(LedgerEntryType.STATISTICS));
+  LedgerKeyStatistics(this.stats) : super(LedgerEntryType(LedgerEntryType.STATISTICS));
   late LedgerKeyStatsStats stats;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     stats.toXdr(stream);
   }
 }
 
 class LedgerKeyAccountLimits extends LedgerKey {
-  LedgerKeyAccountLimits(this.accountLimits)
-      : super(LedgerEntryType(LedgerEntryType.ACCOUNT_LIMITS));
+  LedgerKeyAccountLimits(this.accountLimits) : super(LedgerEntryType(LedgerEntryType.ACCOUNT_LIMITS));
   late LedgerKeyAccountLimitsAccountLimits accountLimits;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     accountLimits.toXdr(stream);
   }
 }
 
 class LedgerKeyAssetPair extends LedgerKey {
-  LedgerKeyAssetPair(this.assetPair)
-      : super(LedgerEntryType(LedgerEntryType.ASSET_PAIR));
+  LedgerKeyAssetPair(this.assetPair) : super(LedgerEntryType(LedgerEntryType.ASSET_PAIR));
   late LedgerKeyAssetPairAssetPair assetPair;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     assetPair.toXdr(stream);
   }
 }
 
 class LedgerKeyOfferEntry extends LedgerKey {
-  LedgerKeyOfferEntry(this.offer)
-      : super(LedgerEntryType(LedgerEntryType.OFFER_ENTRY));
+  LedgerKeyOfferEntry(this.offer) : super(LedgerEntryType(LedgerEntryType.OFFER_ENTRY));
   late LedgerKeyOfferOffer offer;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     offer.toXdr(stream);
   }
 }
 
 class LedgerKeyReviewableRequest extends LedgerKey {
-  LedgerKeyReviewableRequest(this.reviewableRequest)
-      : super(LedgerEntryType(LedgerEntryType.REVIEWABLE_REQUEST));
+  LedgerKeyReviewableRequest(this.reviewableRequest) : super(LedgerEntryType(LedgerEntryType.REVIEWABLE_REQUEST));
   late LedgerKeyReviewableRequestReviewableRequest reviewableRequest;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     reviewableRequest.toXdr(stream);
   }
 }
 
 class LedgerKeyExternalSystemAccountId extends LedgerKey {
-  LedgerKeyExternalSystemAccountId(this.externalSystemAccountID)
-      : super(LedgerEntryType(LedgerEntryType.EXTERNAL_SYSTEM_ACCOUNT_ID));
-  late LedgerKeyExternalSystemAccountIDExternalSystemAccountID
-      externalSystemAccountID;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  LedgerKeyExternalSystemAccountId(this.externalSystemAccountID) : super(LedgerEntryType(LedgerEntryType.EXTERNAL_SYSTEM_ACCOUNT_ID));
+  late LedgerKeyExternalSystemAccountIDExternalSystemAccountID externalSystemAccountID;
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     externalSystemAccountID.toXdr(stream);
   }
@@ -4450,156 +3960,115 @@ class LedgerKeyExternalSystemAccountId extends LedgerKey {
 class LedgerKeySale extends LedgerKey {
   LedgerKeySale(this.sale) : super(LedgerEntryType(LedgerEntryType.SALE));
   late LedgerKeySaleSale sale;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     sale.toXdr(stream);
   }
 }
 
 class LedgerKeyKeyValue extends LedgerKey {
-  LedgerKeyKeyValue(this.keyValue)
-      : super(LedgerEntryType(LedgerEntryType.KEY_VALUE));
+  LedgerKeyKeyValue(this.keyValue) : super(LedgerEntryType(LedgerEntryType.KEY_VALUE));
   late LedgerKeyKeyValueKeyValue keyValue;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     keyValue.toXdr(stream);
   }
 }
 
 class LedgerKeyAccountKyc extends LedgerKey {
-  LedgerKeyAccountKyc(this.accountKYC)
-      : super(LedgerEntryType(LedgerEntryType.ACCOUNT_KYC));
+  LedgerKeyAccountKyc(this.accountKYC) : super(LedgerEntryType(LedgerEntryType.ACCOUNT_KYC));
   late LedgerKeyAccountKYCAccountKYC accountKYC;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     accountKYC.toXdr(stream);
   }
 }
 
 class LedgerKeyExternalSystemAccountIdPoolEntry extends LedgerKey {
-  LedgerKeyExternalSystemAccountIdPoolEntry(
-      this.externalSystemAccountIDPoolEntry)
-      : super(LedgerEntryType(
-            LedgerEntryType.EXTERNAL_SYSTEM_ACCOUNT_ID_POOL_ENTRY));
-  late LedgerKeyExternalSystemAccountIDPoolEntryExternalSystemAccountIDPoolEntry
-      externalSystemAccountIDPoolEntry;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  LedgerKeyExternalSystemAccountIdPoolEntry(this.externalSystemAccountIDPoolEntry) : super(LedgerEntryType(LedgerEntryType.EXTERNAL_SYSTEM_ACCOUNT_ID_POOL_ENTRY));
+  late LedgerKeyExternalSystemAccountIDPoolEntryExternalSystemAccountIDPoolEntry externalSystemAccountIDPoolEntry;
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     externalSystemAccountIDPoolEntry.toXdr(stream);
   }
 }
 
 class LedgerKeyLimitsV2 extends LedgerKey {
-  LedgerKeyLimitsV2(this.limitsV2)
-      : super(LedgerEntryType(LedgerEntryType.LIMITS_V2));
+  LedgerKeyLimitsV2(this.limitsV2) : super(LedgerEntryType(LedgerEntryType.LIMITS_V2));
   late LedgerKeyLimitsV2LimitsV2 limitsV2;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     limitsV2.toXdr(stream);
   }
 }
 
 class LedgerKeyStatisticsV2 extends LedgerKey {
-  LedgerKeyStatisticsV2(this.statisticsV2)
-      : super(LedgerEntryType(LedgerEntryType.STATISTICS_V2));
+  LedgerKeyStatisticsV2(this.statisticsV2) : super(LedgerEntryType(LedgerEntryType.STATISTICS_V2));
   late LedgerKeyStatisticsV2StatisticsV2 statisticsV2;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     statisticsV2.toXdr(stream);
   }
 }
 
 class LedgerKeyPendingStatistics extends LedgerKey {
-  LedgerKeyPendingStatistics(this.pendingStatistics)
-      : super(LedgerEntryType(LedgerEntryType.PENDING_STATISTICS));
+  LedgerKeyPendingStatistics(this.pendingStatistics) : super(LedgerEntryType(LedgerEntryType.PENDING_STATISTICS));
   late LedgerKeyPendingStatisticsPendingStatistics pendingStatistics;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     pendingStatistics.toXdr(stream);
   }
 }
 
 class LedgerKeyContract extends LedgerKey {
-  LedgerKeyContract(this.contract)
-      : super(LedgerEntryType(LedgerEntryType.CONTRACT));
+  LedgerKeyContract(this.contract) : super(LedgerEntryType(LedgerEntryType.CONTRACT));
   late LedgerKeyContractContract contract;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     contract.toXdr(stream);
   }
 }
 
 class LedgerKeyAtomicSwapAsk extends LedgerKey {
-  LedgerKeyAtomicSwapAsk(this.atomicSwapAsk)
-      : super(LedgerEntryType(LedgerEntryType.ATOMIC_SWAP_ASK));
+  LedgerKeyAtomicSwapAsk(this.atomicSwapAsk) : super(LedgerEntryType(LedgerEntryType.ATOMIC_SWAP_ASK));
   late LedgerKeyAtomicSwapAskAtomicSwapAsk atomicSwapAsk;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     atomicSwapAsk.toXdr(stream);
   }
 }
 
 class LedgerKeyAccountRole extends LedgerKey {
-  LedgerKeyAccountRole(this.accountRole)
-      : super(LedgerEntryType(LedgerEntryType.ACCOUNT_ROLE));
+  LedgerKeyAccountRole(this.accountRole) : super(LedgerEntryType(LedgerEntryType.ACCOUNT_ROLE));
   late LedgerKeyAccountRoleAccountRole accountRole;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     accountRole.toXdr(stream);
   }
 }
 
 class LedgerKeyAccountRule extends LedgerKey {
-  LedgerKeyAccountRule(this.accountRule)
-      : super(LedgerEntryType(LedgerEntryType.ACCOUNT_RULE));
+  LedgerKeyAccountRule(this.accountRule) : super(LedgerEntryType(LedgerEntryType.ACCOUNT_RULE));
   late LedgerKeyAccountRuleAccountRule accountRule;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     accountRule.toXdr(stream);
   }
 }
 
 class LedgerKeySignerRole extends LedgerKey {
-  LedgerKeySignerRole(this.signerRole)
-      : super(LedgerEntryType(LedgerEntryType.SIGNER_ROLE));
+  LedgerKeySignerRole(this.signerRole) : super(LedgerEntryType(LedgerEntryType.SIGNER_ROLE));
   late LedgerKeySignerRoleSignerRole signerRole;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     signerRole.toXdr(stream);
   }
 }
 
 class LedgerKeySignerRule extends LedgerKey {
-  LedgerKeySignerRule(this.signerRule)
-      : super(LedgerEntryType(LedgerEntryType.SIGNER_RULE));
+  LedgerKeySignerRule(this.signerRule) : super(LedgerEntryType(LedgerEntryType.SIGNER_RULE));
   late LedgerKeySignerRuleSignerRule signerRule;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     signerRule.toXdr(stream);
   }
@@ -4608,21 +4077,16 @@ class LedgerKeySignerRule extends LedgerKey {
 class LedgerKeyStamp extends LedgerKey {
   LedgerKeyStamp(this.stamp) : super(LedgerEntryType(LedgerEntryType.STAMP));
   late LedgerKeyStampStamp stamp;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     stamp.toXdr(stream);
   }
 }
 
 class LedgerKeyLicense extends LedgerKey {
-  LedgerKeyLicense(this.license)
-      : super(LedgerEntryType(LedgerEntryType.LICENSE));
+  LedgerKeyLicense(this.license) : super(LedgerEntryType(LedgerEntryType.LICENSE));
   late LedgerKeyLicenseLicense license;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     license.toXdr(stream);
   }
@@ -4631,9 +4095,7 @@ class LedgerKeyLicense extends LedgerKey {
 class LedgerKeyPoll extends LedgerKey {
   LedgerKeyPoll(this.poll) : super(LedgerEntryType(LedgerEntryType.POLL));
   late LedgerKeyPollPoll poll;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     poll.toXdr(stream);
   }
@@ -4642,21 +4104,16 @@ class LedgerKeyPoll extends LedgerKey {
 class LedgerKeyVote extends LedgerKey {
   LedgerKeyVote(this.vote) : super(LedgerEntryType(LedgerEntryType.VOTE));
   late LedgerKeyVoteVote vote;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     vote.toXdr(stream);
   }
 }
 
 class LedgerKeyAccountSpecificRule extends LedgerKey {
-  LedgerKeyAccountSpecificRule(this.accountSpecificRule)
-      : super(LedgerEntryType(LedgerEntryType.ACCOUNT_SPECIFIC_RULE));
+  LedgerKeyAccountSpecificRule(this.accountSpecificRule) : super(LedgerEntryType(LedgerEntryType.ACCOUNT_SPECIFIC_RULE));
   late LedgerKeyAccountSpecificRuleAccountSpecificRule accountSpecificRule;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     accountSpecificRule.toXdr(stream);
   }
@@ -4665,9 +4122,7 @@ class LedgerKeyAccountSpecificRule extends LedgerKey {
 class LedgerKeySwap extends LedgerKey {
   LedgerKeySwap(this.swap) : super(LedgerEntryType(LedgerEntryType.SWAP));
   late LedgerKeySwapSwap swap;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     swap.toXdr(stream);
   }
@@ -4676,21 +4131,16 @@ class LedgerKeySwap extends LedgerKey {
 class LedgerKeyData extends LedgerKey {
   LedgerKeyData(this.data) : super(LedgerEntryType(LedgerEntryType.DATA));
   late LedgerKeyDataData data;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     data.toXdr(stream);
   }
 }
 
 class LedgerKeyDeferredPayment extends LedgerKey {
-  LedgerKeyDeferredPayment(this.deferredPayment)
-      : super(LedgerEntryType(LedgerEntryType.DEFERRED_PAYMENT));
+  LedgerKeyDeferredPayment(this.deferredPayment) : super(LedgerEntryType(LedgerEntryType.DEFERRED_PAYMENT));
   late LedgerKeyDeferredPaymentDeferredPayment deferredPayment;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     deferredPayment.toXdr(stream);
   }
@@ -4709,36 +4159,30 @@ class LedgerKeyDeferredPayment extends LedgerKey {
 //      }
 
 //  ===========================================================================
-class LedgerKeyAccountAccount extends XdrEncodable {
-  AccountID accountID;
+class LedgerKeyAccountAccount extends XdrEncodable  {
+  ACCOUNTID accountID;
   LedgerKeyAccountExt ext;
 
   LedgerKeyAccountAccount(
-    this.accountID,
-    this.ext,
-  );
+      this.accountID,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     accountID.toXdr(stream);
     ext.toXdr(stream);
   }
 }
-
 abstract class LedgerKeyAccountExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   LedgerKeyAccountExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class LedgerKeyAccountExtEmptyVersion extends LedgerKeyAccountExt {
-  LedgerKeyAccountExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+  LedgerKeyAccountExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
 // === xdr source ============================================================
 
@@ -4756,39 +4200,33 @@ class LedgerKeyAccountExtEmptyVersion extends LedgerKeyAccountExt {
 //      }
 
 //  ===========================================================================
-class LedgerKeySignerSigner extends XdrEncodable {
+class LedgerKeySignerSigner extends XdrEncodable  {
   PublicKey pubKey;
-  AccountID accountID;
+  ACCOUNTID accountID;
   LedgerKeySignerExt ext;
 
   LedgerKeySignerSigner(
-    this.pubKey,
-    this.accountID,
-    this.ext,
-  );
+      this.pubKey,
+      this.accountID,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     pubKey.toXdr(stream);
     accountID.toXdr(stream);
     ext.toXdr(stream);
   }
 }
-
 abstract class LedgerKeySignerExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   LedgerKeySignerExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class LedgerKeySignerExtEmptyVersion extends LedgerKeySignerExt {
-  LedgerKeySignerExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+  LedgerKeySignerExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
 // === xdr source ============================================================
 
@@ -4805,42 +4243,36 @@ class LedgerKeySignerExtEmptyVersion extends LedgerKeySignerExt {
 //      }
 
 //  ===========================================================================
-class LedgerKeyFeeStateFeeState extends XdrEncodable {
-  Hash hash;
-  Int64 lowerBound;
-  Int64 upperBound;
+class LedgerKeyFeeStateFeeState extends XdrEncodable  {
+  HASH hash;
+  INT64 lowerBound;
+  INT64 upperBound;
   LedgerKeyFeeStateExt ext;
 
   LedgerKeyFeeStateFeeState(
-    this.hash,
-    this.lowerBound,
-    this.upperBound,
-    this.ext,
-  );
+      this.hash,
+      this.lowerBound,
+      this.upperBound,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     hash.toXdr(stream);
     lowerBound.toXdr(stream);
     upperBound.toXdr(stream);
     ext.toXdr(stream);
   }
 }
-
 abstract class LedgerKeyFeeStateExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   LedgerKeyFeeStateExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class LedgerKeyFeeStateExtEmptyVersion extends LedgerKeyFeeStateExt {
-  LedgerKeyFeeStateExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+  LedgerKeyFeeStateExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
 // === xdr source ============================================================
 
@@ -4856,36 +4288,30 @@ class LedgerKeyFeeStateExtEmptyVersion extends LedgerKeyFeeStateExt {
 //      }
 
 //  ===========================================================================
-class LedgerKeyBalanceBalance extends XdrEncodable {
-  BalanceID balanceID;
+class LedgerKeyBalanceBalance extends XdrEncodable  {
+  BALANCEID balanceID;
   LedgerKeyBalanceExt ext;
 
   LedgerKeyBalanceBalance(
-    this.balanceID,
-    this.ext,
-  );
+      this.balanceID,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     balanceID.toXdr(stream);
     ext.toXdr(stream);
   }
 }
-
 abstract class LedgerKeyBalanceExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   LedgerKeyBalanceExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class LedgerKeyBalanceExtEmptyVersion extends LedgerKeyBalanceExt {
-  LedgerKeyBalanceExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+  LedgerKeyBalanceExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
 // === xdr source ============================================================
 
@@ -4901,36 +4327,30 @@ class LedgerKeyBalanceExtEmptyVersion extends LedgerKeyBalanceExt {
 //      }
 
 //  ===========================================================================
-class LedgerKeyAssetAsset extends XdrEncodable {
-  AssetCode code;
+class LedgerKeyAssetAsset extends XdrEncodable  {
+  ASSETCODE code;
   LedgerKeyAssetExt ext;
 
   LedgerKeyAssetAsset(
-    this.code,
-    this.ext,
-  );
+      this.code,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     code.toXdr(stream);
     ext.toXdr(stream);
   }
 }
-
 abstract class LedgerKeyAssetExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   LedgerKeyAssetExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class LedgerKeyAssetExtEmptyVersion extends LedgerKeyAssetExt {
-  LedgerKeyAssetExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+  LedgerKeyAssetExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
 // === xdr source ============================================================
 
@@ -4947,39 +4367,33 @@ class LedgerKeyAssetExtEmptyVersion extends LedgerKeyAssetExt {
 //      }
 
 //  ===========================================================================
-class LedgerKeyReferenceReference extends XdrEncodable {
-  AccountID sender;
-  String64 reference;
+class LedgerKeyReferenceReference extends XdrEncodable  {
+  ACCOUNTID sender;
+  STRING64 reference;
   LedgerKeyReferenceExt ext;
 
   LedgerKeyReferenceReference(
-    this.sender,
-    this.reference,
-    this.ext,
-  );
+      this.sender,
+      this.reference,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     sender.toXdr(stream);
     reference.toXdr(stream);
     ext.toXdr(stream);
   }
 }
-
 abstract class LedgerKeyReferenceExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   LedgerKeyReferenceExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class LedgerKeyReferenceExtEmptyVersion extends LedgerKeyReferenceExt {
-  LedgerKeyReferenceExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+  LedgerKeyReferenceExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
 // === xdr source ============================================================
 
@@ -4994,36 +4408,30 @@ class LedgerKeyReferenceExtEmptyVersion extends LedgerKeyReferenceExt {
 //      }
 
 //  ===========================================================================
-class LedgerKeyStatsStats extends XdrEncodable {
-  AccountID accountID;
+class LedgerKeyStatsStats extends XdrEncodable  {
+  ACCOUNTID accountID;
   LedgerKeyStatsExt ext;
 
   LedgerKeyStatsStats(
-    this.accountID,
-    this.ext,
-  );
+      this.accountID,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     accountID.toXdr(stream);
     ext.toXdr(stream);
   }
 }
-
 abstract class LedgerKeyStatsExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   LedgerKeyStatsExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class LedgerKeyStatsExtEmptyVersion extends LedgerKeyStatsExt {
-  LedgerKeyStatsExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+  LedgerKeyStatsExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
 // === xdr source ============================================================
 
@@ -5038,36 +4446,30 @@ class LedgerKeyStatsExtEmptyVersion extends LedgerKeyStatsExt {
 //      }
 
 //  ===========================================================================
-class LedgerKeyAccountLimitsAccountLimits extends XdrEncodable {
-  AccountID accountID;
+class LedgerKeyAccountLimitsAccountLimits extends XdrEncodable  {
+  ACCOUNTID accountID;
   LedgerKeyAccountLimitsExt ext;
 
   LedgerKeyAccountLimitsAccountLimits(
-    this.accountID,
-    this.ext,
-  );
+      this.accountID,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     accountID.toXdr(stream);
     ext.toXdr(stream);
   }
 }
-
 abstract class LedgerKeyAccountLimitsExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   LedgerKeyAccountLimitsExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class LedgerKeyAccountLimitsExtEmptyVersion extends LedgerKeyAccountLimitsExt {
-  LedgerKeyAccountLimitsExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+  LedgerKeyAccountLimitsExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
 // === xdr source ============================================================
 
@@ -5083,39 +4485,33 @@ class LedgerKeyAccountLimitsExtEmptyVersion extends LedgerKeyAccountLimitsExt {
 //      }
 
 //  ===========================================================================
-class LedgerKeyAssetPairAssetPair extends XdrEncodable {
-  AssetCode base;
-  AssetCode quote;
+class LedgerKeyAssetPairAssetPair extends XdrEncodable  {
+  ASSETCODE base;
+  ASSETCODE quote;
   LedgerKeyAssetPairExt ext;
 
   LedgerKeyAssetPairAssetPair(
-    this.base,
-    this.quote,
-    this.ext,
-  );
+      this.base,
+      this.quote,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     base.toXdr(stream);
     quote.toXdr(stream);
     ext.toXdr(stream);
   }
 }
-
 abstract class LedgerKeyAssetPairExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   LedgerKeyAssetPairExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class LedgerKeyAssetPairExtEmptyVersion extends LedgerKeyAssetPairExt {
-  LedgerKeyAssetPairExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+  LedgerKeyAssetPairExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
 // === xdr source ============================================================
 
@@ -5125,17 +4521,16 @@ class LedgerKeyAssetPairExtEmptyVersion extends LedgerKeyAssetPairExt {
 //      }
 
 //  ===========================================================================
-class LedgerKeyOfferOffer extends XdrEncodable {
-  Uint64 offerID;
-  AccountID ownerID;
+class LedgerKeyOfferOffer extends XdrEncodable  {
+  UINT64 offerID;
+  ACCOUNTID ownerID;
 
   LedgerKeyOfferOffer(
-    this.offerID,
-    this.ownerID,
-  );
+      this.offerID,
+      this.ownerID,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     offerID.toXdr(stream);
     ownerID.toXdr(stream);
   }
@@ -5153,37 +4548,30 @@ class LedgerKeyOfferOffer extends XdrEncodable {
 //      }
 
 //  ===========================================================================
-class LedgerKeyReviewableRequestReviewableRequest extends XdrEncodable {
-  Uint64 requestID;
+class LedgerKeyReviewableRequestReviewableRequest extends XdrEncodable  {
+  UINT64 requestID;
   LedgerKeyReviewableRequestExt ext;
 
   LedgerKeyReviewableRequestReviewableRequest(
-    this.requestID,
-    this.ext,
-  );
+      this.requestID,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     requestID.toXdr(stream);
     ext.toXdr(stream);
   }
 }
-
 abstract class LedgerKeyReviewableRequestExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   LedgerKeyReviewableRequestExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
-class LedgerKeyReviewableRequestExtEmptyVersion
-    extends LedgerKeyReviewableRequestExt {
-  LedgerKeyReviewableRequestExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+class LedgerKeyReviewableRequestExtEmptyVersion extends LedgerKeyReviewableRequestExt {
+  LedgerKeyReviewableRequestExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
 // === xdr source ============================================================
 
@@ -5199,41 +4587,33 @@ class LedgerKeyReviewableRequestExtEmptyVersion
 //  	}
 
 //  ===========================================================================
-class LedgerKeyExternalSystemAccountIDExternalSystemAccountID
-    extends XdrEncodable {
-  AccountID accountID;
-  Int32 externalSystemType;
+class LedgerKeyExternalSystemAccountIDExternalSystemAccountID extends XdrEncodable  {
+  ACCOUNTID accountID;
+  INT32 externalSystemType;
   LedgerKeyExternalSystemAccountIDExt ext;
 
   LedgerKeyExternalSystemAccountIDExternalSystemAccountID(
-    this.accountID,
-    this.externalSystemType,
-    this.ext,
-  );
+      this.accountID,
+      this.externalSystemType,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     accountID.toXdr(stream);
     externalSystemType.toXdr(stream);
     ext.toXdr(stream);
   }
 }
-
 abstract class LedgerKeyExternalSystemAccountIDExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   LedgerKeyExternalSystemAccountIDExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
-class LedgerKeyExternalSystemAccountIDExtEmptyVersion
-    extends LedgerKeyExternalSystemAccountIDExt {
-  LedgerKeyExternalSystemAccountIDExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+class LedgerKeyExternalSystemAccountIDExtEmptyVersion extends LedgerKeyExternalSystemAccountIDExt {
+  LedgerKeyExternalSystemAccountIDExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
 // === xdr source ============================================================
 
@@ -5248,36 +4628,30 @@ class LedgerKeyExternalSystemAccountIDExtEmptyVersion
 //      }
 
 //  ===========================================================================
-class LedgerKeySaleSale extends XdrEncodable {
-  Uint64 saleID;
+class LedgerKeySaleSale extends XdrEncodable  {
+  UINT64 saleID;
   LedgerKeySaleExt ext;
 
   LedgerKeySaleSale(
-    this.saleID,
-    this.ext,
-  );
+      this.saleID,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     saleID.toXdr(stream);
     ext.toXdr(stream);
   }
 }
-
 abstract class LedgerKeySaleExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   LedgerKeySaleExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class LedgerKeySaleExtEmptyVersion extends LedgerKeySaleExt {
-  LedgerKeySaleExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+  LedgerKeySaleExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
 // === xdr source ============================================================
 
@@ -5292,36 +4666,30 @@ class LedgerKeySaleExtEmptyVersion extends LedgerKeySaleExt {
 //      }
 
 //  ===========================================================================
-class LedgerKeyKeyValueKeyValue extends XdrEncodable {
-  Longstring key;
+class LedgerKeyKeyValueKeyValue extends XdrEncodable  {
+  LONGSTRING key;
   LedgerKeyKeyValueExt ext;
 
   LedgerKeyKeyValueKeyValue(
-    this.key,
-    this.ext,
-  );
+      this.key,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     key.toXdr(stream);
     ext.toXdr(stream);
   }
 }
-
 abstract class LedgerKeyKeyValueExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   LedgerKeyKeyValueExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class LedgerKeyKeyValueExtEmptyVersion extends LedgerKeyKeyValueExt {
-  LedgerKeyKeyValueExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+  LedgerKeyKeyValueExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
 // === xdr source ============================================================
 
@@ -5336,36 +4704,30 @@ class LedgerKeyKeyValueExtEmptyVersion extends LedgerKeyKeyValueExt {
 //      }
 
 //  ===========================================================================
-class LedgerKeyAccountKYCAccountKYC extends XdrEncodable {
-  AccountID accountID;
+class LedgerKeyAccountKYCAccountKYC extends XdrEncodable  {
+  ACCOUNTID accountID;
   LedgerKeyAccountKYCExt ext;
 
   LedgerKeyAccountKYCAccountKYC(
-    this.accountID,
-    this.ext,
-  );
+      this.accountID,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     accountID.toXdr(stream);
     ext.toXdr(stream);
   }
 }
-
 abstract class LedgerKeyAccountKYCExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   LedgerKeyAccountKYCExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class LedgerKeyAccountKYCExtEmptyVersion extends LedgerKeyAccountKYCExt {
-  LedgerKeyAccountKYCExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+  LedgerKeyAccountKYCExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
 // === xdr source ============================================================
 
@@ -5380,39 +4742,30 @@ class LedgerKeyAccountKYCExtEmptyVersion extends LedgerKeyAccountKYCExt {
 //  	}
 
 //  ===========================================================================
-class LedgerKeyExternalSystemAccountIDPoolEntryExternalSystemAccountIDPoolEntry
-    extends XdrEncodable {
-  Uint64 poolEntryID;
+class LedgerKeyExternalSystemAccountIDPoolEntryExternalSystemAccountIDPoolEntry extends XdrEncodable  {
+  UINT64 poolEntryID;
   LedgerKeyExternalSystemAccountIDPoolEntryExt ext;
 
   LedgerKeyExternalSystemAccountIDPoolEntryExternalSystemAccountIDPoolEntry(
-    this.poolEntryID,
-    this.ext,
-  );
+      this.poolEntryID,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     poolEntryID.toXdr(stream);
     ext.toXdr(stream);
   }
 }
-
-abstract class LedgerKeyExternalSystemAccountIDPoolEntryExt
-    extends XdrEncodable {
+abstract class LedgerKeyExternalSystemAccountIDPoolEntryExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   LedgerKeyExternalSystemAccountIDPoolEntryExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
-class LedgerKeyExternalSystemAccountIDPoolEntryExtEmptyVersion
-    extends LedgerKeyExternalSystemAccountIDPoolEntryExt {
-  LedgerKeyExternalSystemAccountIDPoolEntryExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+class LedgerKeyExternalSystemAccountIDPoolEntryExtEmptyVersion extends LedgerKeyExternalSystemAccountIDPoolEntryExt {
+  LedgerKeyExternalSystemAccountIDPoolEntryExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
 // === xdr source ============================================================
 
@@ -5426,36 +4779,30 @@ class LedgerKeyExternalSystemAccountIDPoolEntryExtEmptyVersion
 //      }
 
 //  ===========================================================================
-class LedgerKeyLimitsV2LimitsV2 extends XdrEncodable {
-  Uint64 id;
+class LedgerKeyLimitsV2LimitsV2 extends XdrEncodable  {
+  UINT64 id;
   LedgerKeyLimitsV2Ext ext;
 
   LedgerKeyLimitsV2LimitsV2(
-    this.id,
-    this.ext,
-  );
+      this.id,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     id.toXdr(stream);
     ext.toXdr(stream);
   }
 }
-
 abstract class LedgerKeyLimitsV2Ext extends XdrEncodable {
   LedgerVersion discriminant;
-
   LedgerKeyLimitsV2Ext(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class LedgerKeyLimitsV2ExtEmptyVersion extends LedgerKeyLimitsV2Ext {
-  LedgerKeyLimitsV2ExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+  LedgerKeyLimitsV2ExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
 // === xdr source ============================================================
 
@@ -5470,36 +4817,30 @@ class LedgerKeyLimitsV2ExtEmptyVersion extends LedgerKeyLimitsV2Ext {
 //      }
 
 //  ===========================================================================
-class LedgerKeyStatisticsV2StatisticsV2 extends XdrEncodable {
-  Uint64 id;
+class LedgerKeyStatisticsV2StatisticsV2 extends XdrEncodable  {
+  UINT64 id;
   LedgerKeyStatisticsV2Ext ext;
 
   LedgerKeyStatisticsV2StatisticsV2(
-    this.id,
-    this.ext,
-  );
+      this.id,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     id.toXdr(stream);
     ext.toXdr(stream);
   }
 }
-
 abstract class LedgerKeyStatisticsV2Ext extends XdrEncodable {
   LedgerVersion discriminant;
-
   LedgerKeyStatisticsV2Ext(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class LedgerKeyStatisticsV2ExtEmptyVersion extends LedgerKeyStatisticsV2Ext {
-  LedgerKeyStatisticsV2ExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+  LedgerKeyStatisticsV2ExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
 // === xdr source ============================================================
 
@@ -5515,40 +4856,33 @@ class LedgerKeyStatisticsV2ExtEmptyVersion extends LedgerKeyStatisticsV2Ext {
 //      }
 
 //  ===========================================================================
-class LedgerKeyPendingStatisticsPendingStatistics extends XdrEncodable {
-  Uint64 statisticsID;
-  Uint64 requestID;
+class LedgerKeyPendingStatisticsPendingStatistics extends XdrEncodable  {
+  UINT64 statisticsID;
+  UINT64 requestID;
   LedgerKeyPendingStatisticsExt ext;
 
   LedgerKeyPendingStatisticsPendingStatistics(
-    this.statisticsID,
-    this.requestID,
-    this.ext,
-  );
+      this.statisticsID,
+      this.requestID,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     statisticsID.toXdr(stream);
     requestID.toXdr(stream);
     ext.toXdr(stream);
   }
 }
-
 abstract class LedgerKeyPendingStatisticsExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   LedgerKeyPendingStatisticsExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
-class LedgerKeyPendingStatisticsExtEmptyVersion
-    extends LedgerKeyPendingStatisticsExt {
-  LedgerKeyPendingStatisticsExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+class LedgerKeyPendingStatisticsExtEmptyVersion extends LedgerKeyPendingStatisticsExt {
+  LedgerKeyPendingStatisticsExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
 // === xdr source ============================================================
 
@@ -5563,36 +4897,30 @@ class LedgerKeyPendingStatisticsExtEmptyVersion
 //      }
 
 //  ===========================================================================
-class LedgerKeyContractContract extends XdrEncodable {
-  Uint64 contractID;
+class LedgerKeyContractContract extends XdrEncodable  {
+  UINT64 contractID;
   LedgerKeyContractExt ext;
 
   LedgerKeyContractContract(
-    this.contractID,
-    this.ext,
-  );
+      this.contractID,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     contractID.toXdr(stream);
     ext.toXdr(stream);
   }
 }
-
 abstract class LedgerKeyContractExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   LedgerKeyContractExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class LedgerKeyContractExtEmptyVersion extends LedgerKeyContractExt {
-  LedgerKeyContractExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+  LedgerKeyContractExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
 // === xdr source ============================================================
 
@@ -5607,36 +4935,30 @@ class LedgerKeyContractExtEmptyVersion extends LedgerKeyContractExt {
 //      }
 
 //  ===========================================================================
-class LedgerKeyAtomicSwapAskAtomicSwapAsk extends XdrEncodable {
-  Uint64 id;
+class LedgerKeyAtomicSwapAskAtomicSwapAsk extends XdrEncodable  {
+  UINT64 id;
   LedgerKeyAtomicSwapAskExt ext;
 
   LedgerKeyAtomicSwapAskAtomicSwapAsk(
-    this.id,
-    this.ext,
-  );
+      this.id,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     id.toXdr(stream);
     ext.toXdr(stream);
   }
 }
-
 abstract class LedgerKeyAtomicSwapAskExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   LedgerKeyAtomicSwapAskExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class LedgerKeyAtomicSwapAskExtEmptyVersion extends LedgerKeyAtomicSwapAskExt {
-  LedgerKeyAtomicSwapAskExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+  LedgerKeyAtomicSwapAskExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
 // === xdr source ============================================================
 
@@ -5651,36 +4973,30 @@ class LedgerKeyAtomicSwapAskExtEmptyVersion extends LedgerKeyAtomicSwapAskExt {
 //      }
 
 //  ===========================================================================
-class LedgerKeyAccountRoleAccountRole extends XdrEncodable {
-  Uint64 id;
+class LedgerKeyAccountRoleAccountRole extends XdrEncodable  {
+  UINT64 id;
   LedgerKeyAccountRoleExt ext;
 
   LedgerKeyAccountRoleAccountRole(
-    this.id,
-    this.ext,
-  );
+      this.id,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     id.toXdr(stream);
     ext.toXdr(stream);
   }
 }
-
 abstract class LedgerKeyAccountRoleExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   LedgerKeyAccountRoleExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class LedgerKeyAccountRoleExtEmptyVersion extends LedgerKeyAccountRoleExt {
-  LedgerKeyAccountRoleExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+  LedgerKeyAccountRoleExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
 // === xdr source ============================================================
 
@@ -5695,36 +5011,30 @@ class LedgerKeyAccountRoleExtEmptyVersion extends LedgerKeyAccountRoleExt {
 //      }
 
 //  ===========================================================================
-class LedgerKeyAccountRuleAccountRule extends XdrEncodable {
-  Uint64 id;
+class LedgerKeyAccountRuleAccountRule extends XdrEncodable  {
+  UINT64 id;
   LedgerKeyAccountRuleExt ext;
 
   LedgerKeyAccountRuleAccountRule(
-    this.id,
-    this.ext,
-  );
+      this.id,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     id.toXdr(stream);
     ext.toXdr(stream);
   }
 }
-
 abstract class LedgerKeyAccountRuleExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   LedgerKeyAccountRuleExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class LedgerKeyAccountRuleExtEmptyVersion extends LedgerKeyAccountRuleExt {
-  LedgerKeyAccountRuleExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+  LedgerKeyAccountRuleExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
 // === xdr source ============================================================
 
@@ -5739,36 +5049,30 @@ class LedgerKeyAccountRuleExtEmptyVersion extends LedgerKeyAccountRuleExt {
 //      }
 
 //  ===========================================================================
-class LedgerKeySignerRoleSignerRole extends XdrEncodable {
-  Uint64 id;
+class LedgerKeySignerRoleSignerRole extends XdrEncodable  {
+  UINT64 id;
   LedgerKeySignerRoleExt ext;
 
   LedgerKeySignerRoleSignerRole(
-    this.id,
-    this.ext,
-  );
+      this.id,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     id.toXdr(stream);
     ext.toXdr(stream);
   }
 }
-
 abstract class LedgerKeySignerRoleExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   LedgerKeySignerRoleExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class LedgerKeySignerRoleExtEmptyVersion extends LedgerKeySignerRoleExt {
-  LedgerKeySignerRoleExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+  LedgerKeySignerRoleExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
 // === xdr source ============================================================
 
@@ -5783,36 +5087,30 @@ class LedgerKeySignerRoleExtEmptyVersion extends LedgerKeySignerRoleExt {
 //      }
 
 //  ===========================================================================
-class LedgerKeySignerRuleSignerRule extends XdrEncodable {
-  Uint64 id;
+class LedgerKeySignerRuleSignerRule extends XdrEncodable  {
+  UINT64 id;
   LedgerKeySignerRuleExt ext;
 
   LedgerKeySignerRuleSignerRule(
-    this.id,
-    this.ext,
-  );
+      this.id,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     id.toXdr(stream);
     ext.toXdr(stream);
   }
 }
-
 abstract class LedgerKeySignerRuleExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   LedgerKeySignerRuleExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class LedgerKeySignerRuleExtEmptyVersion extends LedgerKeySignerRuleExt {
-  LedgerKeySignerRuleExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+  LedgerKeySignerRuleExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
 // === xdr source ============================================================
 
@@ -5828,39 +5126,33 @@ class LedgerKeySignerRuleExtEmptyVersion extends LedgerKeySignerRuleExt {
 //      }
 
 //  ===========================================================================
-class LedgerKeyStampStamp extends XdrEncodable {
-  Hash ledgerHash;
-  Hash licenseHash;
+class LedgerKeyStampStamp extends XdrEncodable  {
+  HASH ledgerHash;
+  HASH licenseHash;
   LedgerKeyStampExt ext;
 
   LedgerKeyStampStamp(
-    this.ledgerHash,
-    this.licenseHash,
-    this.ext,
-  );
+      this.ledgerHash,
+      this.licenseHash,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     ledgerHash.toXdr(stream);
     licenseHash.toXdr(stream);
     ext.toXdr(stream);
   }
 }
-
 abstract class LedgerKeyStampExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   LedgerKeyStampExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class LedgerKeyStampExtEmptyVersion extends LedgerKeyStampExt {
-  LedgerKeyStampExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+  LedgerKeyStampExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
 // === xdr source ============================================================
 
@@ -5874,36 +5166,30 @@ class LedgerKeyStampExtEmptyVersion extends LedgerKeyStampExt {
 //      }
 
 //  ===========================================================================
-class LedgerKeyLicenseLicense extends XdrEncodable {
-  Hash licenseHash;
+class LedgerKeyLicenseLicense extends XdrEncodable  {
+  HASH licenseHash;
   LedgerKeyLicenseExt ext;
 
   LedgerKeyLicenseLicense(
-    this.licenseHash,
-    this.ext,
-  );
+      this.licenseHash,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     licenseHash.toXdr(stream);
     ext.toXdr(stream);
   }
 }
-
 abstract class LedgerKeyLicenseExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   LedgerKeyLicenseExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class LedgerKeyLicenseExtEmptyVersion extends LedgerKeyLicenseExt {
-  LedgerKeyLicenseExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+  LedgerKeyLicenseExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
 // === xdr source ============================================================
 
@@ -5914,17 +5200,16 @@ class LedgerKeyLicenseExtEmptyVersion extends LedgerKeyLicenseExt {
 //      }
 
 //  ===========================================================================
-class LedgerKeyPollPoll extends XdrEncodable {
-  Uint64 id;
+class LedgerKeyPollPoll extends XdrEncodable  {
+  UINT64 id;
   EmptyExt ext;
 
   LedgerKeyPollPoll(
-    this.id,
-    this.ext,
-  );
+      this.id,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     id.toXdr(stream);
     ext.toXdr(stream);
   }
@@ -5939,19 +5224,18 @@ class LedgerKeyPollPoll extends XdrEncodable {
 //      }
 
 //  ===========================================================================
-class LedgerKeyVoteVote extends XdrEncodable {
-  Uint64 pollID;
-  AccountID voterID;
+class LedgerKeyVoteVote extends XdrEncodable  {
+  UINT64 pollID;
+  ACCOUNTID voterID;
   EmptyExt ext;
 
   LedgerKeyVoteVote(
-    this.pollID,
-    this.voterID,
-    this.ext,
-  );
+      this.pollID,
+      this.voterID,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     pollID.toXdr(stream);
     voterID.toXdr(stream);
     ext.toXdr(stream);
@@ -5966,17 +5250,16 @@ class LedgerKeyVoteVote extends XdrEncodable {
 //      }
 
 //  ===========================================================================
-class LedgerKeyAccountSpecificRuleAccountSpecificRule extends XdrEncodable {
-  Uint64 id;
+class LedgerKeyAccountSpecificRuleAccountSpecificRule extends XdrEncodable  {
+  UINT64 id;
   EmptyExt ext;
 
   LedgerKeyAccountSpecificRuleAccountSpecificRule(
-    this.id,
-    this.ext,
-  );
+      this.id,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     id.toXdr(stream);
     ext.toXdr(stream);
   }
@@ -5991,17 +5274,16 @@ class LedgerKeyAccountSpecificRuleAccountSpecificRule extends XdrEncodable {
 //      }
 
 //  ===========================================================================
-class LedgerKeySwapSwap extends XdrEncodable {
-  Uint64 id;
+class LedgerKeySwapSwap extends XdrEncodable  {
+  UINT64 id;
   EmptyExt ext;
 
   LedgerKeySwapSwap(
-    this.id,
-    this.ext,
-  );
+      this.id,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     id.toXdr(stream);
     ext.toXdr(stream);
   }
@@ -6015,17 +5297,16 @@ class LedgerKeySwapSwap extends XdrEncodable {
 //      }
 
 //  ===========================================================================
-class LedgerKeyDataData extends XdrEncodable {
-  Uint64 id;
+class LedgerKeyDataData extends XdrEncodable  {
+  UINT64 id;
   EmptyExt ext;
 
   LedgerKeyDataData(
-    this.id,
-    this.ext,
-  );
+      this.id,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     id.toXdr(stream);
     ext.toXdr(stream);
   }
@@ -6039,23 +5320,22 @@ class LedgerKeyDataData extends XdrEncodable {
 //      }
 
 //  ===========================================================================
-class LedgerKeyDeferredPaymentDeferredPayment extends XdrEncodable {
-  Uint64 id;
+class LedgerKeyDeferredPaymentDeferredPayment extends XdrEncodable  {
+  UINT64 id;
   EmptyExt ext;
 
   LedgerKeyDeferredPaymentDeferredPayment(
-    this.id,
-    this.ext,
-  );
+      this.id,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     id.toXdr(stream);
     ext.toXdr(stream);
   }
 }
 
-typedef UpgradeType = Uint8List;
+typedef UPGRADETYPE = Uint8List;
 // === xdr source ============================================================
 
 //  struct StellarValue
@@ -6080,45 +5360,39 @@ typedef UpgradeType = Uint8List;
 //  };
 
 //  ===========================================================================
-class StellarValue extends XdrEncodable {
-  Hash txSetHash;
-  Uint64 closeTime;
-  List<UpgradeType> upgrades;
+class StellarValue extends XdrEncodable  {
+  HASH txSetHash;
+  UINT64 closeTime;
+  List<UPGRADETYPE> upgrades;
   StellarValueExt ext;
 
   StellarValue(
-    this.txSetHash,
-    this.closeTime,
-    this.upgrades,
-    this.ext,
-  );
+      this.txSetHash,
+      this.closeTime,
+      this.upgrades,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     txSetHash.toXdr(stream);
     closeTime.toXdr(stream);
     upgrades.length.toXdr(stream);
-    upgrades.forEach((element) {
+    upgrades.forEach ((element) {
       element.toXdr(stream);
     });
     ext.toXdr(stream);
   }
 }
-
 abstract class StellarValueExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   StellarValueExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class StellarValueExtEmptyVersion extends StellarValueExt {
-  StellarValueExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+  StellarValueExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
 // === xdr source ============================================================
 
@@ -6128,17 +5402,16 @@ class StellarValueExtEmptyVersion extends StellarValueExt {
 //  };
 
 //  ===========================================================================
-class IdGenerator extends XdrEncodable {
+class IdGenerator extends XdrEncodable  {
   LedgerEntryType entryType;
-  Uint64 idPool;
+  UINT64 idPool;
 
   IdGenerator(
-    this.entryType,
-    this.idPool,
-  );
+      this.entryType,
+      this.idPool,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     entryType.toXdr(stream);
     idPool.toXdr(stream);
   }
@@ -6180,39 +5453,38 @@ class IdGenerator extends XdrEncodable {
 //  };
 
 //  ===========================================================================
-class LedgerHeader extends XdrEncodable {
-  Uint32 ledgerVersion;
-  Hash previousLedgerHash;
+class LedgerHeader extends XdrEncodable  {
+  UINT32 ledgerVersion;
+  HASH previousLedgerHash;
   StellarValue scpValue;
-  Hash txSetResultHash;
-  Hash bucketListHash;
-  Uint32 ledgerSeq;
+  HASH txSetResultHash;
+  HASH bucketListHash;
+  UINT32 ledgerSeq;
   List<IdGenerator> idGenerators;
-  Uint32 baseFee;
-  Uint32 baseReserve;
-  Uint32 maxTxSetSize;
-  Int64 txExpirationPeriod;
-  List<Hash> skipList;
+  UINT32 baseFee;
+  UINT32 baseReserve;
+  UINT32 maxTxSetSize;
+  INT64 txExpirationPeriod;
+  List<HASH> skipList;
   LedgerHeaderExt ext;
 
   LedgerHeader(
-    this.ledgerVersion,
-    this.previousLedgerHash,
-    this.scpValue,
-    this.txSetResultHash,
-    this.bucketListHash,
-    this.ledgerSeq,
-    this.idGenerators,
-    this.baseFee,
-    this.baseReserve,
-    this.maxTxSetSize,
-    this.txExpirationPeriod,
-    this.skipList,
-    this.ext,
-  );
+      this.ledgerVersion,
+      this.previousLedgerHash,
+      this.scpValue,
+      this.txSetResultHash,
+      this.bucketListHash,
+      this.ledgerSeq,
+      this.idGenerators,
+      this.baseFee,
+      this.baseReserve,
+      this.maxTxSetSize,
+      this.txExpirationPeriod,
+      this.skipList,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     ledgerVersion.toXdr(stream);
     previousLedgerHash.toXdr(stream);
     scpValue.toXdr(stream);
@@ -6220,87 +5492,71 @@ class LedgerHeader extends XdrEncodable {
     bucketListHash.toXdr(stream);
     ledgerSeq.toXdr(stream);
     idGenerators.length.toXdr(stream);
-    idGenerators.forEach((element) {
+    idGenerators.forEach ((element) {
       element.toXdr(stream);
     });
     baseFee.toXdr(stream);
     baseReserve.toXdr(stream);
     maxTxSetSize.toXdr(stream);
     txExpirationPeriod.toXdr(stream);
-    skipList.forEach((element) {
+    skipList.forEach ((element) {
       element.toXdr(stream);
     });
     ext.toXdr(stream);
   }
 }
-
 abstract class LedgerHeaderExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   LedgerHeaderExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class LedgerHeaderExtEmptyVersion extends LedgerHeaderExt {
-  LedgerHeaderExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+  LedgerHeaderExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
-
 class LedgerUpgradeType extends XdrEncodable {
   static const VERSION = 1;
   static const MAX_TX_SET_SIZE = 2;
   static const TX_EXPIRATION_PERIOD = 3;
-  var value;
-
+  int value;
   LedgerUpgradeType(this.value);
-}
+  @override toXdr(XdrDataOutputStream stream) {
+    value.toXdr(stream);
+  }
 
+}
 abstract class LedgerUpgrade extends XdrEncodable {
   LedgerUpgradeType discriminant;
-
   LedgerUpgrade(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class LedgerUpgradeVersion extends LedgerUpgrade {
-  LedgerUpgradeVersion(this.newLedgerVersion)
-      : super(LedgerUpgradeType(LedgerUpgradeType.VERSION));
-  late Uint32 newLedgerVersion;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  LedgerUpgradeVersion(this.newLedgerVersion) : super(LedgerUpgradeType(LedgerUpgradeType.VERSION));
+  late UINT32 newLedgerVersion;
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     newLedgerVersion.toXdr(stream);
   }
 }
 
 class LedgerUpgradeMaxTxSetSize extends LedgerUpgrade {
-  LedgerUpgradeMaxTxSetSize(this.newMaxTxSetSize)
-      : super(LedgerUpgradeType(LedgerUpgradeType.MAX_TX_SET_SIZE));
-  late Uint32 newMaxTxSetSize;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  LedgerUpgradeMaxTxSetSize(this.newMaxTxSetSize) : super(LedgerUpgradeType(LedgerUpgradeType.MAX_TX_SET_SIZE));
+  late UINT32 newMaxTxSetSize;
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     newMaxTxSetSize.toXdr(stream);
   }
 }
 
 class LedgerUpgradeTxExpirationPeriod extends LedgerUpgrade {
-  LedgerUpgradeTxExpirationPeriod(this.newTxExpirationPeriod)
-      : super(LedgerUpgradeType(LedgerUpgradeType.TX_EXPIRATION_PERIOD));
-  late Int64 newTxExpirationPeriod;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  LedgerUpgradeTxExpirationPeriod(this.newTxExpirationPeriod) : super(LedgerUpgradeType(LedgerUpgradeType.TX_EXPIRATION_PERIOD));
+  late INT64 newTxExpirationPeriod;
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     newTxExpirationPeriod.toXdr(stream);
   }
@@ -6309,41 +5565,34 @@ class LedgerUpgradeTxExpirationPeriod extends LedgerUpgrade {
 class BucketEntryType extends XdrEncodable {
   static const LIVEENTRY = 0;
   static const DEADENTRY = 1;
-  var value;
-
+  int value;
   BucketEntryType(this.value);
-}
+  @override toXdr(XdrDataOutputStream stream) {
+    value.toXdr(stream);
+  }
 
+}
 abstract class BucketEntry extends XdrEncodable {
   BucketEntryType discriminant;
-
   BucketEntry(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class BucketEntryLiveentry extends BucketEntry {
-  BucketEntryLiveentry(this.liveEntry)
-      : super(BucketEntryType(BucketEntryType.LIVEENTRY));
+  BucketEntryLiveentry(this.liveEntry) : super(BucketEntryType(BucketEntryType.LIVEENTRY));
   late LedgerEntry liveEntry;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     liveEntry.toXdr(stream);
   }
 }
 
 class BucketEntryDeadentry extends BucketEntry {
-  BucketEntryDeadentry(this.deadEntry)
-      : super(BucketEntryType(BucketEntryType.DEADENTRY));
+  BucketEntryDeadentry(this.deadEntry) : super(BucketEntryType(BucketEntryType.DEADENTRY));
   late LedgerKey deadEntry;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     deadEntry.toXdr(stream);
   }
@@ -6358,20 +5607,19 @@ class BucketEntryDeadentry extends BucketEntry {
 //  };
 
 //  ===========================================================================
-class TransactionSet extends XdrEncodable {
-  Hash previousLedgerHash;
+class TransactionSet extends XdrEncodable  {
+  HASH previousLedgerHash;
   List<TransactionEnvelope> txs;
 
   TransactionSet(
-    this.previousLedgerHash,
-    this.txs,
-  );
+      this.previousLedgerHash,
+      this.txs,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     previousLedgerHash.toXdr(stream);
     txs.length.toXdr(stream);
-    txs.forEach((element) {
+    txs.forEach ((element) {
       element.toXdr(stream);
     });
   }
@@ -6385,17 +5633,16 @@ class TransactionSet extends XdrEncodable {
 //  };
 
 //  ===========================================================================
-class TransactionResultPair extends XdrEncodable {
-  Hash transactionHash;
+class TransactionResultPair extends XdrEncodable  {
+  HASH transactionHash;
   TransactionResult result;
 
   TransactionResultPair(
-    this.transactionHash,
-    this.result,
-  );
+      this.transactionHash,
+      this.result,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     transactionHash.toXdr(stream);
     result.toXdr(stream);
   }
@@ -6408,17 +5655,16 @@ class TransactionResultPair extends XdrEncodable {
 //  };
 
 //  ===========================================================================
-class TransactionResultSet extends XdrEncodable {
+class TransactionResultSet extends XdrEncodable  {
   List<TransactionResultPair> results;
 
   TransactionResultSet(
-    this.results,
-  );
+      this.results,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     results.length.toXdr(stream);
-    results.forEach((element) {
+    results.forEach ((element) {
       element.toXdr(stream);
     });
   }
@@ -6440,40 +5686,33 @@ class TransactionResultSet extends XdrEncodable {
 //  };
 
 //  ===========================================================================
-class TransactionHistoryEntry extends XdrEncodable {
-  Uint32 ledgerSeq;
+class TransactionHistoryEntry extends XdrEncodable  {
+  UINT32 ledgerSeq;
   TransactionSet txSet;
   TransactionHistoryEntryExt ext;
 
   TransactionHistoryEntry(
-    this.ledgerSeq,
-    this.txSet,
-    this.ext,
-  );
+      this.ledgerSeq,
+      this.txSet,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     ledgerSeq.toXdr(stream);
     txSet.toXdr(stream);
     ext.toXdr(stream);
   }
 }
-
 abstract class TransactionHistoryEntryExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   TransactionHistoryEntryExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
-class TransactionHistoryEntryExtEmptyVersion
-    extends TransactionHistoryEntryExt {
-  TransactionHistoryEntryExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+class TransactionHistoryEntryExtEmptyVersion extends TransactionHistoryEntryExt {
+  TransactionHistoryEntryExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
 // === xdr source ============================================================
 
@@ -6492,40 +5731,33 @@ class TransactionHistoryEntryExtEmptyVersion
 //  };
 
 //  ===========================================================================
-class TransactionHistoryResultEntry extends XdrEncodable {
-  Uint32 ledgerSeq;
+class TransactionHistoryResultEntry extends XdrEncodable  {
+  UINT32 ledgerSeq;
   TransactionResultSet txResultSet;
   TransactionHistoryResultEntryExt ext;
 
   TransactionHistoryResultEntry(
-    this.ledgerSeq,
-    this.txResultSet,
-    this.ext,
-  );
+      this.ledgerSeq,
+      this.txResultSet,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     ledgerSeq.toXdr(stream);
     txResultSet.toXdr(stream);
     ext.toXdr(stream);
   }
 }
-
 abstract class TransactionHistoryResultEntryExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   TransactionHistoryResultEntryExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
-class TransactionHistoryResultEntryExtEmptyVersion
-    extends TransactionHistoryResultEntryExt {
-  TransactionHistoryResultEntryExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+class TransactionHistoryResultEntryExtEmptyVersion extends TransactionHistoryResultEntryExt {
+  TransactionHistoryResultEntryExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
 // === xdr source ============================================================
 
@@ -6544,40 +5776,33 @@ class TransactionHistoryResultEntryExtEmptyVersion
 //  };
 
 //  ===========================================================================
-class LedgerHeaderHistoryEntry extends XdrEncodable {
-  Hash hash;
+class LedgerHeaderHistoryEntry extends XdrEncodable  {
+  HASH hash;
   LedgerHeader header;
   LedgerHeaderHistoryEntryExt ext;
 
   LedgerHeaderHistoryEntry(
-    this.hash,
-    this.header,
-    this.ext,
-  );
+      this.hash,
+      this.header,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     hash.toXdr(stream);
     header.toXdr(stream);
     ext.toXdr(stream);
   }
 }
-
 abstract class LedgerHeaderHistoryEntryExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   LedgerHeaderHistoryEntryExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
-class LedgerHeaderHistoryEntryExtEmptyVersion
-    extends LedgerHeaderHistoryEntryExt {
-  LedgerHeaderHistoryEntryExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+class LedgerHeaderHistoryEntryExtEmptyVersion extends LedgerHeaderHistoryEntryExt {
+  LedgerHeaderHistoryEntryExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
 // === xdr source ============================================================
 
@@ -6588,20 +5813,19 @@ class LedgerHeaderHistoryEntryExtEmptyVersion
 //  };
 
 //  ===========================================================================
-class LedgerSCPMessages extends XdrEncodable {
-  Uint32 ledgerSeq;
+class LedgerSCPMessages extends XdrEncodable  {
+  UINT32 ledgerSeq;
   List<SCPEnvelope> messages;
 
   LedgerSCPMessages(
-    this.ledgerSeq,
-    this.messages,
-  );
+      this.ledgerSeq,
+      this.messages,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     ledgerSeq.toXdr(stream);
     messages.length.toXdr(stream);
-    messages.forEach((element) {
+    messages.forEach ((element) {
       element.toXdr(stream);
     });
   }
@@ -6615,43 +5839,35 @@ class LedgerSCPMessages extends XdrEncodable {
 //  };
 
 //  ===========================================================================
-class SCPHistoryEntryV0 extends XdrEncodable {
+class SCPHistoryEntryV0 extends XdrEncodable  {
   List<SCPQuorumSet> quorumSets;
   LedgerSCPMessages ledgerMessages;
 
   SCPHistoryEntryV0(
-    this.quorumSets,
-    this.ledgerMessages,
-  );
+      this.quorumSets,
+      this.ledgerMessages,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     quorumSets.length.toXdr(stream);
-    quorumSets.forEach((element) {
+    quorumSets.forEach ((element) {
       element.toXdr(stream);
     });
     ledgerMessages.toXdr(stream);
   }
 }
-
 abstract class SCPHistoryEntry extends XdrEncodable {
   LedgerVersion discriminant;
-
   SCPHistoryEntry(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class SCPHistoryEntryEmptyVersion extends SCPHistoryEntry {
-  SCPHistoryEntryEmptyVersion(this.v0)
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+  SCPHistoryEntryEmptyVersion(this.v0) : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
   late SCPHistoryEntryV0 v0;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     v0.toXdr(stream);
   }
@@ -6662,80 +5878,66 @@ class LedgerEntryChangeType extends XdrEncodable {
   static const UPDATED = 1;
   static const REMOVED = 2;
   static const STATE = 3;
-  var value;
-
+  int value;
   LedgerEntryChangeType(this.value);
-}
+  @override toXdr(XdrDataOutputStream stream) {
+    value.toXdr(stream);
+  }
 
+}
 abstract class LedgerEntryChange extends XdrEncodable {
   LedgerEntryChangeType discriminant;
-
   LedgerEntryChange(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class LedgerEntryChangeCreated extends LedgerEntryChange {
-  LedgerEntryChangeCreated(this.created)
-      : super(LedgerEntryChangeType(LedgerEntryChangeType.CREATED));
+  LedgerEntryChangeCreated(this.created) : super(LedgerEntryChangeType(LedgerEntryChangeType.CREATED));
   late LedgerEntry created;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     created.toXdr(stream);
   }
 }
 
 class LedgerEntryChangeUpdated extends LedgerEntryChange {
-  LedgerEntryChangeUpdated(this.updated)
-      : super(LedgerEntryChangeType(LedgerEntryChangeType.UPDATED));
+  LedgerEntryChangeUpdated(this.updated) : super(LedgerEntryChangeType(LedgerEntryChangeType.UPDATED));
   late LedgerEntry updated;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     updated.toXdr(stream);
   }
 }
 
 class LedgerEntryChangeRemoved extends LedgerEntryChange {
-  LedgerEntryChangeRemoved(this.removed)
-      : super(LedgerEntryChangeType(LedgerEntryChangeType.REMOVED));
+  LedgerEntryChangeRemoved(this.removed) : super(LedgerEntryChangeType(LedgerEntryChangeType.REMOVED));
   late LedgerKey removed;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     removed.toXdr(stream);
   }
 }
 
 class LedgerEntryChangeState extends LedgerEntryChange {
-  LedgerEntryChangeState(this.state)
-      : super(LedgerEntryChangeType(LedgerEntryChangeType.STATE));
+  LedgerEntryChangeState(this.state) : super(LedgerEntryChangeType(LedgerEntryChangeType.STATE));
   late LedgerEntry state;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     state.toXdr(stream);
   }
 }
 
-typedef LedgerEntryChanges = List<LedgerEntryChange>;
+typedef LEDGERENTRYCHANGES = List<LedgerEntryChange>;
 
-extension LedgerEntryChangesToXdr on LedgerEntryChanges {
+extension LedgerEntryChangesToXdr on LEDGERENTRYCHANGES {
   toXdr(XdrDataOutputStream stream) {
     this.length.toXdr(stream);
-    this.forEach((element) {
+    this.forEach ((element) {
       element.toXdr(stream);
     });
-  }
-}
+  }}
 // === xdr source ============================================================
 
 //  struct OperationMeta
@@ -6744,40 +5946,32 @@ extension LedgerEntryChangesToXdr on LedgerEntryChanges {
 //  };
 
 //  ===========================================================================
-class OperationMeta extends XdrEncodable {
-  LedgerEntryChanges changes;
+class OperationMeta extends XdrEncodable  {
+  LEDGERENTRYCHANGES changes;
 
   OperationMeta(
-    this.changes,
-  );
+      this.changes,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     changes.toXdr(stream);
   }
 }
-
 abstract class TransactionMeta extends XdrEncodable {
   LedgerVersion discriminant;
-
   TransactionMeta(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class TransactionMetaEmptyVersion extends TransactionMeta {
-  TransactionMetaEmptyVersion(this.operations)
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+  TransactionMetaEmptyVersion(this.operations) : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
   late List<OperationMeta> operations;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     operations.length.toXdr(stream);
-    operations.forEach((element) {
+    operations.forEach ((element) {
       element.toXdr(stream);
     });
   }
@@ -6801,46 +5995,41 @@ class TransactionMetaEmptyVersion extends TransactionMeta {
 //  };
 
 //  ===========================================================================
-class BindExternalSystemAccountIdOp extends XdrEncodable {
-  Int32 externalSystemType;
+class BindExternalSystemAccountIdOp extends XdrEncodable  {
+  INT32 externalSystemType;
   BindExternalSystemAccountIdOpExt ext;
 
   BindExternalSystemAccountIdOp(
-    this.externalSystemType,
-    this.ext,
-  );
+      this.externalSystemType,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     externalSystemType.toXdr(stream);
     ext.toXdr(stream);
   }
 }
-
 abstract class BindExternalSystemAccountIdOpExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   BindExternalSystemAccountIdOpExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
-class BindExternalSystemAccountIdOpExtEmptyVersion
-    extends BindExternalSystemAccountIdOpExt {
-  BindExternalSystemAccountIdOpExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+class BindExternalSystemAccountIdOpExtEmptyVersion extends BindExternalSystemAccountIdOpExt {
+  BindExternalSystemAccountIdOpExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
-
 class BindExternalSystemAccountIdResultCode extends XdrEncodable {
   static const SUCCESS = 0;
   static const MALFORMED = -1;
   static const NO_AVAILABLE_ID = -2;
-  var value;
-
+  int value;
   BindExternalSystemAccountIdResultCode(this.value);
+  @override toXdr(XdrDataOutputStream stream) {
+    value.toXdr(stream);
+  }
+
 }
 // === xdr source ============================================================
 
@@ -6860,59 +6049,43 @@ class BindExternalSystemAccountIdResultCode extends XdrEncodable {
 //  };
 
 //  ===========================================================================
-class BindExternalSystemAccountIdSuccess extends XdrEncodable {
-  Longstring data;
+class BindExternalSystemAccountIdSuccess extends XdrEncodable  {
+  LONGSTRING data;
   BindExternalSystemAccountIdSuccessExt ext;
 
   BindExternalSystemAccountIdSuccess(
-    this.data,
-    this.ext,
-  );
+      this.data,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     data.toXdr(stream);
     ext.toXdr(stream);
   }
 }
-
 abstract class BindExternalSystemAccountIdSuccessExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   BindExternalSystemAccountIdSuccessExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
-class BindExternalSystemAccountIdSuccessExtEmptyVersion
-    extends BindExternalSystemAccountIdSuccessExt {
-  BindExternalSystemAccountIdSuccessExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+class BindExternalSystemAccountIdSuccessExtEmptyVersion extends BindExternalSystemAccountIdSuccessExt {
+  BindExternalSystemAccountIdSuccessExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
-
 abstract class BindExternalSystemAccountIdResult extends XdrEncodable {
   BindExternalSystemAccountIdResultCode discriminant;
-
   BindExternalSystemAccountIdResult(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
-class BindExternalSystemAccountIdResultSuccess
-    extends BindExternalSystemAccountIdResult {
-  BindExternalSystemAccountIdResultSuccess(this.success)
-      : super(BindExternalSystemAccountIdResultCode(
-            BindExternalSystemAccountIdResultCode.SUCCESS));
+class BindExternalSystemAccountIdResultSuccess extends BindExternalSystemAccountIdResult {
+  BindExternalSystemAccountIdResultSuccess(this.success) : super(BindExternalSystemAccountIdResultCode(BindExternalSystemAccountIdResultCode.SUCCESS));
   late BindExternalSystemAccountIdSuccess success;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     success.toXdr(stream);
   }
@@ -6935,45 +6108,41 @@ class BindExternalSystemAccountIdResultSuccess
 //  };
 
 //  ===========================================================================
-class CancelAtomicSwapAskOp extends XdrEncodable {
-  Uint64 askID;
+class CancelAtomicSwapAskOp extends XdrEncodable  {
+  UINT64 askID;
   CancelAtomicSwapAskOpExt ext;
 
   CancelAtomicSwapAskOp(
-    this.askID,
-    this.ext,
-  );
+      this.askID,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     askID.toXdr(stream);
     ext.toXdr(stream);
   }
 }
-
 abstract class CancelAtomicSwapAskOpExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   CancelAtomicSwapAskOpExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class CancelAtomicSwapAskOpExtEmptyVersion extends CancelAtomicSwapAskOpExt {
-  CancelAtomicSwapAskOpExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+  CancelAtomicSwapAskOpExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
-
 class CancelAtomicSwapAskResultCode extends XdrEncodable {
   static const SUCCESS = 0;
   static const NOT_FOUND = -1;
   static const ALREADY_CANCELLED = -2;
-  var value;
-
+  int value;
   CancelAtomicSwapAskResultCode(this.value);
+  @override toXdr(XdrDataOutputStream stream) {
+    value.toXdr(stream);
+  }
+
 }
 // === xdr source ============================================================
 
@@ -6993,59 +6162,43 @@ class CancelAtomicSwapAskResultCode extends XdrEncodable {
 //  };
 
 //  ===========================================================================
-class CancelAtomicSwapAskResultSuccess extends XdrEncodable {
-  Uint64 lockedAmount;
+class CancelAtomicSwapAskResultSuccess extends XdrEncodable  {
+  UINT64 lockedAmount;
   CancelAtomicSwapAskResultSuccessExt ext;
 
   CancelAtomicSwapAskResultSuccess(
-    this.lockedAmount,
-    this.ext,
-  );
+      this.lockedAmount,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     lockedAmount.toXdr(stream);
     ext.toXdr(stream);
   }
 }
-
 abstract class CancelAtomicSwapAskResultSuccessExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   CancelAtomicSwapAskResultSuccessExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
-class CancelAtomicSwapAskResultSuccessExtEmptyVersion
-    extends CancelAtomicSwapAskResultSuccessExt {
-  CancelAtomicSwapAskResultSuccessExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+class CancelAtomicSwapAskResultSuccessExtEmptyVersion extends CancelAtomicSwapAskResultSuccessExt {
+  CancelAtomicSwapAskResultSuccessExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
-
 abstract class CancelAtomicSwapAskResult extends XdrEncodable {
   CancelAtomicSwapAskResultCode discriminant;
-
   CancelAtomicSwapAskResult(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
-class CancelAtomicSwapAskResultSuccessSuccess
-    extends CancelAtomicSwapAskResult {
-  CancelAtomicSwapAskResultSuccessSuccess(this.success)
-      : super(CancelAtomicSwapAskResultCode(
-            CancelAtomicSwapAskResultCode.SUCCESS));
+class CancelAtomicSwapAskResultSuccessSuccess extends CancelAtomicSwapAskResult {
+  CancelAtomicSwapAskResultSuccessSuccess(this.success) : super(CancelAtomicSwapAskResultCode(CancelAtomicSwapAskResultCode.SUCCESS));
   late CancelAtomicSwapAskResultSuccess success;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     success.toXdr(stream);
   }
@@ -7071,46 +6224,41 @@ class CancelAtomicSwapAskResultSuccessSuccess
 //  };
 
 //  ===========================================================================
-class CancelChangeRoleRequestOp extends XdrEncodable {
-  Uint64 requestID;
+class CancelChangeRoleRequestOp extends XdrEncodable  {
+  UINT64 requestID;
   CancelChangeRoleRequestOpExt ext;
 
   CancelChangeRoleRequestOp(
-    this.requestID,
-    this.ext,
-  );
+      this.requestID,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     requestID.toXdr(stream);
     ext.toXdr(stream);
   }
 }
-
 abstract class CancelChangeRoleRequestOpExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   CancelChangeRoleRequestOpExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
-class CancelChangeRoleRequestOpExtEmptyVersion
-    extends CancelChangeRoleRequestOpExt {
-  CancelChangeRoleRequestOpExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+class CancelChangeRoleRequestOpExtEmptyVersion extends CancelChangeRoleRequestOpExt {
+  CancelChangeRoleRequestOpExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
-
 class CancelChangeRoleRequestResultCode extends XdrEncodable {
   static const SUCCESS = 0;
   static const REQUEST_ID_INVALID = -1;
   static const REQUEST_NOT_FOUND = -2;
-  var value;
-
+  int value;
   CancelChangeRoleRequestResultCode(this.value);
+  @override toXdr(XdrDataOutputStream stream) {
+    value.toXdr(stream);
+  }
+
 }
 // === xdr source ============================================================
 
@@ -7127,56 +6275,40 @@ class CancelChangeRoleRequestResultCode extends XdrEncodable {
 //  };
 
 //  ===========================================================================
-class CancelChangeRoleSuccess extends XdrEncodable {
+class CancelChangeRoleSuccess extends XdrEncodable  {
   CancelChangeRoleSuccessExt ext;
 
   CancelChangeRoleSuccess(
-    this.ext,
-  );
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     ext.toXdr(stream);
   }
 }
-
 abstract class CancelChangeRoleSuccessExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   CancelChangeRoleSuccessExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
-class CancelChangeRoleSuccessExtEmptyVersion
-    extends CancelChangeRoleSuccessExt {
-  CancelChangeRoleSuccessExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+class CancelChangeRoleSuccessExtEmptyVersion extends CancelChangeRoleSuccessExt {
+  CancelChangeRoleSuccessExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
-
 abstract class CancelChangeRoleRequestResult extends XdrEncodable {
   CancelChangeRoleRequestResultCode discriminant;
-
   CancelChangeRoleRequestResult(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
-class CancelChangeRoleRequestResultSuccess
-    extends CancelChangeRoleRequestResult {
-  CancelChangeRoleRequestResultSuccess(this.success)
-      : super(CancelChangeRoleRequestResultCode(
-            CancelChangeRoleRequestResultCode.SUCCESS));
+class CancelChangeRoleRequestResultSuccess extends CancelChangeRoleRequestResult {
+  CancelChangeRoleRequestResultSuccess(this.success) : super(CancelChangeRoleRequestResultCode(CancelChangeRoleRequestResultCode.SUCCESS));
   late CancelChangeRoleSuccess success;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     success.toXdr(stream);
   }
@@ -7199,45 +6331,40 @@ class CancelChangeRoleRequestResultSuccess
 //  };
 
 //  ===========================================================================
-class CancelCloseDeferredPaymentRequestOp extends XdrEncodable {
-  Uint64 requestID;
+class CancelCloseDeferredPaymentRequestOp extends XdrEncodable  {
+  UINT64 requestID;
   CancelCloseDeferredPaymentRequestOpExt ext;
 
   CancelCloseDeferredPaymentRequestOp(
-    this.requestID,
-    this.ext,
-  );
+      this.requestID,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     requestID.toXdr(stream);
     ext.toXdr(stream);
   }
 }
-
 abstract class CancelCloseDeferredPaymentRequestOpExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   CancelCloseDeferredPaymentRequestOpExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
-class CancelCloseDeferredPaymentRequestOpExtEmptyVersion
-    extends CancelCloseDeferredPaymentRequestOpExt {
-  CancelCloseDeferredPaymentRequestOpExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+class CancelCloseDeferredPaymentRequestOpExtEmptyVersion extends CancelCloseDeferredPaymentRequestOpExt {
+  CancelCloseDeferredPaymentRequestOpExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
-
 class CancelCloseDeferredPaymentRequestResultCode extends XdrEncodable {
   static const SUCCESS = 0;
   static const NOT_FOUND = -1;
-  var value;
-
+  int value;
   CancelCloseDeferredPaymentRequestResultCode(this.value);
+  @override toXdr(XdrDataOutputStream stream) {
+    value.toXdr(stream);
+  }
+
 }
 // === xdr source ============================================================
 
@@ -7253,57 +6380,40 @@ class CancelCloseDeferredPaymentRequestResultCode extends XdrEncodable {
 //  };
 
 //  ===========================================================================
-class CancelCloseDeferredPaymentRequestResultSuccess extends XdrEncodable {
+class CancelCloseDeferredPaymentRequestResultSuccess extends XdrEncodable  {
   CancelCloseDeferredPaymentRequestResultSuccessExt ext;
 
   CancelCloseDeferredPaymentRequestResultSuccess(
-    this.ext,
-  );
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     ext.toXdr(stream);
   }
 }
-
-abstract class CancelCloseDeferredPaymentRequestResultSuccessExt
-    extends XdrEncodable {
+abstract class CancelCloseDeferredPaymentRequestResultSuccessExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   CancelCloseDeferredPaymentRequestResultSuccessExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
-class CancelCloseDeferredPaymentRequestResultSuccessExtEmptyVersion
-    extends CancelCloseDeferredPaymentRequestResultSuccessExt {
-  CancelCloseDeferredPaymentRequestResultSuccessExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+class CancelCloseDeferredPaymentRequestResultSuccessExtEmptyVersion extends CancelCloseDeferredPaymentRequestResultSuccessExt {
+  CancelCloseDeferredPaymentRequestResultSuccessExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
-
 abstract class CancelCloseDeferredPaymentRequestResult extends XdrEncodable {
   CancelCloseDeferredPaymentRequestResultCode discriminant;
-
   CancelCloseDeferredPaymentRequestResult(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
-class CancelCloseDeferredPaymentRequestResultSuccessSuccess
-    extends CancelCloseDeferredPaymentRequestResult {
-  CancelCloseDeferredPaymentRequestResultSuccessSuccess(this.success)
-      : super(CancelCloseDeferredPaymentRequestResultCode(
-            CancelCloseDeferredPaymentRequestResultCode.SUCCESS));
+class CancelCloseDeferredPaymentRequestResultSuccessSuccess extends CancelCloseDeferredPaymentRequestResult {
+  CancelCloseDeferredPaymentRequestResultSuccessSuccess(this.success) : super(CancelCloseDeferredPaymentRequestResultCode(CancelCloseDeferredPaymentRequestResultCode.SUCCESS));
   late CancelCloseDeferredPaymentRequestResultSuccess success;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     success.toXdr(stream);
   }
@@ -7329,46 +6439,41 @@ class CancelCloseDeferredPaymentRequestResultSuccessSuccess
 //  };
 
 //  ===========================================================================
-class CancelDataCreationRequestOp extends XdrEncodable {
-  Uint64 requestID;
+class CancelDataCreationRequestOp extends XdrEncodable  {
+  UINT64 requestID;
   CancelDataCreationRequestOpExt ext;
 
   CancelDataCreationRequestOp(
-    this.requestID,
-    this.ext,
-  );
+      this.requestID,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     requestID.toXdr(stream);
     ext.toXdr(stream);
   }
 }
-
 abstract class CancelDataCreationRequestOpExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   CancelDataCreationRequestOpExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
-class CancelDataCreationRequestOpExtEmptyVersion
-    extends CancelDataCreationRequestOpExt {
-  CancelDataCreationRequestOpExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+class CancelDataCreationRequestOpExtEmptyVersion extends CancelDataCreationRequestOpExt {
+  CancelDataCreationRequestOpExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
-
 class CancelDataCreationRequestResultCode extends XdrEncodable {
   static const SUCCESS = 0;
   static const REQUEST_ID_INVALID = -1;
   static const REQUEST_NOT_FOUND = -2;
-  var value;
-
+  int value;
   CancelDataCreationRequestResultCode(this.value);
+  @override toXdr(XdrDataOutputStream stream) {
+    value.toXdr(stream);
+  }
+
 }
 // === xdr source ============================================================
 
@@ -7385,56 +6490,40 @@ class CancelDataCreationRequestResultCode extends XdrEncodable {
 //  };
 
 //  ===========================================================================
-class CancelDataCreationSuccess extends XdrEncodable {
+class CancelDataCreationSuccess extends XdrEncodable  {
   CancelDataCreationSuccessExt ext;
 
   CancelDataCreationSuccess(
-    this.ext,
-  );
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     ext.toXdr(stream);
   }
 }
-
 abstract class CancelDataCreationSuccessExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   CancelDataCreationSuccessExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
-class CancelDataCreationSuccessExtEmptyVersion
-    extends CancelDataCreationSuccessExt {
-  CancelDataCreationSuccessExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+class CancelDataCreationSuccessExtEmptyVersion extends CancelDataCreationSuccessExt {
+  CancelDataCreationSuccessExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
-
 abstract class CancelDataCreationRequestResult extends XdrEncodable {
   CancelDataCreationRequestResultCode discriminant;
-
   CancelDataCreationRequestResult(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
-class CancelDataCreationRequestResultSuccess
-    extends CancelDataCreationRequestResult {
-  CancelDataCreationRequestResultSuccess(this.success)
-      : super(CancelDataCreationRequestResultCode(
-            CancelDataCreationRequestResultCode.SUCCESS));
+class CancelDataCreationRequestResultSuccess extends CancelDataCreationRequestResult {
+  CancelDataCreationRequestResultSuccess(this.success) : super(CancelDataCreationRequestResultCode(CancelDataCreationRequestResultCode.SUCCESS));
   late CancelDataCreationSuccess success;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     success.toXdr(stream);
   }
@@ -7460,46 +6549,41 @@ class CancelDataCreationRequestResultSuccess
 //  };
 
 //  ===========================================================================
-class CancelDataRemoveRequestOp extends XdrEncodable {
-  Uint64 requestID;
+class CancelDataRemoveRequestOp extends XdrEncodable  {
+  UINT64 requestID;
   CancelDataRemoveRequestOpExt ext;
 
   CancelDataRemoveRequestOp(
-    this.requestID,
-    this.ext,
-  );
+      this.requestID,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     requestID.toXdr(stream);
     ext.toXdr(stream);
   }
 }
-
 abstract class CancelDataRemoveRequestOpExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   CancelDataRemoveRequestOpExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
-class CancelDataRemoveRequestOpExtEmptyVersion
-    extends CancelDataRemoveRequestOpExt {
-  CancelDataRemoveRequestOpExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+class CancelDataRemoveRequestOpExtEmptyVersion extends CancelDataRemoveRequestOpExt {
+  CancelDataRemoveRequestOpExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
-
 class CancelDataRemoveRequestResultCode extends XdrEncodable {
   static const SUCCESS = 0;
   static const REQUEST_ID_INVALID = -1;
   static const REQUEST_NOT_FOUND = -2;
-  var value;
-
+  int value;
   CancelDataRemoveRequestResultCode(this.value);
+  @override toXdr(XdrDataOutputStream stream) {
+    value.toXdr(stream);
+  }
+
 }
 // === xdr source ============================================================
 
@@ -7516,56 +6600,40 @@ class CancelDataRemoveRequestResultCode extends XdrEncodable {
 //  };
 
 //  ===========================================================================
-class CancelDataRemoveSuccess extends XdrEncodable {
+class CancelDataRemoveSuccess extends XdrEncodable  {
   CancelDataRemoveSuccessExt ext;
 
   CancelDataRemoveSuccess(
-    this.ext,
-  );
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     ext.toXdr(stream);
   }
 }
-
 abstract class CancelDataRemoveSuccessExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   CancelDataRemoveSuccessExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
-class CancelDataRemoveSuccessExtEmptyVersion
-    extends CancelDataRemoveSuccessExt {
-  CancelDataRemoveSuccessExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+class CancelDataRemoveSuccessExtEmptyVersion extends CancelDataRemoveSuccessExt {
+  CancelDataRemoveSuccessExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
-
 abstract class CancelDataRemoveRequestResult extends XdrEncodable {
   CancelDataRemoveRequestResultCode discriminant;
-
   CancelDataRemoveRequestResult(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
-class CancelDataRemoveRequestResultSuccess
-    extends CancelDataRemoveRequestResult {
-  CancelDataRemoveRequestResultSuccess(this.success)
-      : super(CancelDataRemoveRequestResultCode(
-            CancelDataRemoveRequestResultCode.SUCCESS));
+class CancelDataRemoveRequestResultSuccess extends CancelDataRemoveRequestResult {
+  CancelDataRemoveRequestResultSuccess(this.success) : super(CancelDataRemoveRequestResultCode(CancelDataRemoveRequestResultCode.SUCCESS));
   late CancelDataRemoveSuccess success;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     success.toXdr(stream);
   }
@@ -7591,46 +6659,41 @@ class CancelDataRemoveRequestResultSuccess
 //  };
 
 //  ===========================================================================
-class CancelDataUpdateRequestOp extends XdrEncodable {
-  Uint64 requestID;
+class CancelDataUpdateRequestOp extends XdrEncodable  {
+  UINT64 requestID;
   CancelDataUpdateRequestOpExt ext;
 
   CancelDataUpdateRequestOp(
-    this.requestID,
-    this.ext,
-  );
+      this.requestID,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     requestID.toXdr(stream);
     ext.toXdr(stream);
   }
 }
-
 abstract class CancelDataUpdateRequestOpExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   CancelDataUpdateRequestOpExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
-class CancelDataUpdateRequestOpExtEmptyVersion
-    extends CancelDataUpdateRequestOpExt {
-  CancelDataUpdateRequestOpExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+class CancelDataUpdateRequestOpExtEmptyVersion extends CancelDataUpdateRequestOpExt {
+  CancelDataUpdateRequestOpExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
-
 class CancelDataUpdateRequestResultCode extends XdrEncodable {
   static const SUCCESS = 0;
   static const REQUEST_ID_INVALID = -1;
   static const REQUEST_NOT_FOUND = -2;
-  var value;
-
+  int value;
   CancelDataUpdateRequestResultCode(this.value);
+  @override toXdr(XdrDataOutputStream stream) {
+    value.toXdr(stream);
+  }
+
 }
 // === xdr source ============================================================
 
@@ -7647,56 +6710,40 @@ class CancelDataUpdateRequestResultCode extends XdrEncodable {
 //  };
 
 //  ===========================================================================
-class CancelDataUpdateSuccess extends XdrEncodable {
+class CancelDataUpdateSuccess extends XdrEncodable  {
   CancelDataUpdateSuccessExt ext;
 
   CancelDataUpdateSuccess(
-    this.ext,
-  );
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     ext.toXdr(stream);
   }
 }
-
 abstract class CancelDataUpdateSuccessExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   CancelDataUpdateSuccessExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
-class CancelDataUpdateSuccessExtEmptyVersion
-    extends CancelDataUpdateSuccessExt {
-  CancelDataUpdateSuccessExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+class CancelDataUpdateSuccessExtEmptyVersion extends CancelDataUpdateSuccessExt {
+  CancelDataUpdateSuccessExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
-
 abstract class CancelDataUpdateRequestResult extends XdrEncodable {
   CancelDataUpdateRequestResultCode discriminant;
-
   CancelDataUpdateRequestResult(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
-class CancelDataUpdateRequestResultSuccess
-    extends CancelDataUpdateRequestResult {
-  CancelDataUpdateRequestResultSuccess(this.success)
-      : super(CancelDataUpdateRequestResultCode(
-            CancelDataUpdateRequestResultCode.SUCCESS));
+class CancelDataUpdateRequestResultSuccess extends CancelDataUpdateRequestResult {
+  CancelDataUpdateRequestResultSuccess(this.success) : super(CancelDataUpdateRequestResultCode(CancelDataUpdateRequestResultCode.SUCCESS));
   late CancelDataUpdateSuccess success;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     success.toXdr(stream);
   }
@@ -7719,47 +6766,42 @@ class CancelDataUpdateRequestResultSuccess
 //  };
 
 //  ===========================================================================
-class CancelDeferredPaymentCreationRequestOp extends XdrEncodable {
-  Uint64 requestID;
+class CancelDeferredPaymentCreationRequestOp extends XdrEncodable  {
+  UINT64 requestID;
   CancelDeferredPaymentCreationRequestOpExt ext;
 
   CancelDeferredPaymentCreationRequestOp(
-    this.requestID,
-    this.ext,
-  );
+      this.requestID,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     requestID.toXdr(stream);
     ext.toXdr(stream);
   }
 }
-
 abstract class CancelDeferredPaymentCreationRequestOpExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   CancelDeferredPaymentCreationRequestOpExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
-class CancelDeferredPaymentCreationRequestOpExtEmptyVersion
-    extends CancelDeferredPaymentCreationRequestOpExt {
-  CancelDeferredPaymentCreationRequestOpExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+class CancelDeferredPaymentCreationRequestOpExtEmptyVersion extends CancelDeferredPaymentCreationRequestOpExt {
+  CancelDeferredPaymentCreationRequestOpExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
-
 class CancelDeferredPaymentCreationRequestResultCode extends XdrEncodable {
   static const SUCCESS = 0;
   static const NOT_FOUND = -1;
   static const REQUEST_ID_INVALID = -2;
   static const LINE_FULL = -3;
-  var value;
-
+  int value;
   CancelDeferredPaymentCreationRequestResultCode(this.value);
+  @override toXdr(XdrDataOutputStream stream) {
+    value.toXdr(stream);
+  }
+
 }
 // === xdr source ============================================================
 
@@ -7775,57 +6817,40 @@ class CancelDeferredPaymentCreationRequestResultCode extends XdrEncodable {
 //  };
 
 //  ===========================================================================
-class CancelDeferredPaymentCreationRequestResultSuccess extends XdrEncodable {
+class CancelDeferredPaymentCreationRequestResultSuccess extends XdrEncodable  {
   CancelDeferredPaymentCreationRequestResultSuccessExt ext;
 
   CancelDeferredPaymentCreationRequestResultSuccess(
-    this.ext,
-  );
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     ext.toXdr(stream);
   }
 }
-
-abstract class CancelDeferredPaymentCreationRequestResultSuccessExt
-    extends XdrEncodable {
+abstract class CancelDeferredPaymentCreationRequestResultSuccessExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   CancelDeferredPaymentCreationRequestResultSuccessExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
-class CancelDeferredPaymentCreationRequestResultSuccessExtEmptyVersion
-    extends CancelDeferredPaymentCreationRequestResultSuccessExt {
-  CancelDeferredPaymentCreationRequestResultSuccessExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+class CancelDeferredPaymentCreationRequestResultSuccessExtEmptyVersion extends CancelDeferredPaymentCreationRequestResultSuccessExt {
+  CancelDeferredPaymentCreationRequestResultSuccessExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
-
 abstract class CancelDeferredPaymentCreationRequestResult extends XdrEncodable {
   CancelDeferredPaymentCreationRequestResultCode discriminant;
-
   CancelDeferredPaymentCreationRequestResult(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
-class CancelDeferredPaymentCreationRequestResultSuccessSuccess
-    extends CancelDeferredPaymentCreationRequestResult {
-  CancelDeferredPaymentCreationRequestResultSuccessSuccess(this.success)
-      : super(CancelDeferredPaymentCreationRequestResultCode(
-            CancelDeferredPaymentCreationRequestResultCode.SUCCESS));
+class CancelDeferredPaymentCreationRequestResultSuccessSuccess extends CancelDeferredPaymentCreationRequestResult {
+  CancelDeferredPaymentCreationRequestResultSuccessSuccess(this.success) : super(CancelDeferredPaymentCreationRequestResultCode(CancelDeferredPaymentCreationRequestResultCode.SUCCESS));
   late CancelDeferredPaymentCreationRequestResultSuccess success;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     success.toXdr(stream);
   }
@@ -7852,46 +6877,41 @@ class CancelDeferredPaymentCreationRequestResultSuccessSuccess
 //  };
 
 //  ===========================================================================
-class CancelSaleCreationRequestOp extends XdrEncodable {
-  Uint64 requestID;
+class CancelSaleCreationRequestOp extends XdrEncodable  {
+  UINT64 requestID;
   CancelSaleCreationRequestOpExt ext;
 
   CancelSaleCreationRequestOp(
-    this.requestID,
-    this.ext,
-  );
+      this.requestID,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     requestID.toXdr(stream);
     ext.toXdr(stream);
   }
 }
-
 abstract class CancelSaleCreationRequestOpExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   CancelSaleCreationRequestOpExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
-class CancelSaleCreationRequestOpExtEmptyVersion
-    extends CancelSaleCreationRequestOpExt {
-  CancelSaleCreationRequestOpExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+class CancelSaleCreationRequestOpExtEmptyVersion extends CancelSaleCreationRequestOpExt {
+  CancelSaleCreationRequestOpExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
-
 class CancelSaleCreationRequestResultCode extends XdrEncodable {
   static const SUCCESS = 0;
   static const REQUEST_ID_INVALID = -1;
   static const REQUEST_NOT_FOUND = -2;
-  var value;
-
+  int value;
   CancelSaleCreationRequestResultCode(this.value);
+  @override toXdr(XdrDataOutputStream stream) {
+    value.toXdr(stream);
+  }
+
 }
 // === xdr source ============================================================
 
@@ -7908,56 +6928,40 @@ class CancelSaleCreationRequestResultCode extends XdrEncodable {
 //  };
 
 //  ===========================================================================
-class CancelSaleCreationSuccess extends XdrEncodable {
+class CancelSaleCreationSuccess extends XdrEncodable  {
   CancelSaleCreationSuccessExt ext;
 
   CancelSaleCreationSuccess(
-    this.ext,
-  );
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     ext.toXdr(stream);
   }
 }
-
 abstract class CancelSaleCreationSuccessExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   CancelSaleCreationSuccessExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
-class CancelSaleCreationSuccessExtEmptyVersion
-    extends CancelSaleCreationSuccessExt {
-  CancelSaleCreationSuccessExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+class CancelSaleCreationSuccessExtEmptyVersion extends CancelSaleCreationSuccessExt {
+  CancelSaleCreationSuccessExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
-
 abstract class CancelSaleCreationRequestResult extends XdrEncodable {
   CancelSaleCreationRequestResultCode discriminant;
-
   CancelSaleCreationRequestResult(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
-class CancelSaleCreationRequestResultSuccess
-    extends CancelSaleCreationRequestResult {
-  CancelSaleCreationRequestResultSuccess(this.success)
-      : super(CancelSaleCreationRequestResultCode(
-            CancelSaleCreationRequestResultCode.SUCCESS));
+class CancelSaleCreationRequestResultSuccess extends CancelSaleCreationRequestResult {
+  CancelSaleCreationRequestResultSuccess(this.success) : super(CancelSaleCreationRequestResultCode(CancelSaleCreationRequestResultCode.SUCCESS));
   late CancelSaleCreationSuccess success;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     success.toXdr(stream);
   }
@@ -7980,54 +6984,52 @@ class CancelSaleCreationRequestResultSuccess
 //  };
 
 //  ===========================================================================
-class CheckSaleStateOp extends XdrEncodable {
-  Uint64 saleID;
+class CheckSaleStateOp extends XdrEncodable  {
+  UINT64 saleID;
   CheckSaleStateOpExt ext;
 
   CheckSaleStateOp(
-    this.saleID,
-    this.ext,
-  );
+      this.saleID,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     saleID.toXdr(stream);
     ext.toXdr(stream);
   }
 }
-
 abstract class CheckSaleStateOpExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   CheckSaleStateOpExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class CheckSaleStateOpExtEmptyVersion extends CheckSaleStateOpExt {
-  CheckSaleStateOpExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+  CheckSaleStateOpExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
-
 class CheckSaleStateResultCode extends XdrEncodable {
   static const SUCCESS = 0;
   static const NOT_FOUND = -1;
   static const NOT_READY = -2;
-  var value;
-
+  int value;
   CheckSaleStateResultCode(this.value);
-}
+  @override toXdr(XdrDataOutputStream stream) {
+    value.toXdr(stream);
+  }
 
+}
 class CheckSaleStateEffect extends XdrEncodable {
   static const CANCELED = 1;
   static const CLOSED = 2;
   static const UPDATED = 3;
-  var value;
-
+  int value;
   CheckSaleStateEffect(this.value);
+  @override toXdr(XdrDataOutputStream stream) {
+    value.toXdr(stream);
+  }
+
 }
 // === xdr source ============================================================
 
@@ -8043,33 +7045,27 @@ class CheckSaleStateEffect extends XdrEncodable {
 //  };
 
 //  ===========================================================================
-class SaleCanceled extends XdrEncodable {
+class SaleCanceled extends XdrEncodable  {
   SaleCanceledExt ext;
 
   SaleCanceled(
-    this.ext,
-  );
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     ext.toXdr(stream);
   }
 }
-
 abstract class SaleCanceledExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   SaleCanceledExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class SaleCanceledExtEmptyVersion extends SaleCanceledExt {
-  SaleCanceledExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+  SaleCanceledExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
 // === xdr source ============================================================
 
@@ -8085,33 +7081,27 @@ class SaleCanceledExtEmptyVersion extends SaleCanceledExt {
 //  };
 
 //  ===========================================================================
-class SaleUpdated extends XdrEncodable {
+class SaleUpdated extends XdrEncodable  {
   SaleUpdatedExt ext;
 
   SaleUpdated(
-    this.ext,
-  );
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     ext.toXdr(stream);
   }
 }
-
 abstract class SaleUpdatedExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   SaleUpdatedExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class SaleUpdatedExtEmptyVersion extends SaleUpdatedExt {
-  SaleUpdatedExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+  SaleUpdatedExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
 // === xdr source ============================================================
 
@@ -8133,43 +7123,36 @@ class SaleUpdatedExtEmptyVersion extends SaleUpdatedExt {
 //  };
 
 //  ===========================================================================
-class CheckSubSaleClosedResult extends XdrEncodable {
-  BalanceID saleBaseBalance;
-  BalanceID saleQuoteBalance;
+class CheckSubSaleClosedResult extends XdrEncodable  {
+  BALANCEID saleBaseBalance;
+  BALANCEID saleQuoteBalance;
   ManageOfferSuccessResult saleDetails;
   CheckSubSaleClosedResultExt ext;
 
   CheckSubSaleClosedResult(
-    this.saleBaseBalance,
-    this.saleQuoteBalance,
-    this.saleDetails,
-    this.ext,
-  );
+      this.saleBaseBalance,
+      this.saleQuoteBalance,
+      this.saleDetails,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     saleBaseBalance.toXdr(stream);
     saleQuoteBalance.toXdr(stream);
     saleDetails.toXdr(stream);
     ext.toXdr(stream);
   }
 }
-
 abstract class CheckSubSaleClosedResultExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   CheckSubSaleClosedResultExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
-class CheckSubSaleClosedResultExtEmptyVersion
-    extends CheckSubSaleClosedResultExt {
-  CheckSubSaleClosedResultExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+class CheckSubSaleClosedResultExtEmptyVersion extends CheckSubSaleClosedResultExt {
+  CheckSubSaleClosedResultExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
 // === xdr source ============================================================
 
@@ -8189,42 +7172,36 @@ class CheckSubSaleClosedResultExtEmptyVersion
 //  };
 
 //  ===========================================================================
-class CheckSaleClosedResult extends XdrEncodable {
-  AccountID saleOwner;
+class CheckSaleClosedResult extends XdrEncodable  {
+  ACCOUNTID saleOwner;
   List<CheckSubSaleClosedResult> results;
   CheckSaleClosedResultExt ext;
 
   CheckSaleClosedResult(
-    this.saleOwner,
-    this.results,
-    this.ext,
-  );
+      this.saleOwner,
+      this.results,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     saleOwner.toXdr(stream);
     results.length.toXdr(stream);
-    results.forEach((element) {
+    results.forEach ((element) {
       element.toXdr(stream);
     });
     ext.toXdr(stream);
   }
 }
-
 abstract class CheckSaleClosedResultExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   CheckSaleClosedResultExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class CheckSaleClosedResultExtEmptyVersion extends CheckSaleClosedResultExt {
-  CheckSaleClosedResultExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+  CheckSaleClosedResultExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
 // === xdr source ============================================================
 
@@ -8254,67 +7231,53 @@ class CheckSaleClosedResultExtEmptyVersion extends CheckSaleClosedResultExt {
 //  };
 
 //  ===========================================================================
-class CheckSaleStateSuccess extends XdrEncodable {
-  Uint64 saleID;
+class CheckSaleStateSuccess extends XdrEncodable  {
+  UINT64 saleID;
   CheckSaleStateSuccessEffect effect;
   CheckSaleStateSuccessExt ext;
 
   CheckSaleStateSuccess(
-    this.saleID,
-    this.effect,
-    this.ext,
-  );
+      this.saleID,
+      this.effect,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     saleID.toXdr(stream);
     effect.toXdr(stream);
     ext.toXdr(stream);
   }
 }
-
 abstract class CheckSaleStateSuccessEffect extends XdrEncodable {
   CheckSaleStateEffect discriminant;
-
   CheckSaleStateSuccessEffect(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class CheckSaleStateSuccessEffectCanceled extends CheckSaleStateSuccessEffect {
-  CheckSaleStateSuccessEffectCanceled(this.saleCanceled)
-      : super(CheckSaleStateEffect(CheckSaleStateEffect.CANCELED));
+  CheckSaleStateSuccessEffectCanceled(this.saleCanceled) : super(CheckSaleStateEffect(CheckSaleStateEffect.CANCELED));
   late SaleCanceled saleCanceled;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     saleCanceled.toXdr(stream);
   }
 }
 
 class CheckSaleStateSuccessEffectClosed extends CheckSaleStateSuccessEffect {
-  CheckSaleStateSuccessEffectClosed(this.saleClosed)
-      : super(CheckSaleStateEffect(CheckSaleStateEffect.CLOSED));
+  CheckSaleStateSuccessEffectClosed(this.saleClosed) : super(CheckSaleStateEffect(CheckSaleStateEffect.CLOSED));
   late CheckSaleClosedResult saleClosed;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     saleClosed.toXdr(stream);
   }
 }
 
 class CheckSaleStateSuccessEffectUpdated extends CheckSaleStateSuccessEffect {
-  CheckSaleStateSuccessEffectUpdated(this.saleUpdated)
-      : super(CheckSaleStateEffect(CheckSaleStateEffect.UPDATED));
+  CheckSaleStateSuccessEffectUpdated(this.saleUpdated) : super(CheckSaleStateEffect(CheckSaleStateEffect.UPDATED));
   late SaleUpdated saleUpdated;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     saleUpdated.toXdr(stream);
   }
@@ -8322,38 +7285,27 @@ class CheckSaleStateSuccessEffectUpdated extends CheckSaleStateSuccessEffect {
 
 abstract class CheckSaleStateSuccessExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   CheckSaleStateSuccessExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class CheckSaleStateSuccessExtEmptyVersion extends CheckSaleStateSuccessExt {
-  CheckSaleStateSuccessExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+  CheckSaleStateSuccessExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
-
 abstract class CheckSaleStateResult extends XdrEncodable {
   CheckSaleStateResultCode discriminant;
-
   CheckSaleStateResult(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class CheckSaleStateResultSuccess extends CheckSaleStateResult {
-  CheckSaleStateResultSuccess(this.success)
-      : super(CheckSaleStateResultCode(CheckSaleStateResultCode.SUCCESS));
+  CheckSaleStateResultSuccess(this.success) : super(CheckSaleStateResultCode(CheckSaleStateResultCode.SUCCESS));
   late CheckSaleStateSuccess success;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     success.toXdr(stream);
   }
@@ -8373,19 +7325,18 @@ class CheckSaleStateResultSuccess extends CheckSaleStateResult {
 //  };
 
 //  ===========================================================================
-class CloseSwapOp extends XdrEncodable {
-  Uint64 swapID;
-  Hash? secret;
+class CloseSwapOp extends XdrEncodable  {
+  UINT64 swapID;
+  HASH? secret;
   EmptyExt ext;
 
   CloseSwapOp(
-    this.swapID,
-    this.secret,
-    this.ext,
-  );
+      this.swapID,
+      this.secret,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     swapID.toXdr(stream);
     if (secret != null) {
       true.toXdr(stream);
@@ -8396,24 +7347,28 @@ class CloseSwapOp extends XdrEncodable {
     ext.toXdr(stream);
   }
 }
-
 class CloseSwapResultCode extends XdrEncodable {
   static const SUCCESS = 0;
   static const SWAP_EXPIRED = -1;
   static const INVALID_SECRET = -2;
   static const LINE_FULL = -3;
   static const NOT_AUTHORIZED = -4;
-  var value;
-
+  int value;
   CloseSwapResultCode(this.value);
-}
+  @override toXdr(XdrDataOutputStream stream) {
+    value.toXdr(stream);
+  }
 
+}
 class CloseSwapEffect extends XdrEncodable {
   static const CLOSED = 0;
   static const CANCELLED = 1;
-  var value;
-
+  int value;
   CloseSwapEffect(this.value);
+  @override toXdr(XdrDataOutputStream stream) {
+    value.toXdr(stream);
+  }
+
 }
 // === xdr source ============================================================
 
@@ -8426,40 +7381,32 @@ class CloseSwapEffect extends XdrEncodable {
 //  };
 
 //  ===========================================================================
-class CloseSwapSuccess extends XdrEncodable {
+class CloseSwapSuccess extends XdrEncodable  {
   CloseSwapEffect effect;
   EmptyExt ext;
 
   CloseSwapSuccess(
-    this.effect,
-    this.ext,
-  );
+      this.effect,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     effect.toXdr(stream);
     ext.toXdr(stream);
   }
 }
-
 abstract class CloseSwapResult extends XdrEncodable {
   CloseSwapResultCode discriminant;
-
   CloseSwapResult(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class CloseSwapResultSuccess extends CloseSwapResult {
-  CloseSwapResultSuccess(this.success)
-      : super(CloseSwapResultCode(CloseSwapResultCode.SUCCESS));
+  CloseSwapResultSuccess(this.success) : super(CloseSwapResultCode(CloseSwapResultCode.SUCCESS));
   late CloseSwapSuccess success;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     success.toXdr(stream);
   }
@@ -8490,21 +7437,20 @@ class CloseSwapResultSuccess extends CloseSwapResult {
 //  };
 
 //  ===========================================================================
-class CreateAMLAlertRequestOp extends XdrEncodable {
-  String64 reference;
+class CreateAMLAlertRequestOp extends XdrEncodable  {
+  STRING64 reference;
   AMLAlertRequest amlAlertRequest;
-  Uint32? allTasks;
+  UINT32? allTasks;
   CreateAMLAlertRequestOpExt ext;
 
   CreateAMLAlertRequestOp(
-    this.reference,
-    this.amlAlertRequest,
-    this.allTasks,
-    this.ext,
-  );
+      this.reference,
+      this.amlAlertRequest,
+      this.allTasks,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     reference.toXdr(stream);
     amlAlertRequest.toXdr(stream);
     if (allTasks != null) {
@@ -8516,24 +7462,17 @@ class CreateAMLAlertRequestOp extends XdrEncodable {
     ext.toXdr(stream);
   }
 }
-
 abstract class CreateAMLAlertRequestOpExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   CreateAMLAlertRequestOpExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
-class CreateAMLAlertRequestOpExtEmptyVersion
-    extends CreateAMLAlertRequestOpExt {
-  CreateAMLAlertRequestOpExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+class CreateAMLAlertRequestOpExtEmptyVersion extends CreateAMLAlertRequestOpExt {
+  CreateAMLAlertRequestOpExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
-
 class CreateAMLAlertRequestResultCode extends XdrEncodable {
   static const SUCCESS = 0;
   static const OLD_BALANCE_NOT_EXIST = 1;
@@ -8549,9 +7488,12 @@ class CreateAMLAlertRequestResultCode extends XdrEncodable {
   static const REFERENCE_DUPLICATION = -5;
   static const INVALID_AMOUNT = -6;
   static const INCORRECT_PRECISION = -7;
-  var value;
-
+  int value;
   CreateAMLAlertRequestResultCode(this.value);
+  @override toXdr(XdrDataOutputStream stream) {
+    value.toXdr(stream);
+  }
+
 }
 // === xdr source ============================================================
 
@@ -8571,61 +7513,46 @@ class CreateAMLAlertRequestResultCode extends XdrEncodable {
 //  };
 
 //  ===========================================================================
-class CreateAMLAlertRequestSuccess extends XdrEncodable {
-  Uint64 requestID;
+class CreateAMLAlertRequestSuccess extends XdrEncodable  {
+  UINT64 requestID;
   bool fulfilled;
   CreateAMLAlertRequestSuccessExt ext;
 
   CreateAMLAlertRequestSuccess(
-    this.requestID,
-    this.fulfilled,
-    this.ext,
-  );
+      this.requestID,
+      this.fulfilled,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     requestID.toXdr(stream);
     fulfilled.toXdr(stream);
     ext.toXdr(stream);
   }
 }
-
 abstract class CreateAMLAlertRequestSuccessExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   CreateAMLAlertRequestSuccessExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
-class CreateAMLAlertRequestSuccessExtEmptyVersion
-    extends CreateAMLAlertRequestSuccessExt {
-  CreateAMLAlertRequestSuccessExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+class CreateAMLAlertRequestSuccessExtEmptyVersion extends CreateAMLAlertRequestSuccessExt {
+  CreateAMLAlertRequestSuccessExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
-
 abstract class CreateAMLAlertRequestResult extends XdrEncodable {
   CreateAMLAlertRequestResultCode discriminant;
-
   CreateAMLAlertRequestResult(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class CreateAMLAlertRequestResultSuccess extends CreateAMLAlertRequestResult {
-  CreateAMLAlertRequestResultSuccess(this.success)
-      : super(CreateAMLAlertRequestResultCode(
-            CreateAMLAlertRequestResultCode.SUCCESS));
+  CreateAMLAlertRequestResultSuccess(this.success) : super(CreateAMLAlertRequestResultCode(CreateAMLAlertRequestResultCode.SUCCESS));
   late CreateAMLAlertRequestSuccess success;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     success.toXdr(stream);
   }
@@ -8657,23 +7584,22 @@ class CreateAMLAlertRequestResultSuccess extends CreateAMLAlertRequestResult {
 //  };
 
 //  ===========================================================================
-class CreateAccountOp extends XdrEncodable {
-  AccountID destination;
-  AccountID? referrer;
-  Uint64 roleID;
+class CreateAccountOp extends XdrEncodable  {
+  ACCOUNTID destination;
+  ACCOUNTID? referrer;
+  UINT64 roleID;
   List<UpdateSignerData> signersData;
   CreateAccountOpExt ext;
 
   CreateAccountOp(
-    this.destination,
-    this.referrer,
-    this.roleID,
-    this.signersData,
-    this.ext,
-  );
+      this.destination,
+      this.referrer,
+      this.roleID,
+      this.signersData,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     destination.toXdr(stream);
     if (referrer != null) {
       true.toXdr(stream);
@@ -8683,29 +7609,23 @@ class CreateAccountOp extends XdrEncodable {
     }
     roleID.toXdr(stream);
     signersData.length.toXdr(stream);
-    signersData.forEach((element) {
+    signersData.forEach ((element) {
       element.toXdr(stream);
     });
     ext.toXdr(stream);
   }
 }
-
 abstract class CreateAccountOpExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   CreateAccountOpExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class CreateAccountOpExtEmptyVersion extends CreateAccountOpExt {
-  CreateAccountOpExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+  CreateAccountOpExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
-
 class CreateAccountResultCode extends XdrEncodable {
   static const SUCCESS = 0;
   static const INVALID_DESTINATION = -1;
@@ -8714,9 +7634,12 @@ class CreateAccountResultCode extends XdrEncodable {
   static const NO_SUCH_ROLE = -4;
   static const INVALID_SIGNER_DATA = -5;
   static const NO_SIGNER_DATA = -6;
-  var value;
-
+  int value;
   CreateAccountResultCode(this.value);
+  @override toXdr(XdrDataOutputStream stream) {
+    value.toXdr(stream);
+  }
+
 }
 // === xdr source ============================================================
 
@@ -8736,69 +7659,52 @@ class CreateAccountResultCode extends XdrEncodable {
 //  };
 
 //  ===========================================================================
-class CreateAccountSuccess extends XdrEncodable {
-  Uint64 sequentialID;
+class CreateAccountSuccess extends XdrEncodable  {
+  UINT64 sequentialID;
   CreateAccountSuccessExt ext;
 
   CreateAccountSuccess(
-    this.sequentialID,
-    this.ext,
-  );
+      this.sequentialID,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     sequentialID.toXdr(stream);
     ext.toXdr(stream);
   }
 }
-
 abstract class CreateAccountSuccessExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   CreateAccountSuccessExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class CreateAccountSuccessExtEmptyVersion extends CreateAccountSuccessExt {
-  CreateAccountSuccessExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+  CreateAccountSuccessExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
-
 abstract class CreateAccountResult extends XdrEncodable {
   CreateAccountResultCode discriminant;
-
   CreateAccountResult(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class CreateAccountResultSuccess extends CreateAccountResult {
-  CreateAccountResultSuccess(this.success)
-      : super(CreateAccountResultCode(CreateAccountResultCode.SUCCESS));
+  CreateAccountResultSuccess(this.success) : super(CreateAccountResultCode(CreateAccountResultCode.SUCCESS));
   late CreateAccountSuccess success;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     success.toXdr(stream);
   }
 }
 
 class CreateAccountResultInvalidSignerData extends CreateAccountResult {
-  CreateAccountResultInvalidSignerData(this.createSignerErrorCode)
-      : super(CreateAccountResultCode(
-            CreateAccountResultCode.INVALID_SIGNER_DATA));
+  CreateAccountResultInvalidSignerData(this.createSignerErrorCode) : super(CreateAccountResultCode(CreateAccountResultCode.INVALID_SIGNER_DATA));
   late ManageSignerResultCode createSignerErrorCode;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     createSignerErrorCode.toXdr(stream);
   }
@@ -8825,19 +7731,18 @@ class CreateAccountResultInvalidSignerData extends CreateAccountResult {
 //  };
 
 //  ===========================================================================
-class CreateAtomicSwapAskRequestOp extends XdrEncodable {
+class CreateAtomicSwapAskRequestOp extends XdrEncodable  {
   CreateAtomicSwapAskRequest request;
-  Uint32? allTasks;
+  UINT32? allTasks;
   CreateAtomicSwapAskRequestOpExt ext;
 
   CreateAtomicSwapAskRequestOp(
-    this.request,
-    this.allTasks,
-    this.ext,
-  );
+      this.request,
+      this.allTasks,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     request.toXdr(stream);
     if (allTasks != null) {
       true.toXdr(stream);
@@ -8848,24 +7753,17 @@ class CreateAtomicSwapAskRequestOp extends XdrEncodable {
     ext.toXdr(stream);
   }
 }
-
 abstract class CreateAtomicSwapAskRequestOpExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   CreateAtomicSwapAskRequestOpExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
-class CreateAtomicSwapAskRequestOpExtEmptyVersion
-    extends CreateAtomicSwapAskRequestOpExt {
-  CreateAtomicSwapAskRequestOpExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+class CreateAtomicSwapAskRequestOpExtEmptyVersion extends CreateAtomicSwapAskRequestOpExt {
+  CreateAtomicSwapAskRequestOpExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
-
 class CreateAtomicSwapAskRequestResultCode extends XdrEncodable {
   static const SUCCESS = 0;
   static const INVALID_AMOUNT = -1;
@@ -8881,9 +7779,12 @@ class CreateAtomicSwapAskRequestResultCode extends XdrEncodable {
   static const BASE_BALANCE_UNDERFUNDED = -11;
   static const INVALID_QUOTE_ASSET = -12;
   static const ATOMIC_SWAP_ASK_TASKS_NOT_FOUND = -13;
-  var value;
-
+  int value;
   CreateAtomicSwapAskRequestResultCode(this.value);
+  @override toXdr(XdrDataOutputStream stream) {
+    value.toXdr(stream);
+  }
+
 }
 // === xdr source ============================================================
 
@@ -8906,65 +7807,49 @@ class CreateAtomicSwapAskRequestResultCode extends XdrEncodable {
 //  };
 
 //  ===========================================================================
-class CreateAtomicSwapAskRequestSuccess extends XdrEncodable {
-  Uint64 requestID;
+class CreateAtomicSwapAskRequestSuccess extends XdrEncodable  {
+  UINT64 requestID;
   bool fulfilled;
-  Uint64 askID;
+  UINT64 askID;
   CreateAtomicSwapAskRequestSuccessExt ext;
 
   CreateAtomicSwapAskRequestSuccess(
-    this.requestID,
-    this.fulfilled,
-    this.askID,
-    this.ext,
-  );
+      this.requestID,
+      this.fulfilled,
+      this.askID,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     requestID.toXdr(stream);
     fulfilled.toXdr(stream);
     askID.toXdr(stream);
     ext.toXdr(stream);
   }
 }
-
 abstract class CreateAtomicSwapAskRequestSuccessExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   CreateAtomicSwapAskRequestSuccessExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
-class CreateAtomicSwapAskRequestSuccessExtEmptyVersion
-    extends CreateAtomicSwapAskRequestSuccessExt {
-  CreateAtomicSwapAskRequestSuccessExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+class CreateAtomicSwapAskRequestSuccessExtEmptyVersion extends CreateAtomicSwapAskRequestSuccessExt {
+  CreateAtomicSwapAskRequestSuccessExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
-
 abstract class CreateAtomicSwapAskRequestResult extends XdrEncodable {
   CreateAtomicSwapAskRequestResultCode discriminant;
-
   CreateAtomicSwapAskRequestResult(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
-class CreateAtomicSwapAskRequestResultSuccess
-    extends CreateAtomicSwapAskRequestResult {
-  CreateAtomicSwapAskRequestResultSuccess(this.success)
-      : super(CreateAtomicSwapAskRequestResultCode(
-            CreateAtomicSwapAskRequestResultCode.SUCCESS));
+class CreateAtomicSwapAskRequestResultSuccess extends CreateAtomicSwapAskRequestResult {
+  CreateAtomicSwapAskRequestResultSuccess(this.success) : super(CreateAtomicSwapAskRequestResultCode(CreateAtomicSwapAskRequestResultCode.SUCCESS));
   late CreateAtomicSwapAskRequestSuccess success;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     success.toXdr(stream);
   }
@@ -8987,39 +7872,31 @@ class CreateAtomicSwapAskRequestResultSuccess
 //  };
 
 //  ===========================================================================
-class CreateAtomicSwapBidRequestOp extends XdrEncodable {
+class CreateAtomicSwapBidRequestOp extends XdrEncodable  {
   CreateAtomicSwapBidRequest request;
   CreateAtomicSwapBidRequestOpExt ext;
 
   CreateAtomicSwapBidRequestOp(
-    this.request,
-    this.ext,
-  );
+      this.request,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     request.toXdr(stream);
     ext.toXdr(stream);
   }
 }
-
 abstract class CreateAtomicSwapBidRequestOpExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   CreateAtomicSwapBidRequestOpExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
-class CreateAtomicSwapBidRequestOpExtEmptyVersion
-    extends CreateAtomicSwapBidRequestOpExt {
-  CreateAtomicSwapBidRequestOpExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+class CreateAtomicSwapBidRequestOpExtEmptyVersion extends CreateAtomicSwapBidRequestOpExt {
+  CreateAtomicSwapBidRequestOpExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
-
 class CreateAtomicSwapBidRequestResultCode extends XdrEncodable {
   static const SUCCESS = 0;
   static const INVALID_BASE_AMOUNT = -1;
@@ -9033,9 +7910,12 @@ class CreateAtomicSwapBidRequestResultCode extends XdrEncodable {
   static const SOURCE_ACCOUNT_EQUALS_ASK_OWNER = -9;
   static const ATOMIC_SWAP_BID_ZERO_TASKS_NOT_ALLOWED = -10;
   static const QUOTE_AMOUNT_OVERFLOWS = -11;
-  var value;
-
+  int value;
   CreateAtomicSwapBidRequestResultCode(this.value);
+  @override toXdr(XdrDataOutputStream stream) {
+    value.toXdr(stream);
+  }
+
 }
 // === xdr source ============================================================
 
@@ -9058,65 +7938,49 @@ class CreateAtomicSwapBidRequestResultCode extends XdrEncodable {
 //  };
 
 //  ===========================================================================
-class CreateAtomicSwapBidRequestSuccess extends XdrEncodable {
-  Uint64 requestID;
-  AccountID askOwnerID;
-  Uint64 quoteAmount;
+class CreateAtomicSwapBidRequestSuccess extends XdrEncodable  {
+  UINT64 requestID;
+  ACCOUNTID askOwnerID;
+  UINT64 quoteAmount;
   CreateAtomicSwapBidRequestSuccessExt ext;
 
   CreateAtomicSwapBidRequestSuccess(
-    this.requestID,
-    this.askOwnerID,
-    this.quoteAmount,
-    this.ext,
-  );
+      this.requestID,
+      this.askOwnerID,
+      this.quoteAmount,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     requestID.toXdr(stream);
     askOwnerID.toXdr(stream);
     quoteAmount.toXdr(stream);
     ext.toXdr(stream);
   }
 }
-
 abstract class CreateAtomicSwapBidRequestSuccessExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   CreateAtomicSwapBidRequestSuccessExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
-class CreateAtomicSwapBidRequestSuccessExtEmptyVersion
-    extends CreateAtomicSwapBidRequestSuccessExt {
-  CreateAtomicSwapBidRequestSuccessExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+class CreateAtomicSwapBidRequestSuccessExtEmptyVersion extends CreateAtomicSwapBidRequestSuccessExt {
+  CreateAtomicSwapBidRequestSuccessExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
-
 abstract class CreateAtomicSwapBidRequestResult extends XdrEncodable {
   CreateAtomicSwapBidRequestResultCode discriminant;
-
   CreateAtomicSwapBidRequestResult(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
-class CreateAtomicSwapBidRequestResultSuccess
-    extends CreateAtomicSwapBidRequestResult {
-  CreateAtomicSwapBidRequestResultSuccess(this.success)
-      : super(CreateAtomicSwapBidRequestResultCode(
-            CreateAtomicSwapBidRequestResultCode.SUCCESS));
+class CreateAtomicSwapBidRequestResultSuccess extends CreateAtomicSwapBidRequestResult {
+  CreateAtomicSwapBidRequestResultSuccess(this.success) : super(CreateAtomicSwapBidRequestResultCode(CreateAtomicSwapBidRequestResultCode.SUCCESS));
   late CreateAtomicSwapBidRequestSuccess success;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     success.toXdr(stream);
   }
@@ -9152,25 +8016,24 @@ class CreateAtomicSwapBidRequestResultSuccess
 //  };
 
 //  ===========================================================================
-class CreateChangeRoleRequestOp extends XdrEncodable {
-  Uint64 requestID;
-  AccountID destinationAccount;
-  Uint64 accountRoleToSet;
-  Longstring creatorDetails;
-  Uint32? allTasks;
+class CreateChangeRoleRequestOp extends XdrEncodable  {
+  UINT64 requestID;
+  ACCOUNTID destinationAccount;
+  UINT64 accountRoleToSet;
+  LONGSTRING creatorDetails;
+  UINT32? allTasks;
   CreateChangeRoleRequestOpExt ext;
 
   CreateChangeRoleRequestOp(
-    this.requestID,
-    this.destinationAccount,
-    this.accountRoleToSet,
-    this.creatorDetails,
-    this.allTasks,
-    this.ext,
-  );
+      this.requestID,
+      this.destinationAccount,
+      this.accountRoleToSet,
+      this.creatorDetails,
+      this.allTasks,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     requestID.toXdr(stream);
     destinationAccount.toXdr(stream);
     accountRoleToSet.toXdr(stream);
@@ -9184,24 +8047,17 @@ class CreateChangeRoleRequestOp extends XdrEncodable {
     ext.toXdr(stream);
   }
 }
-
 abstract class CreateChangeRoleRequestOpExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   CreateChangeRoleRequestOpExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
-class CreateChangeRoleRequestOpExtEmptyVersion
-    extends CreateChangeRoleRequestOpExt {
-  CreateChangeRoleRequestOpExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+class CreateChangeRoleRequestOpExtEmptyVersion extends CreateChangeRoleRequestOpExt {
+  CreateChangeRoleRequestOpExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
-
 class CreateChangeRoleRequestResultCode extends XdrEncodable {
   static const SUCCESS = 0;
   static const ACC_TO_UPDATE_DOES_NOT_EXIST = -1;
@@ -9212,31 +8068,25 @@ class CreateChangeRoleRequestResultCode extends XdrEncodable {
   static const INVALID_CREATOR_DETAILS = -8;
   static const CHANGE_ROLE_TASKS_NOT_FOUND = -9;
   static const ACCOUNT_ROLE_TO_SET_DOES_NOT_EXIST = -10;
-  var value;
-
+  int value;
   CreateChangeRoleRequestResultCode(this.value);
-}
+  @override toXdr(XdrDataOutputStream stream) {
+    value.toXdr(stream);
+  }
 
+}
 abstract class CreateChangeRoleRequestResult extends XdrEncodable {
   CreateChangeRoleRequestResultCode discriminant;
-
   CreateChangeRoleRequestResult(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
-class CreateChangeRoleRequestResultSuccess
-    extends CreateChangeRoleRequestResult {
-  CreateChangeRoleRequestResultSuccess(this.success)
-      : super(CreateChangeRoleRequestResultCode(
-            CreateChangeRoleRequestResultCode.SUCCESS));
+class CreateChangeRoleRequestResultSuccess extends CreateChangeRoleRequestResult {
+  CreateChangeRoleRequestResultSuccess(this.success) : super(CreateChangeRoleRequestResultCode(CreateChangeRoleRequestResultCode.SUCCESS));
   late CreateChangeRoleRequestResultSuccessSuccess success;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     success.toXdr(stream);
   }
@@ -9259,40 +8109,33 @@ class CreateChangeRoleRequestResultSuccess
 //  	}
 
 //  ===========================================================================
-class CreateChangeRoleRequestResultSuccessSuccess extends XdrEncodable {
-  Uint64 requestID;
+class CreateChangeRoleRequestResultSuccessSuccess extends XdrEncodable  {
+  UINT64 requestID;
   bool fulfilled;
   CreateChangeRoleRequestResultSuccessExt ext;
 
   CreateChangeRoleRequestResultSuccessSuccess(
-    this.requestID,
-    this.fulfilled,
-    this.ext,
-  );
+      this.requestID,
+      this.fulfilled,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     requestID.toXdr(stream);
     fulfilled.toXdr(stream);
     ext.toXdr(stream);
   }
 }
-
 abstract class CreateChangeRoleRequestResultSuccessExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   CreateChangeRoleRequestResultSuccessExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
-class CreateChangeRoleRequestResultSuccessExtEmptyVersion
-    extends CreateChangeRoleRequestResultSuccessExt {
-  CreateChangeRoleRequestResultSuccessExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+class CreateChangeRoleRequestResultSuccessExtEmptyVersion extends CreateChangeRoleRequestResultSuccessExt {
+  CreateChangeRoleRequestResultSuccessExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
 
 // === xdr source ============================================================
@@ -9317,21 +8160,20 @@ class CreateChangeRoleRequestResultSuccessExtEmptyVersion
 //  };
 
 //  ===========================================================================
-class CreateCloseDeferredPaymentRequestOp extends XdrEncodable {
-  Uint64 requestID;
+class CreateCloseDeferredPaymentRequestOp extends XdrEncodable  {
+  UINT64 requestID;
   CloseDeferredPaymentRequest request;
-  Uint32? allTasks;
+  UINT32? allTasks;
   CreateCloseDeferredPaymentRequestOpExt ext;
 
   CreateCloseDeferredPaymentRequestOp(
-    this.requestID,
-    this.request,
-    this.allTasks,
-    this.ext,
-  );
+      this.requestID,
+      this.request,
+      this.allTasks,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     requestID.toXdr(stream);
     request.toXdr(stream);
     if (allTasks != null) {
@@ -9343,24 +8185,17 @@ class CreateCloseDeferredPaymentRequestOp extends XdrEncodable {
     ext.toXdr(stream);
   }
 }
-
 abstract class CreateCloseDeferredPaymentRequestOpExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   CreateCloseDeferredPaymentRequestOpExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
-class CreateCloseDeferredPaymentRequestOpExtEmptyVersion
-    extends CreateCloseDeferredPaymentRequestOpExt {
-  CreateCloseDeferredPaymentRequestOpExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+class CreateCloseDeferredPaymentRequestOpExtEmptyVersion extends CreateCloseDeferredPaymentRequestOpExt {
+  CreateCloseDeferredPaymentRequestOpExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
-
 class CreateCloseDeferredPaymentRequestResultCode extends XdrEncodable {
   static const SUCCESS = 0;
   static const UNDERFUNDED = -1;
@@ -9374,17 +8209,22 @@ class CreateCloseDeferredPaymentRequestResultCode extends XdrEncodable {
   static const INVALID_AMOUNT = -9;
   static const DESTINATION_BALANCE_NOT_FOUND = -10;
   static const REQUEST_NOT_FOUND = -11;
-  var value;
-
+  int value;
   CreateCloseDeferredPaymentRequestResultCode(this.value);
-}
+  @override toXdr(XdrDataOutputStream stream) {
+    value.toXdr(stream);
+  }
 
+}
 class CloseDeferredPaymentEffect extends XdrEncodable {
   static const CHARGED = 0;
   static const DELETED = 1;
-  var value;
-
+  int value;
   CloseDeferredPaymentEffect(this.value);
+  @override toXdr(XdrDataOutputStream stream) {
+    value.toXdr(stream);
+  }
+
 }
 // === xdr source ============================================================
 
@@ -9401,23 +8241,22 @@ class CloseDeferredPaymentEffect extends XdrEncodable {
 //  };
 
 //  ===========================================================================
-class CloseDeferredPaymentResult extends XdrEncodable {
-  Uint64 deferredPaymentID;
-  AccountID destination;
-  BalanceID destinationBalance;
+class CloseDeferredPaymentResult extends XdrEncodable  {
+  UINT64 deferredPaymentID;
+  ACCOUNTID destination;
+  BALANCEID destinationBalance;
   CloseDeferredPaymentEffect effect;
   EmptyExt ext;
 
   CloseDeferredPaymentResult(
-    this.deferredPaymentID,
-    this.destination,
-    this.destinationBalance,
-    this.effect,
-    this.ext,
-  );
+      this.deferredPaymentID,
+      this.destination,
+      this.destinationBalance,
+      this.effect,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     deferredPaymentID.toXdr(stream);
     destination.toXdr(stream);
     destinationBalance.toXdr(stream);
@@ -9445,23 +8284,22 @@ class CloseDeferredPaymentResult extends XdrEncodable {
 //  };
 
 //  ===========================================================================
-class CreateCloseDeferredPaymentRequestSuccess extends XdrEncodable {
-  Uint64 requestID;
+class CreateCloseDeferredPaymentRequestSuccess extends XdrEncodable  {
+  UINT64 requestID;
   bool fulfilled;
-  Uint64 deferredPaymentID;
+  UINT64 deferredPaymentID;
   CloseDeferredPaymentResult? extendedResult;
   CreateCloseDeferredPaymentRequestSuccessExt ext;
 
   CreateCloseDeferredPaymentRequestSuccess(
-    this.requestID,
-    this.fulfilled,
-    this.deferredPaymentID,
-    this.extendedResult,
-    this.ext,
-  );
+      this.requestID,
+      this.fulfilled,
+      this.deferredPaymentID,
+      this.extendedResult,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     requestID.toXdr(stream);
     fulfilled.toXdr(stream);
     deferredPaymentID.toXdr(stream);
@@ -9474,45 +8312,29 @@ class CreateCloseDeferredPaymentRequestSuccess extends XdrEncodable {
     ext.toXdr(stream);
   }
 }
-
-abstract class CreateCloseDeferredPaymentRequestSuccessExt
-    extends XdrEncodable {
+abstract class CreateCloseDeferredPaymentRequestSuccessExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   CreateCloseDeferredPaymentRequestSuccessExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
-class CreateCloseDeferredPaymentRequestSuccessExtEmptyVersion
-    extends CreateCloseDeferredPaymentRequestSuccessExt {
-  CreateCloseDeferredPaymentRequestSuccessExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+class CreateCloseDeferredPaymentRequestSuccessExtEmptyVersion extends CreateCloseDeferredPaymentRequestSuccessExt {
+  CreateCloseDeferredPaymentRequestSuccessExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
-
 abstract class CreateCloseDeferredPaymentRequestResult extends XdrEncodable {
   CreateCloseDeferredPaymentRequestResultCode discriminant;
-
   CreateCloseDeferredPaymentRequestResult(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
-class CreateCloseDeferredPaymentRequestResultSuccess
-    extends CreateCloseDeferredPaymentRequestResult {
-  CreateCloseDeferredPaymentRequestResultSuccess(this.success)
-      : super(CreateCloseDeferredPaymentRequestResultCode(
-            CreateCloseDeferredPaymentRequestResultCode.SUCCESS));
+class CreateCloseDeferredPaymentRequestResultSuccess extends CreateCloseDeferredPaymentRequestResult {
+  CreateCloseDeferredPaymentRequestResultSuccess(this.success) : super(CreateCloseDeferredPaymentRequestResultCode(CreateCloseDeferredPaymentRequestResultCode.SUCCESS));
   late CreateCloseDeferredPaymentRequestSuccess success;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     success.toXdr(stream);
   }
@@ -9534,21 +8356,20 @@ class CreateCloseDeferredPaymentRequestResultSuccess
 //  };
 
 //  ===========================================================================
-class CreateDataCreationRequestOp extends XdrEncodable {
-  Uint64 requestID;
+class CreateDataCreationRequestOp extends XdrEncodable  {
+  UINT64 requestID;
   DataCreationRequest dataCreationRequest;
-  Uint32? allTasks;
+  UINT32? allTasks;
   EmptyExt ext;
 
   CreateDataCreationRequestOp(
-    this.requestID,
-    this.dataCreationRequest,
-    this.allTasks,
-    this.ext,
-  );
+      this.requestID,
+      this.dataCreationRequest,
+      this.allTasks,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     requestID.toXdr(stream);
     dataCreationRequest.toXdr(stream);
     if (allTasks != null) {
@@ -9560,16 +8381,18 @@ class CreateDataCreationRequestOp extends XdrEncodable {
     ext.toXdr(stream);
   }
 }
-
 class CreateDataCreationRequestResultCode extends XdrEncodable {
   static const SUCCESS = 0;
   static const INVALID_VALUE = -1;
   static const CREATE_DATA_TASKS_NOT_FOUND = -2;
   static const REQUEST_NOT_FOUND = -3;
   static const INVALID_CREATOR_DETAILS = -4;
-  var value;
-
+  int value;
   CreateDataCreationRequestResultCode(this.value);
+  @override toXdr(XdrDataOutputStream stream) {
+    value.toXdr(stream);
+  }
+
 }
 // === xdr source ============================================================
 
@@ -9591,27 +8414,26 @@ class CreateDataCreationRequestResultCode extends XdrEncodable {
 //  };
 
 //  ===========================================================================
-class CreateDataCreationRequestSuccess extends XdrEncodable {
-  Uint64 requestID;
+class CreateDataCreationRequestSuccess extends XdrEncodable  {
+  UINT64 requestID;
   bool fulfilled;
-  AccountID owner;
-  Uint64 id;
-  Uint64 type;
-  Longstring value;
+  ACCOUNTID owner;
+  UINT64 id;
+  UINT64 type;
+  LONGSTRING value;
   CreateDataCreationRequestSuccessExt ext;
 
   CreateDataCreationRequestSuccess(
-    this.requestID,
-    this.fulfilled,
-    this.owner,
-    this.id,
-    this.type,
-    this.value,
-    this.ext,
-  );
+      this.requestID,
+      this.fulfilled,
+      this.owner,
+      this.id,
+      this.type,
+      this.value,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     requestID.toXdr(stream);
     fulfilled.toXdr(stream);
     owner.toXdr(stream);
@@ -9621,44 +8443,29 @@ class CreateDataCreationRequestSuccess extends XdrEncodable {
     ext.toXdr(stream);
   }
 }
-
 abstract class CreateDataCreationRequestSuccessExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   CreateDataCreationRequestSuccessExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
-class CreateDataCreationRequestSuccessExtEmptyVersion
-    extends CreateDataCreationRequestSuccessExt {
-  CreateDataCreationRequestSuccessExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+class CreateDataCreationRequestSuccessExtEmptyVersion extends CreateDataCreationRequestSuccessExt {
+  CreateDataCreationRequestSuccessExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
-
 abstract class CreateDataCreationRequestResult extends XdrEncodable {
   CreateDataCreationRequestResultCode discriminant;
-
   CreateDataCreationRequestResult(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
-class CreateDataCreationRequestResultSuccess
-    extends CreateDataCreationRequestResult {
-  CreateDataCreationRequestResultSuccess(this.success)
-      : super(CreateDataCreationRequestResultCode(
-            CreateDataCreationRequestResultCode.SUCCESS));
+class CreateDataCreationRequestResultSuccess extends CreateDataCreationRequestResult {
+  CreateDataCreationRequestResultSuccess(this.success) : super(CreateDataCreationRequestResultCode(CreateDataCreationRequestResultCode.SUCCESS));
   late CreateDataCreationRequestSuccess success;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     success.toXdr(stream);
   }
@@ -9680,21 +8487,20 @@ class CreateDataCreationRequestResultSuccess
 //  };
 
 //  ===========================================================================
-class CreateDataRemoveRequestOp extends XdrEncodable {
-  Uint64 requestID;
+class CreateDataRemoveRequestOp extends XdrEncodable  {
+  UINT64 requestID;
   DataRemoveRequest dataRemoveRequest;
-  Uint32? allTasks;
+  UINT32? allTasks;
   EmptyExt ext;
 
   CreateDataRemoveRequestOp(
-    this.requestID,
-    this.dataRemoveRequest,
-    this.allTasks,
-    this.ext,
-  );
+      this.requestID,
+      this.dataRemoveRequest,
+      this.allTasks,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     requestID.toXdr(stream);
     dataRemoveRequest.toXdr(stream);
     if (allTasks != null) {
@@ -9706,16 +8512,18 @@ class CreateDataRemoveRequestOp extends XdrEncodable {
     ext.toXdr(stream);
   }
 }
-
 class CreateDataRemoveRequestResultCode extends XdrEncodable {
   static const SUCCESS = 0;
   static const REMOVE_DATA_TASKS_NOT_FOUND = -1;
   static const DATA_NOT_FOUND = -2;
   static const INVALID_CREATOR_DETAILS = -3;
   static const REQUEST_NOT_FOUND = -4;
-  var value;
-
+  int value;
   CreateDataRemoveRequestResultCode(this.value);
+  @override toXdr(XdrDataOutputStream stream) {
+    value.toXdr(stream);
+  }
+
 }
 // === xdr source ============================================================
 
@@ -9733,62 +8541,46 @@ class CreateDataRemoveRequestResultCode extends XdrEncodable {
 //  };
 
 //  ===========================================================================
-class CreateDataRemoveRequestSuccess extends XdrEncodable {
-  Uint64 requestID;
+class CreateDataRemoveRequestSuccess extends XdrEncodable  {
+  UINT64 requestID;
   bool fulfilled;
   CreateDataRemoveRequestSuccessExt ext;
 
   CreateDataRemoveRequestSuccess(
-    this.requestID,
-    this.fulfilled,
-    this.ext,
-  );
+      this.requestID,
+      this.fulfilled,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     requestID.toXdr(stream);
     fulfilled.toXdr(stream);
     ext.toXdr(stream);
   }
 }
-
 abstract class CreateDataRemoveRequestSuccessExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   CreateDataRemoveRequestSuccessExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
-class CreateDataRemoveRequestSuccessExtEmptyVersion
-    extends CreateDataRemoveRequestSuccessExt {
-  CreateDataRemoveRequestSuccessExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+class CreateDataRemoveRequestSuccessExtEmptyVersion extends CreateDataRemoveRequestSuccessExt {
+  CreateDataRemoveRequestSuccessExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
-
 abstract class CreateDataRemoveRequestResult extends XdrEncodable {
   CreateDataRemoveRequestResultCode discriminant;
-
   CreateDataRemoveRequestResult(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
-class CreateDataRemoveRequestResultSuccess
-    extends CreateDataRemoveRequestResult {
-  CreateDataRemoveRequestResultSuccess(this.success)
-      : super(CreateDataRemoveRequestResultCode(
-            CreateDataRemoveRequestResultCode.SUCCESS));
+class CreateDataRemoveRequestResultSuccess extends CreateDataRemoveRequestResult {
+  CreateDataRemoveRequestResultSuccess(this.success) : super(CreateDataRemoveRequestResultCode(CreateDataRemoveRequestResultCode.SUCCESS));
   late CreateDataRemoveRequestSuccess success;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     success.toXdr(stream);
   }
@@ -9810,21 +8602,20 @@ class CreateDataRemoveRequestResultSuccess
 //  };
 
 //  ===========================================================================
-class CreateDataUpdateRequestOp extends XdrEncodable {
-  Uint64 requestID;
+class CreateDataUpdateRequestOp extends XdrEncodable  {
+  UINT64 requestID;
   DataUpdateRequest dataUpdateRequest;
-  Uint32? allTasks;
+  UINT32? allTasks;
   EmptyExt ext;
 
   CreateDataUpdateRequestOp(
-    this.requestID,
-    this.dataUpdateRequest,
-    this.allTasks,
-    this.ext,
-  );
+      this.requestID,
+      this.dataUpdateRequest,
+      this.allTasks,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     requestID.toXdr(stream);
     dataUpdateRequest.toXdr(stream);
     if (allTasks != null) {
@@ -9836,7 +8627,6 @@ class CreateDataUpdateRequestOp extends XdrEncodable {
     ext.toXdr(stream);
   }
 }
-
 class CreateDataUpdateRequestResultCode extends XdrEncodable {
   static const SUCCESS = 0;
   static const INVALID_VALUE = -1;
@@ -9844,9 +8634,12 @@ class CreateDataUpdateRequestResultCode extends XdrEncodable {
   static const DATA_NOT_FOUND = -3;
   static const INVALID_CREATOR_DETAILS = -4;
   static const REQUEST_NOT_FOUND = -5;
-  var value;
-
+  int value;
   CreateDataUpdateRequestResultCode(this.value);
+  @override toXdr(XdrDataOutputStream stream) {
+    value.toXdr(stream);
+  }
+
 }
 // === xdr source ============================================================
 
@@ -9864,62 +8657,46 @@ class CreateDataUpdateRequestResultCode extends XdrEncodable {
 //  };
 
 //  ===========================================================================
-class CreateDataUpdateRequestSuccess extends XdrEncodable {
-  Uint64 requestID;
+class CreateDataUpdateRequestSuccess extends XdrEncodable  {
+  UINT64 requestID;
   bool fulfilled;
   CreateDataUpdateRequestSuccessExt ext;
 
   CreateDataUpdateRequestSuccess(
-    this.requestID,
-    this.fulfilled,
-    this.ext,
-  );
+      this.requestID,
+      this.fulfilled,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     requestID.toXdr(stream);
     fulfilled.toXdr(stream);
     ext.toXdr(stream);
   }
 }
-
 abstract class CreateDataUpdateRequestSuccessExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   CreateDataUpdateRequestSuccessExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
-class CreateDataUpdateRequestSuccessExtEmptyVersion
-    extends CreateDataUpdateRequestSuccessExt {
-  CreateDataUpdateRequestSuccessExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+class CreateDataUpdateRequestSuccessExtEmptyVersion extends CreateDataUpdateRequestSuccessExt {
+  CreateDataUpdateRequestSuccessExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
-
 abstract class CreateDataUpdateRequestResult extends XdrEncodable {
   CreateDataUpdateRequestResultCode discriminant;
-
   CreateDataUpdateRequestResult(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
-class CreateDataUpdateRequestResultSuccess
-    extends CreateDataUpdateRequestResult {
-  CreateDataUpdateRequestResultSuccess(this.success)
-      : super(CreateDataUpdateRequestResultCode(
-            CreateDataUpdateRequestResultCode.SUCCESS));
+class CreateDataUpdateRequestResultSuccess extends CreateDataUpdateRequestResult {
+  CreateDataUpdateRequestResultSuccess(this.success) : super(CreateDataUpdateRequestResultCode(CreateDataUpdateRequestResultCode.SUCCESS));
   late CreateDataUpdateRequestSuccess success;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     success.toXdr(stream);
   }
@@ -9939,31 +8716,32 @@ class CreateDataUpdateRequestResultSuccess
 //  };
 
 //  ===========================================================================
-class CreateDataOp extends XdrEncodable {
-  Uint64 type;
-  Longstring value;
+class CreateDataOp extends XdrEncodable  {
+  UINT64 type;
+  LONGSTRING value;
   EmptyExt ext;
 
   CreateDataOp(
-    this.type,
-    this.value,
-    this.ext,
-  );
+      this.type,
+      this.value,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     type.toXdr(stream);
     value.toXdr(stream);
     ext.toXdr(stream);
   }
 }
-
 class CreateDataResultCode extends XdrEncodable {
   static const SUCCESS = 0;
   static const INVALID_DATA = -1;
-  var value;
-
+  int value;
   CreateDataResultCode(this.value);
+  @override toXdr(XdrDataOutputStream stream) {
+    value.toXdr(stream);
+  }
+
 }
 // === xdr source ============================================================
 
@@ -9976,40 +8754,32 @@ class CreateDataResultCode extends XdrEncodable {
 //  };
 
 //  ===========================================================================
-class CreateDataSuccess extends XdrEncodable {
-  Uint64 dataID;
+class CreateDataSuccess extends XdrEncodable  {
+  UINT64 dataID;
   EmptyExt ext;
 
   CreateDataSuccess(
-    this.dataID,
-    this.ext,
-  );
+      this.dataID,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     dataID.toXdr(stream);
     ext.toXdr(stream);
   }
 }
-
 abstract class CreateDataResult extends XdrEncodable {
   CreateDataResultCode discriminant;
-
   CreateDataResult(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class CreateDataResultSuccess extends CreateDataResult {
-  CreateDataResultSuccess(this.success)
-      : super(CreateDataResultCode(CreateDataResultCode.SUCCESS));
+  CreateDataResultSuccess(this.success) : super(CreateDataResultCode(CreateDataResultCode.SUCCESS));
   late CreateDataSuccess success;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     success.toXdr(stream);
   }
@@ -10038,21 +8808,20 @@ class CreateDataResultSuccess extends CreateDataResult {
 //  };
 
 //  ===========================================================================
-class CreateDeferredPaymentCreationRequestOp extends XdrEncodable {
-  Uint64 requestID;
+class CreateDeferredPaymentCreationRequestOp extends XdrEncodable  {
+  UINT64 requestID;
   CreateDeferredPaymentRequest request;
-  Uint32? allTasks;
+  UINT32? allTasks;
   CreateDeferredPaymentCreationRequestOpExt ext;
 
   CreateDeferredPaymentCreationRequestOp(
-    this.requestID,
-    this.request,
-    this.allTasks,
-    this.ext,
-  );
+      this.requestID,
+      this.request,
+      this.allTasks,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     requestID.toXdr(stream);
     request.toXdr(stream);
     if (allTasks != null) {
@@ -10064,24 +8833,17 @@ class CreateDeferredPaymentCreationRequestOp extends XdrEncodable {
     ext.toXdr(stream);
   }
 }
-
 abstract class CreateDeferredPaymentCreationRequestOpExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   CreateDeferredPaymentCreationRequestOpExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
-class CreateDeferredPaymentCreationRequestOpExtEmptyVersion
-    extends CreateDeferredPaymentCreationRequestOpExt {
-  CreateDeferredPaymentCreationRequestOpExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+class CreateDeferredPaymentCreationRequestOpExtEmptyVersion extends CreateDeferredPaymentCreationRequestOpExt {
+  CreateDeferredPaymentCreationRequestOpExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
-
 class CreateDeferredPaymentCreationRequestResultCode extends XdrEncodable {
   static const SUCCESS = 0;
   static const SOURCE_BALANCE_NOT_FOUND = -1;
@@ -10092,9 +8854,12 @@ class CreateDeferredPaymentCreationRequestResultCode extends XdrEncodable {
   static const INVALID_CREATOR_DETAILS = -6;
   static const INVALID_AMOUNT = -7;
   static const REQUEST_NOT_FOUND = -8;
-  var value;
-
+  int value;
   CreateDeferredPaymentCreationRequestResultCode(this.value);
+  @override toXdr(XdrDataOutputStream stream) {
+    value.toXdr(stream);
+  }
+
 }
 // === xdr source ============================================================
 
@@ -10117,66 +8882,49 @@ class CreateDeferredPaymentCreationRequestResultCode extends XdrEncodable {
 //  };
 
 //  ===========================================================================
-class CreateDeferredPaymentCreationRequestSuccess extends XdrEncodable {
-  Uint64 requestID;
+class CreateDeferredPaymentCreationRequestSuccess extends XdrEncodable  {
+  UINT64 requestID;
   bool fulfilled;
-  Uint64 deferredPaymentID;
+  UINT64 deferredPaymentID;
   CreateDeferredPaymentCreationRequestSuccessExt ext;
 
   CreateDeferredPaymentCreationRequestSuccess(
-    this.requestID,
-    this.fulfilled,
-    this.deferredPaymentID,
-    this.ext,
-  );
+      this.requestID,
+      this.fulfilled,
+      this.deferredPaymentID,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     requestID.toXdr(stream);
     fulfilled.toXdr(stream);
     deferredPaymentID.toXdr(stream);
     ext.toXdr(stream);
   }
 }
-
-abstract class CreateDeferredPaymentCreationRequestSuccessExt
-    extends XdrEncodable {
+abstract class CreateDeferredPaymentCreationRequestSuccessExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   CreateDeferredPaymentCreationRequestSuccessExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
-class CreateDeferredPaymentCreationRequestSuccessExtEmptyVersion
-    extends CreateDeferredPaymentCreationRequestSuccessExt {
-  CreateDeferredPaymentCreationRequestSuccessExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+class CreateDeferredPaymentCreationRequestSuccessExtEmptyVersion extends CreateDeferredPaymentCreationRequestSuccessExt {
+  CreateDeferredPaymentCreationRequestSuccessExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
-
 abstract class CreateDeferredPaymentCreationRequestResult extends XdrEncodable {
   CreateDeferredPaymentCreationRequestResultCode discriminant;
-
   CreateDeferredPaymentCreationRequestResult(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
-class CreateDeferredPaymentCreationRequestResultSuccess
-    extends CreateDeferredPaymentCreationRequestResult {
-  CreateDeferredPaymentCreationRequestResultSuccess(this.success)
-      : super(CreateDeferredPaymentCreationRequestResultCode(
-            CreateDeferredPaymentCreationRequestResultCode.SUCCESS));
+class CreateDeferredPaymentCreationRequestResultSuccess extends CreateDeferredPaymentCreationRequestResult {
+  CreateDeferredPaymentCreationRequestResultSuccess(this.success) : super(CreateDeferredPaymentCreationRequestResultCode(CreateDeferredPaymentCreationRequestResultCode.SUCCESS));
   late CreateDeferredPaymentCreationRequestSuccess success;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     success.toXdr(stream);
   }
@@ -10205,21 +8953,20 @@ class CreateDeferredPaymentCreationRequestResultSuccess
 //  };
 
 //  ===========================================================================
-class CreateIssuanceRequestOp extends XdrEncodable {
+class CreateIssuanceRequestOp extends XdrEncodable  {
   IssuanceRequest request;
-  String64 reference;
-  Uint32? allTasks;
+  STRING64 reference;
+  UINT32? allTasks;
   CreateIssuanceRequestOpExt ext;
 
   CreateIssuanceRequestOp(
-    this.request,
-    this.reference,
-    this.allTasks,
-    this.ext,
-  );
+      this.request,
+      this.reference,
+      this.allTasks,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     request.toXdr(stream);
     reference.toXdr(stream);
     if (allTasks != null) {
@@ -10231,24 +8978,17 @@ class CreateIssuanceRequestOp extends XdrEncodable {
     ext.toXdr(stream);
   }
 }
-
 abstract class CreateIssuanceRequestOpExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   CreateIssuanceRequestOpExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
-class CreateIssuanceRequestOpExtEmptyVersion
-    extends CreateIssuanceRequestOpExt {
-  CreateIssuanceRequestOpExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+class CreateIssuanceRequestOpExtEmptyVersion extends CreateIssuanceRequestOpExt {
+  CreateIssuanceRequestOpExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
-
 class CreateIssuanceRequestResultCode extends XdrEncodable {
   static const SUCCESS = 0;
   static const ASSET_NOT_FOUND = -1;
@@ -10265,9 +9005,12 @@ class CreateIssuanceRequestResultCode extends XdrEncodable {
   static const ISSUANCE_TASKS_NOT_FOUND = -12;
   static const SYSTEM_TASKS_NOT_ALLOWED = -13;
   static const INVALID_AMOUNT_PRECISION = -14;
-  var value;
-
+  int value;
   CreateIssuanceRequestResultCode(this.value);
+  @override toXdr(XdrDataOutputStream stream) {
+    value.toXdr(stream);
+  }
+
 }
 // === xdr source ============================================================
 
@@ -10291,23 +9034,22 @@ class CreateIssuanceRequestResultCode extends XdrEncodable {
 //  };
 
 //  ===========================================================================
-class CreateIssuanceRequestSuccess extends XdrEncodable {
-  Uint64 requestID;
-  AccountID receiver;
+class CreateIssuanceRequestSuccess extends XdrEncodable  {
+  UINT64 requestID;
+  ACCOUNTID receiver;
   bool fulfilled;
   Fee fee;
   CreateIssuanceRequestSuccessExt ext;
 
   CreateIssuanceRequestSuccess(
-    this.requestID,
-    this.receiver,
-    this.fulfilled,
-    this.fee,
-    this.ext,
-  );
+      this.requestID,
+      this.receiver,
+      this.fulfilled,
+      this.fee,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     requestID.toXdr(stream);
     receiver.toXdr(stream);
     fulfilled.toXdr(stream);
@@ -10315,43 +9057,29 @@ class CreateIssuanceRequestSuccess extends XdrEncodable {
     ext.toXdr(stream);
   }
 }
-
 abstract class CreateIssuanceRequestSuccessExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   CreateIssuanceRequestSuccessExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
-class CreateIssuanceRequestSuccessExtEmptyVersion
-    extends CreateIssuanceRequestSuccessExt {
-  CreateIssuanceRequestSuccessExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+class CreateIssuanceRequestSuccessExtEmptyVersion extends CreateIssuanceRequestSuccessExt {
+  CreateIssuanceRequestSuccessExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
-
 abstract class CreateIssuanceRequestResult extends XdrEncodable {
   CreateIssuanceRequestResultCode discriminant;
-
   CreateIssuanceRequestResult(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class CreateIssuanceRequestResultSuccess extends CreateIssuanceRequestResult {
-  CreateIssuanceRequestResultSuccess(this.success)
-      : super(CreateIssuanceRequestResultCode(
-            CreateIssuanceRequestResultCode.SUCCESS));
+  CreateIssuanceRequestResultSuccess(this.success) : super(CreateIssuanceRequestResultCode(CreateIssuanceRequestResultCode.SUCCESS));
   late CreateIssuanceRequestSuccess success;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     success.toXdr(stream);
   }
@@ -10385,29 +9113,28 @@ class CreateIssuanceRequestResultSuccess extends CreateIssuanceRequestResult {
 //  };
 
 //  ===========================================================================
-class CreateKYCRecoveryRequestOp extends XdrEncodable {
-  Uint64 requestID;
-  AccountID targetAccount;
+class CreateKYCRecoveryRequestOp extends XdrEncodable  {
+  UINT64 requestID;
+  ACCOUNTID targetAccount;
   List<UpdateSignerData> signersData;
-  Longstring creatorDetails;
-  Uint32? allTasks;
+  LONGSTRING creatorDetails;
+  UINT32? allTasks;
   CreateKYCRecoveryRequestOpExt ext;
 
   CreateKYCRecoveryRequestOp(
-    this.requestID,
-    this.targetAccount,
-    this.signersData,
-    this.creatorDetails,
-    this.allTasks,
-    this.ext,
-  );
+      this.requestID,
+      this.targetAccount,
+      this.signersData,
+      this.creatorDetails,
+      this.allTasks,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     requestID.toXdr(stream);
     targetAccount.toXdr(stream);
     signersData.length.toXdr(stream);
-    signersData.forEach((element) {
+    signersData.forEach ((element) {
       element.toXdr(stream);
     });
     creatorDetails.toXdr(stream);
@@ -10420,24 +9147,17 @@ class CreateKYCRecoveryRequestOp extends XdrEncodable {
     ext.toXdr(stream);
   }
 }
-
 abstract class CreateKYCRecoveryRequestOpExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   CreateKYCRecoveryRequestOpExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
-class CreateKYCRecoveryRequestOpExtEmptyVersion
-    extends CreateKYCRecoveryRequestOpExt {
-  CreateKYCRecoveryRequestOpExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+class CreateKYCRecoveryRequestOpExtEmptyVersion extends CreateKYCRecoveryRequestOpExt {
+  CreateKYCRecoveryRequestOpExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
-
 class CreateKYCRecoveryRequestResultCode extends XdrEncodable {
   static const SUCCESS = 0;
   static const INVALID_CREATOR_DETAILS = -1;
@@ -10453,31 +9173,25 @@ class CreateKYCRecoveryRequestResultCode extends XdrEncodable {
   static const REQUEST_NOT_FOUND = -12;
   static const INVALID_UPDATE_DATA = -13;
   static const NOT_ALLOWED_TO_SET_TASKS_ON_UPDATE = -14;
-  var value;
-
+  int value;
   CreateKYCRecoveryRequestResultCode(this.value);
-}
+  @override toXdr(XdrDataOutputStream stream) {
+    value.toXdr(stream);
+  }
 
+}
 abstract class CreateKYCRecoveryRequestResult extends XdrEncodable {
   CreateKYCRecoveryRequestResultCode discriminant;
-
   CreateKYCRecoveryRequestResult(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
-class CreateKYCRecoveryRequestResultSuccess
-    extends CreateKYCRecoveryRequestResult {
-  CreateKYCRecoveryRequestResultSuccess(this.success)
-      : super(CreateKYCRecoveryRequestResultCode(
-            CreateKYCRecoveryRequestResultCode.SUCCESS));
+class CreateKYCRecoveryRequestResultSuccess extends CreateKYCRecoveryRequestResult {
+  CreateKYCRecoveryRequestResultSuccess(this.success) : super(CreateKYCRecoveryRequestResultCode(CreateKYCRecoveryRequestResultCode.SUCCESS));
   late CreateKYCRecoveryRequestResultSuccessSuccess success;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     success.toXdr(stream);
   }
@@ -10501,40 +9215,33 @@ class CreateKYCRecoveryRequestResultSuccess
 //      }
 
 //  ===========================================================================
-class CreateKYCRecoveryRequestResultSuccessSuccess extends XdrEncodable {
-  Uint64 requestID;
+class CreateKYCRecoveryRequestResultSuccessSuccess extends XdrEncodable  {
+  UINT64 requestID;
   bool fulfilled;
   CreateKYCRecoveryRequestResultSuccessExt ext;
 
   CreateKYCRecoveryRequestResultSuccessSuccess(
-    this.requestID,
-    this.fulfilled,
-    this.ext,
-  );
+      this.requestID,
+      this.fulfilled,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     requestID.toXdr(stream);
     fulfilled.toXdr(stream);
     ext.toXdr(stream);
   }
 }
-
 abstract class CreateKYCRecoveryRequestResultSuccessExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   CreateKYCRecoveryRequestResultSuccessExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
-class CreateKYCRecoveryRequestResultSuccessExtEmptyVersion
-    extends CreateKYCRecoveryRequestResultSuccessExt {
-  CreateKYCRecoveryRequestResultSuccessExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+class CreateKYCRecoveryRequestResultSuccessExtEmptyVersion extends CreateKYCRecoveryRequestResultSuccessExt {
+  CreateKYCRecoveryRequestResultSuccessExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
 
 // === xdr source ============================================================
@@ -10561,21 +9268,20 @@ class CreateKYCRecoveryRequestResultSuccessExtEmptyVersion
 //  };
 
 //  ===========================================================================
-class CreateManageLimitsRequestOp extends XdrEncodable {
+class CreateManageLimitsRequestOp extends XdrEncodable  {
   LimitsUpdateRequest manageLimitsRequest;
-  Uint32? allTasks;
-  Uint64 requestID;
+  UINT32? allTasks;
+  UINT64 requestID;
   CreateManageLimitsRequestOpExt ext;
 
   CreateManageLimitsRequestOp(
-    this.manageLimitsRequest,
-    this.allTasks,
-    this.requestID,
-    this.ext,
-  );
+      this.manageLimitsRequest,
+      this.allTasks,
+      this.requestID,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     manageLimitsRequest.toXdr(stream);
     if (allTasks != null) {
       true.toXdr(stream);
@@ -10587,24 +9293,17 @@ class CreateManageLimitsRequestOp extends XdrEncodable {
     ext.toXdr(stream);
   }
 }
-
 abstract class CreateManageLimitsRequestOpExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   CreateManageLimitsRequestOpExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
-class CreateManageLimitsRequestOpExtEmptyVersion
-    extends CreateManageLimitsRequestOpExt {
-  CreateManageLimitsRequestOpExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+class CreateManageLimitsRequestOpExtEmptyVersion extends CreateManageLimitsRequestOpExt {
+  CreateManageLimitsRequestOpExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
-
 class CreateManageLimitsRequestResultCode extends XdrEncodable {
   static const SUCCESS = 0;
   static const MANAGE_LIMITS_REQUEST_REFERENCE_DUPLICATION = -1;
@@ -10613,31 +9312,25 @@ class CreateManageLimitsRequestResultCode extends XdrEncodable {
   static const LIMITS_UPDATE_TASKS_NOT_FOUND = -5;
   static const NOT_ALLOWED_TO_SET_TASKS_ON_UPDATE = -6;
   static const LIMITS_UPDATE_ZERO_TASKS_NOT_ALLOWED = -7;
-  var value;
-
+  int value;
   CreateManageLimitsRequestResultCode(this.value);
-}
+  @override toXdr(XdrDataOutputStream stream) {
+    value.toXdr(stream);
+  }
 
+}
 abstract class CreateManageLimitsRequestResult extends XdrEncodable {
   CreateManageLimitsRequestResultCode discriminant;
-
   CreateManageLimitsRequestResult(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
-class CreateManageLimitsRequestResultSuccess
-    extends CreateManageLimitsRequestResult {
-  CreateManageLimitsRequestResultSuccess(this.success)
-      : super(CreateManageLimitsRequestResultCode(
-            CreateManageLimitsRequestResultCode.SUCCESS));
+class CreateManageLimitsRequestResultSuccess extends CreateManageLimitsRequestResult {
+  CreateManageLimitsRequestResultSuccess(this.success) : super(CreateManageLimitsRequestResultCode(CreateManageLimitsRequestResultCode.SUCCESS));
   late CreateManageLimitsRequestResultSuccessSuccess success;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     success.toXdr(stream);
   }
@@ -10659,40 +9352,33 @@ class CreateManageLimitsRequestResultSuccess
 //      }
 
 //  ===========================================================================
-class CreateManageLimitsRequestResultSuccessSuccess extends XdrEncodable {
-  Uint64 manageLimitsRequestID;
+class CreateManageLimitsRequestResultSuccessSuccess extends XdrEncodable  {
+  UINT64 manageLimitsRequestID;
   bool fulfilled;
   CreateManageLimitsRequestResultSuccessExt ext;
 
   CreateManageLimitsRequestResultSuccessSuccess(
-    this.manageLimitsRequestID,
-    this.fulfilled,
-    this.ext,
-  );
+      this.manageLimitsRequestID,
+      this.fulfilled,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     manageLimitsRequestID.toXdr(stream);
     fulfilled.toXdr(stream);
     ext.toXdr(stream);
   }
 }
-
 abstract class CreateManageLimitsRequestResultSuccessExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   CreateManageLimitsRequestResultSuccessExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
-class CreateManageLimitsRequestResultSuccessExtEmptyVersion
-    extends CreateManageLimitsRequestResultSuccessExt {
-  CreateManageLimitsRequestResultSuccessExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+class CreateManageLimitsRequestResultSuccessExtEmptyVersion extends CreateManageLimitsRequestResultSuccessExt {
+  CreateManageLimitsRequestResultSuccessExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
 
 // === xdr source ============================================================
@@ -10711,19 +9397,18 @@ class CreateManageLimitsRequestResultSuccessExtEmptyVersion
 //  };
 
 //  ===========================================================================
-class CreateManageOfferRequestOp extends XdrEncodable {
+class CreateManageOfferRequestOp extends XdrEncodable  {
   ManageOfferRequest request;
-  Uint32? allTasks;
+  UINT32? allTasks;
   EmptyExt ext;
 
   CreateManageOfferRequestOp(
-    this.request,
-    this.allTasks,
-    this.ext,
-  );
+      this.request,
+      this.allTasks,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     request.toXdr(stream);
     if (allTasks != null) {
       true.toXdr(stream);
@@ -10734,15 +9419,17 @@ class CreateManageOfferRequestOp extends XdrEncodable {
     ext.toXdr(stream);
   }
 }
-
 class CreateManageOfferRequestResultCode extends XdrEncodable {
   static const SUCCESS = 0;
   static const INVALID_OFFER = -1;
   static const MANAGE_OFFER_TASKS_NOT_FOUND = -2;
   static const INVALID_CREATOR_DETAILS = -3;
-  var value;
-
+  int value;
   CreateManageOfferRequestResultCode(this.value);
+  @override toXdr(XdrDataOutputStream stream) {
+    value.toXdr(stream);
+  }
+
 }
 // === xdr source ============================================================
 
@@ -10761,21 +9448,20 @@ class CreateManageOfferRequestResultCode extends XdrEncodable {
 //  };
 
 //  ===========================================================================
-class CreateManagerOfferRequestSuccessResult extends XdrEncodable {
-  Uint64 requestID;
+class CreateManagerOfferRequestSuccessResult extends XdrEncodable  {
+  UINT64 requestID;
   bool fulfilled;
   ManageOfferResult? manageOfferResult;
   EmptyExt ext;
 
   CreateManagerOfferRequestSuccessResult(
-    this.requestID,
-    this.fulfilled,
-    this.manageOfferResult,
-    this.ext,
-  );
+      this.requestID,
+      this.fulfilled,
+      this.manageOfferResult,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     requestID.toXdr(stream);
     fulfilled.toXdr(stream);
     if (manageOfferResult != null) {
@@ -10787,41 +9473,27 @@ class CreateManagerOfferRequestSuccessResult extends XdrEncodable {
     ext.toXdr(stream);
   }
 }
-
 abstract class CreateManageOfferRequestResult extends XdrEncodable {
   CreateManageOfferRequestResultCode discriminant;
-
   CreateManageOfferRequestResult(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
-class CreateManageOfferRequestResultSuccess
-    extends CreateManageOfferRequestResult {
-  CreateManageOfferRequestResultSuccess(this.success)
-      : super(CreateManageOfferRequestResultCode(
-            CreateManageOfferRequestResultCode.SUCCESS));
+class CreateManageOfferRequestResultSuccess extends CreateManageOfferRequestResult {
+  CreateManageOfferRequestResultSuccess(this.success) : super(CreateManageOfferRequestResultCode(CreateManageOfferRequestResultCode.SUCCESS));
   late CreateManagerOfferRequestSuccessResult success;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     success.toXdr(stream);
   }
 }
 
-class CreateManageOfferRequestResultInvalidOffer
-    extends CreateManageOfferRequestResult {
-  CreateManageOfferRequestResultInvalidOffer(this.manageOfferCode)
-      : super(CreateManageOfferRequestResultCode(
-            CreateManageOfferRequestResultCode.INVALID_OFFER));
+class CreateManageOfferRequestResultInvalidOffer extends CreateManageOfferRequestResult {
+  CreateManageOfferRequestResultInvalidOffer(this.manageOfferCode) : super(CreateManageOfferRequestResultCode(CreateManageOfferRequestResultCode.INVALID_OFFER));
   late ManageOfferResultCode manageOfferCode;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     manageOfferCode.toXdr(stream);
   }
@@ -10843,19 +9515,18 @@ class CreateManageOfferRequestResultInvalidOffer
 //  };
 
 //  ===========================================================================
-class CreatePaymentRequestOp extends XdrEncodable {
+class CreatePaymentRequestOp extends XdrEncodable  {
   CreatePaymentRequest request;
-  Uint32? allTasks;
+  UINT32? allTasks;
   EmptyExt ext;
 
   CreatePaymentRequestOp(
-    this.request,
-    this.allTasks,
-    this.ext,
-  );
+      this.request,
+      this.allTasks,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     request.toXdr(stream);
     if (allTasks != null) {
       true.toXdr(stream);
@@ -10866,15 +9537,17 @@ class CreatePaymentRequestOp extends XdrEncodable {
     ext.toXdr(stream);
   }
 }
-
 class CreatePaymentRequestResultCode extends XdrEncodable {
   static const SUCCESS = 0;
   static const INVALID_PAYMENT = -1;
   static const PAYMENT_TASKS_NOT_FOUND = -2;
   static const INVALID_CREATOR_DETAILS = -3;
-  var value;
-
+  int value;
   CreatePaymentRequestResultCode(this.value);
+  @override toXdr(XdrDataOutputStream stream) {
+    value.toXdr(stream);
+  }
+
 }
 // === xdr source ============================================================
 
@@ -10894,21 +9567,20 @@ class CreatePaymentRequestResultCode extends XdrEncodable {
 //  };
 
 //  ===========================================================================
-class CreatePaymentRequestSuccessResult extends XdrEncodable {
-  Uint64 requestID;
+class CreatePaymentRequestSuccessResult extends XdrEncodable  {
+  UINT64 requestID;
   bool fulfilled;
   PaymentResult? paymentResult;
   EmptyExt ext;
 
   CreatePaymentRequestSuccessResult(
-    this.requestID,
-    this.fulfilled,
-    this.paymentResult,
-    this.ext,
-  );
+      this.requestID,
+      this.fulfilled,
+      this.paymentResult,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     requestID.toXdr(stream);
     fulfilled.toXdr(stream);
     if (paymentResult != null) {
@@ -10920,40 +9592,27 @@ class CreatePaymentRequestSuccessResult extends XdrEncodable {
     ext.toXdr(stream);
   }
 }
-
 abstract class CreatePaymentRequestResult extends XdrEncodable {
   CreatePaymentRequestResultCode discriminant;
-
   CreatePaymentRequestResult(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class CreatePaymentRequestResultSuccess extends CreatePaymentRequestResult {
-  CreatePaymentRequestResultSuccess(this.success)
-      : super(CreatePaymentRequestResultCode(
-            CreatePaymentRequestResultCode.SUCCESS));
+  CreatePaymentRequestResultSuccess(this.success) : super(CreatePaymentRequestResultCode(CreatePaymentRequestResultCode.SUCCESS));
   late CreatePaymentRequestSuccessResult success;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     success.toXdr(stream);
   }
 }
 
-class CreatePaymentRequestResultInvalidPayment
-    extends CreatePaymentRequestResult {
-  CreatePaymentRequestResultInvalidPayment(this.paymentCode)
-      : super(CreatePaymentRequestResultCode(
-            CreatePaymentRequestResultCode.INVALID_PAYMENT));
+class CreatePaymentRequestResultInvalidPayment extends CreatePaymentRequestResult {
+  CreatePaymentRequestResultInvalidPayment(this.paymentCode) : super(CreatePaymentRequestResultCode(CreatePaymentRequestResultCode.INVALID_PAYMENT));
   late PaymentResultCode paymentCode;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     paymentCode.toXdr(stream);
   }
@@ -10981,19 +9640,18 @@ class CreatePaymentRequestResultInvalidPayment
 //  };
 
 //  ===========================================================================
-class CreatePreIssuanceRequestOp extends XdrEncodable {
+class CreatePreIssuanceRequestOp extends XdrEncodable  {
   PreIssuanceRequest request;
-  Uint32? allTasks;
+  UINT32? allTasks;
   CreatePreIssuanceRequestOpExt ext;
 
   CreatePreIssuanceRequestOp(
-    this.request,
-    this.allTasks,
-    this.ext,
-  );
+      this.request,
+      this.allTasks,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     request.toXdr(stream);
     if (allTasks != null) {
       true.toXdr(stream);
@@ -11004,24 +9662,17 @@ class CreatePreIssuanceRequestOp extends XdrEncodable {
     ext.toXdr(stream);
   }
 }
-
 abstract class CreatePreIssuanceRequestOpExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   CreatePreIssuanceRequestOpExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
-class CreatePreIssuanceRequestOpExtEmptyVersion
-    extends CreatePreIssuanceRequestOpExt {
-  CreatePreIssuanceRequestOpExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+class CreatePreIssuanceRequestOpExtEmptyVersion extends CreatePreIssuanceRequestOpExt {
+  CreatePreIssuanceRequestOpExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
-
 class CreatePreIssuanceRequestResultCode extends XdrEncodable {
   static const SUCCESS = 0;
   static const ASSET_NOT_FOUND = -1;
@@ -11034,31 +9685,25 @@ class CreatePreIssuanceRequestResultCode extends XdrEncodable {
   static const INCORRECT_AMOUNT_PRECISION = -8;
   static const PREISSUANCE_TASKS_NOT_FOUND = -9;
   static const INVALID_CREATOR_DETAILS = -10;
-  var value;
-
+  int value;
   CreatePreIssuanceRequestResultCode(this.value);
-}
+  @override toXdr(XdrDataOutputStream stream) {
+    value.toXdr(stream);
+  }
 
+}
 abstract class CreatePreIssuanceRequestResult extends XdrEncodable {
   CreatePreIssuanceRequestResultCode discriminant;
-
   CreatePreIssuanceRequestResult(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
-class CreatePreIssuanceRequestResultSuccess
-    extends CreatePreIssuanceRequestResult {
-  CreatePreIssuanceRequestResultSuccess(this.success)
-      : super(CreatePreIssuanceRequestResultCode(
-            CreatePreIssuanceRequestResultCode.SUCCESS));
+class CreatePreIssuanceRequestResultSuccess extends CreatePreIssuanceRequestResult {
+  CreatePreIssuanceRequestResultSuccess(this.success) : super(CreatePreIssuanceRequestResultCode(CreatePreIssuanceRequestResultCode.SUCCESS));
   late CreatePreIssuanceRequestResultSuccessSuccess success;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     success.toXdr(stream);
   }
@@ -11081,40 +9726,33 @@ class CreatePreIssuanceRequestResultSuccess
 //  	}
 
 //  ===========================================================================
-class CreatePreIssuanceRequestResultSuccessSuccess extends XdrEncodable {
-  Uint64 requestID;
+class CreatePreIssuanceRequestResultSuccessSuccess extends XdrEncodable  {
+  UINT64 requestID;
   bool fulfilled;
   CreatePreIssuanceRequestResultSuccessExt ext;
 
   CreatePreIssuanceRequestResultSuccessSuccess(
-    this.requestID,
-    this.fulfilled,
-    this.ext,
-  );
+      this.requestID,
+      this.fulfilled,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     requestID.toXdr(stream);
     fulfilled.toXdr(stream);
     ext.toXdr(stream);
   }
 }
-
 abstract class CreatePreIssuanceRequestResultSuccessExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   CreatePreIssuanceRequestResultSuccessExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
-class CreatePreIssuanceRequestResultSuccessExtEmptyVersion
-    extends CreatePreIssuanceRequestResultSuccessExt {
-  CreatePreIssuanceRequestResultSuccessExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+class CreatePreIssuanceRequestResultSuccessExtEmptyVersion extends CreatePreIssuanceRequestResultSuccessExt {
+  CreatePreIssuanceRequestResultSuccessExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
 
 // === xdr source ============================================================
@@ -11142,21 +9780,20 @@ class CreatePreIssuanceRequestResultSuccessExtEmptyVersion
 //  };
 
 //  ===========================================================================
-class CreateRedemptionRequestOp extends XdrEncodable {
-  String64 reference;
+class CreateRedemptionRequestOp extends XdrEncodable  {
+  STRING64 reference;
   RedemptionRequest redemptionRequest;
-  Uint32? allTasks;
+  UINT32? allTasks;
   CreateRedemptionRequestOpExt ext;
 
   CreateRedemptionRequestOp(
-    this.reference,
-    this.redemptionRequest,
-    this.allTasks,
-    this.ext,
-  );
+      this.reference,
+      this.redemptionRequest,
+      this.allTasks,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     reference.toXdr(stream);
     redemptionRequest.toXdr(stream);
     if (allTasks != null) {
@@ -11168,24 +9805,17 @@ class CreateRedemptionRequestOp extends XdrEncodable {
     ext.toXdr(stream);
   }
 }
-
 abstract class CreateRedemptionRequestOpExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   CreateRedemptionRequestOpExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
-class CreateRedemptionRequestOpExtEmptyVersion
-    extends CreateRedemptionRequestOpExt {
-  CreateRedemptionRequestOpExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+class CreateRedemptionRequestOpExtEmptyVersion extends CreateRedemptionRequestOpExt {
+  CreateRedemptionRequestOpExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
-
 class CreateRedemptionRequestResultCode extends XdrEncodable {
   static const SUCCESS = 0;
   static const INVALID_REDEMPTION = -1;
@@ -11200,9 +9830,12 @@ class CreateRedemptionRequestResultCode extends XdrEncodable {
   static const DST_ACCOUNT_NOT_FOUND = -10;
   static const REDEMPTION_ZERO_TASKS_NOT_ALLOWED = -11;
   static const REDEMPTION_NON_OWNED_ASSET_FORBIDDEN = -12;
-  var value;
-
+  int value;
   CreateRedemptionRequestResultCode(this.value);
+  @override toXdr(XdrDataOutputStream stream) {
+    value.toXdr(stream);
+  }
+
 }
 // === xdr source ============================================================
 
@@ -11229,25 +9862,24 @@ class CreateRedemptionRequestResultCode extends XdrEncodable {
 //  };
 
 //  ===========================================================================
-class RedemptionRequestResponse extends XdrEncodable {
-  Uint64 requestID;
+class RedemptionRequestResponse extends XdrEncodable  {
+  UINT64 requestID;
   bool fulfilled;
-  BalanceID destinationBalanceID;
-  AssetCode asset;
-  Uint64 sourceSentUniversal;
+  BALANCEID destinationBalanceID;
+  ASSETCODE asset;
+  UINT64 sourceSentUniversal;
   RedemptionRequestResponseExt ext;
 
   RedemptionRequestResponse(
-    this.requestID,
-    this.fulfilled,
-    this.destinationBalanceID,
-    this.asset,
-    this.sourceSentUniversal,
-    this.ext,
-  );
+      this.requestID,
+      this.fulfilled,
+      this.destinationBalanceID,
+      this.asset,
+      this.sourceSentUniversal,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     requestID.toXdr(stream);
     fulfilled.toXdr(stream);
     destinationBalanceID.toXdr(stream);
@@ -11256,44 +9888,29 @@ class RedemptionRequestResponse extends XdrEncodable {
     ext.toXdr(stream);
   }
 }
-
 abstract class RedemptionRequestResponseExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   RedemptionRequestResponseExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
-class RedemptionRequestResponseExtEmptyVersion
-    extends RedemptionRequestResponseExt {
-  RedemptionRequestResponseExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+class RedemptionRequestResponseExtEmptyVersion extends RedemptionRequestResponseExt {
+  RedemptionRequestResponseExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
-
 abstract class CreateRedemptionRequestResult extends XdrEncodable {
   CreateRedemptionRequestResultCode discriminant;
-
   CreateRedemptionRequestResult(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
-class CreateRedemptionRequestResultSuccess
-    extends CreateRedemptionRequestResult {
-  CreateRedemptionRequestResultSuccess(this.redemptionResponse)
-      : super(CreateRedemptionRequestResultCode(
-            CreateRedemptionRequestResultCode.SUCCESS));
+class CreateRedemptionRequestResultSuccess extends CreateRedemptionRequestResult {
+  CreateRedemptionRequestResultSuccess(this.redemptionResponse) : super(CreateRedemptionRequestResultCode(CreateRedemptionRequestResultCode.SUCCESS));
   late RedemptionRequestResponse redemptionResponse;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     redemptionResponse.toXdr(stream);
   }
@@ -11323,21 +9940,20 @@ class CreateRedemptionRequestResultSuccess
 //  };
 
 //  ===========================================================================
-class CreateSaleCreationRequestOp extends XdrEncodable {
-  Uint64 requestID;
+class CreateSaleCreationRequestOp extends XdrEncodable  {
+  UINT64 requestID;
   SaleCreationRequest request;
-  Uint32? allTasks;
+  UINT32? allTasks;
   CreateSaleCreationRequestOpExt ext;
 
   CreateSaleCreationRequestOp(
-    this.requestID,
-    this.request,
-    this.allTasks,
-    this.ext,
-  );
+      this.requestID,
+      this.request,
+      this.allTasks,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     requestID.toXdr(stream);
     request.toXdr(stream);
     if (allTasks != null) {
@@ -11349,24 +9965,17 @@ class CreateSaleCreationRequestOp extends XdrEncodable {
     ext.toXdr(stream);
   }
 }
-
 abstract class CreateSaleCreationRequestOpExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   CreateSaleCreationRequestOpExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
-class CreateSaleCreationRequestOpExtEmptyVersion
-    extends CreateSaleCreationRequestOpExt {
-  CreateSaleCreationRequestOpExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+class CreateSaleCreationRequestOpExtEmptyVersion extends CreateSaleCreationRequestOpExt {
+  CreateSaleCreationRequestOpExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
-
 class CreateSaleCreationRequestResultCode extends XdrEncodable {
   static const SUCCESS = 0;
   static const REQUEST_NOT_FOUND = -1;
@@ -11390,9 +9999,12 @@ class CreateSaleCreationRequestResultCode extends XdrEncodable {
   static const ACCOUNT_SPECIFIC_RULE_DUPLICATION = -19;
   static const GLOBAL_SPECIFIC_RULE_REQUIRED = -20;
   static const ACCOUNT_NOT_FOUND = -21;
-  var value;
-
+  int value;
   CreateSaleCreationRequestResultCode(this.value);
+  @override toXdr(XdrDataOutputStream stream) {
+    value.toXdr(stream);
+  }
+
 }
 // === xdr source ============================================================
 
@@ -11413,43 +10025,36 @@ class CreateSaleCreationRequestResultCode extends XdrEncodable {
 //  };
 
 //  ===========================================================================
-class CreateSaleCreationSuccess extends XdrEncodable {
-  Uint64 requestID;
-  Uint64 saleID;
+class CreateSaleCreationSuccess extends XdrEncodable  {
+  UINT64 requestID;
+  UINT64 saleID;
   bool fulfilled;
   CreateSaleCreationSuccessExt ext;
 
   CreateSaleCreationSuccess(
-    this.requestID,
-    this.saleID,
-    this.fulfilled,
-    this.ext,
-  );
+      this.requestID,
+      this.saleID,
+      this.fulfilled,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     requestID.toXdr(stream);
     saleID.toXdr(stream);
     fulfilled.toXdr(stream);
     ext.toXdr(stream);
   }
 }
-
 abstract class CreateSaleCreationSuccessExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   CreateSaleCreationSuccessExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
-class CreateSaleCreationSuccessExtEmptyVersion
-    extends CreateSaleCreationSuccessExt {
-  CreateSaleCreationSuccessExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+class CreateSaleCreationSuccessExtEmptyVersion extends CreateSaleCreationSuccessExt {
+  CreateSaleCreationSuccessExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
 // === xdr source ============================================================
 
@@ -11467,73 +10072,52 @@ class CreateSaleCreationSuccessExtEmptyVersion
 //  };
 
 //  ===========================================================================
-class CreateSaleCreationAutoReviewFailed extends XdrEncodable {
+class CreateSaleCreationAutoReviewFailed extends XdrEncodable  {
   ReviewRequestResult reviewRequestRequest;
   CreateSaleCreationAutoReviewFailedExt ext;
 
   CreateSaleCreationAutoReviewFailed(
-    this.reviewRequestRequest,
-    this.ext,
-  );
+      this.reviewRequestRequest,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     reviewRequestRequest.toXdr(stream);
     ext.toXdr(stream);
   }
 }
-
 abstract class CreateSaleCreationAutoReviewFailedExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   CreateSaleCreationAutoReviewFailedExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
-class CreateSaleCreationAutoReviewFailedExtEmptyVersion
-    extends CreateSaleCreationAutoReviewFailedExt {
-  CreateSaleCreationAutoReviewFailedExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+class CreateSaleCreationAutoReviewFailedExtEmptyVersion extends CreateSaleCreationAutoReviewFailedExt {
+  CreateSaleCreationAutoReviewFailedExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
-
 abstract class CreateSaleCreationRequestResult extends XdrEncodable {
   CreateSaleCreationRequestResultCode discriminant;
-
   CreateSaleCreationRequestResult(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
-class CreateSaleCreationRequestResultSuccess
-    extends CreateSaleCreationRequestResult {
-  CreateSaleCreationRequestResultSuccess(this.success)
-      : super(CreateSaleCreationRequestResultCode(
-            CreateSaleCreationRequestResultCode.SUCCESS));
+class CreateSaleCreationRequestResultSuccess extends CreateSaleCreationRequestResult {
+  CreateSaleCreationRequestResultSuccess(this.success) : super(CreateSaleCreationRequestResultCode(CreateSaleCreationRequestResultCode.SUCCESS));
   late CreateSaleCreationSuccess success;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     success.toXdr(stream);
   }
 }
 
-class CreateSaleCreationRequestResultAutoReviewFailed
-    extends CreateSaleCreationRequestResult {
-  CreateSaleCreationRequestResultAutoReviewFailed(this.autoReviewFailed)
-      : super(CreateSaleCreationRequestResultCode(
-            CreateSaleCreationRequestResultCode.AUTO_REVIEW_FAILED));
+class CreateSaleCreationRequestResultAutoReviewFailed extends CreateSaleCreationRequestResult {
+  CreateSaleCreationRequestResultAutoReviewFailed(this.autoReviewFailed) : super(CreateSaleCreationRequestResultCode(CreateSaleCreationRequestResultCode.AUTO_REVIEW_FAILED));
   late CreateSaleCreationAutoReviewFailed autoReviewFailed;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     autoReviewFailed.toXdr(stream);
   }
@@ -11561,19 +10145,18 @@ class CreateSaleCreationRequestResultAutoReviewFailed
 //  };
 
 //  ===========================================================================
-class CreateWithdrawalRequestOp extends XdrEncodable {
+class CreateWithdrawalRequestOp extends XdrEncodable  {
   WithdrawalRequest request;
-  Uint32? allTasks;
+  UINT32? allTasks;
   CreateWithdrawalRequestOpExt ext;
 
   CreateWithdrawalRequestOp(
-    this.request,
-    this.allTasks,
-    this.ext,
-  );
+      this.request,
+      this.allTasks,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     request.toXdr(stream);
     if (allTasks != null) {
       true.toXdr(stream);
@@ -11584,24 +10167,17 @@ class CreateWithdrawalRequestOp extends XdrEncodable {
     ext.toXdr(stream);
   }
 }
-
 abstract class CreateWithdrawalRequestOpExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   CreateWithdrawalRequestOpExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
-class CreateWithdrawalRequestOpExtEmptyVersion
-    extends CreateWithdrawalRequestOpExt {
-  CreateWithdrawalRequestOpExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+class CreateWithdrawalRequestOpExtEmptyVersion extends CreateWithdrawalRequestOpExt {
+  CreateWithdrawalRequestOpExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
-
 class CreateWithdrawalRequestResultCode extends XdrEncodable {
   static const SUCCESS = 0;
   static const INVALID_AMOUNT = -1;
@@ -11622,9 +10198,12 @@ class CreateWithdrawalRequestResultCode extends XdrEncodable {
   static const WITHDRAWAL_TASKS_NOT_FOUND = -16;
   static const NOT_ALLOWED_TO_SET_WITHDRAWAL_TASKS = -17;
   static const WITHDRAWAL_ZERO_TASKS_NOT_ALLOWED = -18;
-  var value;
-
+  int value;
   CreateWithdrawalRequestResultCode(this.value);
+  @override toXdr(XdrDataOutputStream stream) {
+    value.toXdr(stream);
+  }
+
 }
 // === xdr source ============================================================
 
@@ -11644,62 +10223,46 @@ class CreateWithdrawalRequestResultCode extends XdrEncodable {
 //  };
 
 //  ===========================================================================
-class CreateWithdrawalSuccess extends XdrEncodable {
-  Uint64 requestID;
+class CreateWithdrawalSuccess extends XdrEncodable  {
+  UINT64 requestID;
   bool fulfilled;
   CreateWithdrawalSuccessExt ext;
 
   CreateWithdrawalSuccess(
-    this.requestID,
-    this.fulfilled,
-    this.ext,
-  );
+      this.requestID,
+      this.fulfilled,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     requestID.toXdr(stream);
     fulfilled.toXdr(stream);
     ext.toXdr(stream);
   }
 }
-
 abstract class CreateWithdrawalSuccessExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   CreateWithdrawalSuccessExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
-class CreateWithdrawalSuccessExtEmptyVersion
-    extends CreateWithdrawalSuccessExt {
-  CreateWithdrawalSuccessExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+class CreateWithdrawalSuccessExtEmptyVersion extends CreateWithdrawalSuccessExt {
+  CreateWithdrawalSuccessExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
-
 abstract class CreateWithdrawalRequestResult extends XdrEncodable {
   CreateWithdrawalRequestResultCode discriminant;
-
   CreateWithdrawalRequestResult(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
-class CreateWithdrawalRequestResultSuccess
-    extends CreateWithdrawalRequestResult {
-  CreateWithdrawalRequestResultSuccess(this.success)
-      : super(CreateWithdrawalRequestResultCode(
-            CreateWithdrawalRequestResultCode.SUCCESS));
+class CreateWithdrawalRequestResultSuccess extends CreateWithdrawalRequestResult {
+  CreateWithdrawalRequestResultSuccess(this.success) : super(CreateWithdrawalRequestResultCode(CreateWithdrawalRequestResultCode.SUCCESS));
   late CreateWithdrawalSuccess success;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     success.toXdr(stream);
   }
@@ -11724,69 +10287,57 @@ class CreateWithdrawalRequestResultSuccess
 //  };
 
 //  ===========================================================================
-class InitiateKYCRecoveryOp extends XdrEncodable {
-  AccountID account;
+class InitiateKYCRecoveryOp extends XdrEncodable  {
+  ACCOUNTID account;
   PublicKey signer;
   InitiateKYCRecoveryOpExt ext;
 
   InitiateKYCRecoveryOp(
-    this.account,
-    this.signer,
-    this.ext,
-  );
+      this.account,
+      this.signer,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     account.toXdr(stream);
     signer.toXdr(stream);
     ext.toXdr(stream);
   }
 }
-
 abstract class InitiateKYCRecoveryOpExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   InitiateKYCRecoveryOpExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class InitiateKYCRecoveryOpExtEmptyVersion extends InitiateKYCRecoveryOpExt {
-  InitiateKYCRecoveryOpExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+  InitiateKYCRecoveryOpExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
-
 class InitiateKYCRecoveryResultCode extends XdrEncodable {
   static const SUCCESS = 0;
   static const RECOVERY_NOT_ALLOWED = -1;
   static const RECOVERY_SIGNER_ROLE_NOT_FOUND = -2;
-  var value;
-
+  int value;
   InitiateKYCRecoveryResultCode(this.value);
-}
+  @override toXdr(XdrDataOutputStream stream) {
+    value.toXdr(stream);
+  }
 
+}
 abstract class InitiateKYCRecoveryResult extends XdrEncodable {
   InitiateKYCRecoveryResultCode discriminant;
-
   InitiateKYCRecoveryResult(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class InitiateKYCRecoveryResultSuccess extends InitiateKYCRecoveryResult {
-  InitiateKYCRecoveryResultSuccess(this.success)
-      : super(InitiateKYCRecoveryResultCode(
-            InitiateKYCRecoveryResultCode.SUCCESS));
+  InitiateKYCRecoveryResultSuccess(this.success) : super(InitiateKYCRecoveryResultCode(InitiateKYCRecoveryResultCode.SUCCESS));
   late InitiateKYCRecoveryResultSuccessSuccess success;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     success.toXdr(stream);
   }
@@ -11804,34 +10355,27 @@ class InitiateKYCRecoveryResultSuccess extends InitiateKYCRecoveryResult {
 //      }
 
 //  ===========================================================================
-class InitiateKYCRecoveryResultSuccessSuccess extends XdrEncodable {
+class InitiateKYCRecoveryResultSuccessSuccess extends XdrEncodable  {
   InitiateKYCRecoveryResultSuccessExt ext;
 
   InitiateKYCRecoveryResultSuccessSuccess(
-    this.ext,
-  );
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     ext.toXdr(stream);
   }
 }
-
 abstract class InitiateKYCRecoveryResultSuccessExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   InitiateKYCRecoveryResultSuccessExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
-class InitiateKYCRecoveryResultSuccessExtEmptyVersion
-    extends InitiateKYCRecoveryResultSuccessExt {
-  InitiateKYCRecoveryResultSuccessExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+class InitiateKYCRecoveryResultSuccessExtEmptyVersion extends InitiateKYCRecoveryResultSuccessExt {
+  InitiateKYCRecoveryResultSuccessExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
 
 // === xdr source ============================================================
@@ -11860,62 +10404,58 @@ class InitiateKYCRecoveryResultSuccessExtEmptyVersion
 //  };
 
 //  ===========================================================================
-class LicenseOp extends XdrEncodable {
-  Uint64 adminCount;
-  Uint64 dueDate;
-  Hash ledgerHash;
-  Hash prevLicenseHash;
+class LicenseOp extends XdrEncodable  {
+  UINT64 adminCount;
+  UINT64 dueDate;
+  HASH ledgerHash;
+  HASH prevLicenseHash;
   List<DecoratedSignature> signatures;
   LicenseOpExt ext;
 
   LicenseOp(
-    this.adminCount,
-    this.dueDate,
-    this.ledgerHash,
-    this.prevLicenseHash,
-    this.signatures,
-    this.ext,
-  );
+      this.adminCount,
+      this.dueDate,
+      this.ledgerHash,
+      this.prevLicenseHash,
+      this.signatures,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     adminCount.toXdr(stream);
     dueDate.toXdr(stream);
     ledgerHash.toXdr(stream);
     prevLicenseHash.toXdr(stream);
     signatures.length.toXdr(stream);
-    signatures.forEach((element) {
+    signatures.forEach ((element) {
       element.toXdr(stream);
     });
     ext.toXdr(stream);
   }
 }
-
 abstract class LicenseOpExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   LicenseOpExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class LicenseOpExtEmptyVersion extends LicenseOpExt {
-  LicenseOpExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+  LicenseOpExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
-
 class LicenseResultCode extends XdrEncodable {
   static const SUCCESS = 0;
   static const INVALID_STAMP = -1;
   static const INVALID_DUE_DATE = -2;
   static const INVALID_SIGNATURE = -3;
   static const EXTRA_SIGNATURES = -4;
-  var value;
-
+  int value;
   LicenseResultCode(this.value);
+  @override toXdr(XdrDataOutputStream stream) {
+    value.toXdr(stream);
+  }
+
 }
 // === xdr source ============================================================
 
@@ -11931,53 +10471,40 @@ class LicenseResultCode extends XdrEncodable {
 //  };
 
 //  ===========================================================================
-class LicenseSuccess extends XdrEncodable {
+class LicenseSuccess extends XdrEncodable  {
   LicenseSuccessExt ext;
 
   LicenseSuccess(
-    this.ext,
-  );
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     ext.toXdr(stream);
   }
 }
-
 abstract class LicenseSuccessExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   LicenseSuccessExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class LicenseSuccessExtEmptyVersion extends LicenseSuccessExt {
-  LicenseSuccessExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+  LicenseSuccessExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
-
 abstract class LicenseResult extends XdrEncodable {
   LicenseResultCode discriminant;
-
   LicenseResult(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class LicenseResultSuccess extends LicenseResult {
-  LicenseResultSuccess(this.success)
-      : super(LicenseResultCode(LicenseResultCode.SUCCESS));
+  LicenseResultSuccess(this.success) : super(LicenseResultCode(LicenseResultCode.SUCCESS));
   late LicenseSuccess success;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     success.toXdr(stream);
   }
@@ -11987,9 +10514,12 @@ class ManageAccountRoleAction extends XdrEncodable {
   static const CREATE = 0;
   static const UPDATE = 1;
   static const REMOVE = 2;
-  var value;
-
+  int value;
   ManageAccountRoleAction(this.value);
+  @override toXdr(XdrDataOutputStream stream) {
+    value.toXdr(stream);
+  }
+
 }
 // === xdr source ============================================================
 
@@ -12010,42 +10540,36 @@ class ManageAccountRoleAction extends XdrEncodable {
 //  };
 
 //  ===========================================================================
-class CreateAccountRoleData extends XdrEncodable {
-  Longstring details;
-  List<Uint64> ruleIDs;
+class CreateAccountRoleData extends XdrEncodable  {
+  LONGSTRING details;
+  List<UINT64> ruleIDs;
   CreateAccountRoleDataExt ext;
 
   CreateAccountRoleData(
-    this.details,
-    this.ruleIDs,
-    this.ext,
-  );
+      this.details,
+      this.ruleIDs,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     details.toXdr(stream);
     ruleIDs.length.toXdr(stream);
-    ruleIDs.forEach((element) {
+    ruleIDs.forEach ((element) {
       element.toXdr(stream);
     });
     ext.toXdr(stream);
   }
 }
-
 abstract class CreateAccountRoleDataExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   CreateAccountRoleDataExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class CreateAccountRoleDataExtEmptyVersion extends CreateAccountRoleDataExt {
-  CreateAccountRoleDataExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+  CreateAccountRoleDataExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
 // === xdr source ============================================================
 
@@ -12068,45 +10592,39 @@ class CreateAccountRoleDataExtEmptyVersion extends CreateAccountRoleDataExt {
 //  };
 
 //  ===========================================================================
-class UpdateAccountRoleData extends XdrEncodable {
-  Uint64 roleID;
-  Longstring details;
-  List<Uint64> ruleIDs;
+class UpdateAccountRoleData extends XdrEncodable  {
+  UINT64 roleID;
+  LONGSTRING details;
+  List<UINT64> ruleIDs;
   UpdateAccountRoleDataExt ext;
 
   UpdateAccountRoleData(
-    this.roleID,
-    this.details,
-    this.ruleIDs,
-    this.ext,
-  );
+      this.roleID,
+      this.details,
+      this.ruleIDs,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     roleID.toXdr(stream);
     details.toXdr(stream);
     ruleIDs.length.toXdr(stream);
-    ruleIDs.forEach((element) {
+    ruleIDs.forEach ((element) {
       element.toXdr(stream);
     });
     ext.toXdr(stream);
   }
 }
-
 abstract class UpdateAccountRoleDataExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   UpdateAccountRoleDataExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class UpdateAccountRoleDataExtEmptyVersion extends UpdateAccountRoleDataExt {
-  UpdateAccountRoleDataExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+  UpdateAccountRoleDataExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
 // === xdr source ============================================================
 
@@ -12125,36 +10643,30 @@ class UpdateAccountRoleDataExtEmptyVersion extends UpdateAccountRoleDataExt {
 //  };
 
 //  ===========================================================================
-class RemoveAccountRoleData extends XdrEncodable {
-  Uint64 roleID;
+class RemoveAccountRoleData extends XdrEncodable  {
+  UINT64 roleID;
   RemoveAccountRoleDataExt ext;
 
   RemoveAccountRoleData(
-    this.roleID,
-    this.ext,
-  );
+      this.roleID,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     roleID.toXdr(stream);
     ext.toXdr(stream);
   }
 }
-
 abstract class RemoveAccountRoleDataExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   RemoveAccountRoleDataExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class RemoveAccountRoleDataExtEmptyVersion extends RemoveAccountRoleDataExt {
-  RemoveAccountRoleDataExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+  RemoveAccountRoleDataExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
 // === xdr source ============================================================
 
@@ -12182,64 +10694,50 @@ class RemoveAccountRoleDataExtEmptyVersion extends RemoveAccountRoleDataExt {
 //  };
 
 //  ===========================================================================
-class ManageAccountRoleOp extends XdrEncodable {
+class ManageAccountRoleOp extends XdrEncodable  {
   ManageAccountRoleOpData data;
   ManageAccountRoleOpExt ext;
 
   ManageAccountRoleOp(
-    this.data,
-    this.ext,
-  );
+      this.data,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     data.toXdr(stream);
     ext.toXdr(stream);
   }
 }
-
 abstract class ManageAccountRoleOpData extends XdrEncodable {
   ManageAccountRoleAction discriminant;
-
   ManageAccountRoleOpData(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class ManageAccountRoleOpDataCreate extends ManageAccountRoleOpData {
-  ManageAccountRoleOpDataCreate(this.createData)
-      : super(ManageAccountRoleAction(ManageAccountRoleAction.CREATE));
+  ManageAccountRoleOpDataCreate(this.createData) : super(ManageAccountRoleAction(ManageAccountRoleAction.CREATE));
   late CreateAccountRoleData createData;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     createData.toXdr(stream);
   }
 }
 
 class ManageAccountRoleOpDataUpdate extends ManageAccountRoleOpData {
-  ManageAccountRoleOpDataUpdate(this.updateData)
-      : super(ManageAccountRoleAction(ManageAccountRoleAction.UPDATE));
+  ManageAccountRoleOpDataUpdate(this.updateData) : super(ManageAccountRoleAction(ManageAccountRoleAction.UPDATE));
   late UpdateAccountRoleData updateData;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     updateData.toXdr(stream);
   }
 }
 
 class ManageAccountRoleOpDataRemove extends ManageAccountRoleOpData {
-  ManageAccountRoleOpDataRemove(this.removeData)
-      : super(ManageAccountRoleAction(ManageAccountRoleAction.REMOVE));
+  ManageAccountRoleOpDataRemove(this.removeData) : super(ManageAccountRoleAction(ManageAccountRoleAction.REMOVE));
   late RemoveAccountRoleData removeData;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     removeData.toXdr(stream);
   }
@@ -12247,20 +10745,15 @@ class ManageAccountRoleOpDataRemove extends ManageAccountRoleOpData {
 
 abstract class ManageAccountRoleOpExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   ManageAccountRoleOpExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class ManageAccountRoleOpExtEmptyVersion extends ManageAccountRoleOpExt {
-  ManageAccountRoleOpExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+  ManageAccountRoleOpExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
-
 class ManageAccountRoleResultCode extends XdrEncodable {
   static const SUCCESS = 0;
   static const NOT_FOUND = -1;
@@ -12268,55 +10761,43 @@ class ManageAccountRoleResultCode extends XdrEncodable {
   static const INVALID_DETAILS = -3;
   static const NO_SUCH_RULE = -4;
   static const RULE_ID_DUPLICATION = -5;
-  var value;
-
+  int value;
   ManageAccountRoleResultCode(this.value);
-}
+  @override toXdr(XdrDataOutputStream stream) {
+    value.toXdr(stream);
+  }
 
+}
 abstract class ManageAccountRoleResult extends XdrEncodable {
   ManageAccountRoleResultCode discriminant;
-
   ManageAccountRoleResult(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class ManageAccountRoleResultSuccess extends ManageAccountRoleResult {
-  ManageAccountRoleResultSuccess(this.success)
-      : super(ManageAccountRoleResultCode(ManageAccountRoleResultCode.SUCCESS));
+  ManageAccountRoleResultSuccess(this.success) : super(ManageAccountRoleResultCode(ManageAccountRoleResultCode.SUCCESS));
   late ManageAccountRoleResultSuccessSuccess success;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     success.toXdr(stream);
   }
 }
 
 class ManageAccountRoleResultRuleIdDuplication extends ManageAccountRoleResult {
-  ManageAccountRoleResultRuleIdDuplication(this.ruleID)
-      : super(ManageAccountRoleResultCode(
-            ManageAccountRoleResultCode.RULE_ID_DUPLICATION));
-  late Uint64 ruleID;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  ManageAccountRoleResultRuleIdDuplication(this.ruleID) : super(ManageAccountRoleResultCode(ManageAccountRoleResultCode.RULE_ID_DUPLICATION));
+  late UINT64 ruleID;
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     ruleID.toXdr(stream);
   }
 }
 
 class ManageAccountRoleResultNoSuchRule extends ManageAccountRoleResult {
-  ManageAccountRoleResultNoSuchRule(this.ruleID)
-      : super(ManageAccountRoleResultCode(
-            ManageAccountRoleResultCode.NO_SUCH_RULE));
-  late Uint64 ruleID;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  ManageAccountRoleResultNoSuchRule(this.ruleID) : super(ManageAccountRoleResultCode(ManageAccountRoleResultCode.NO_SUCH_RULE));
+  late UINT64 ruleID;
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     ruleID.toXdr(stream);
   }
@@ -12337,46 +10818,42 @@ class ManageAccountRoleResultNoSuchRule extends ManageAccountRoleResult {
 //          }
 
 //  ===========================================================================
-class ManageAccountRoleResultSuccessSuccess extends XdrEncodable {
-  Uint64 roleID;
+class ManageAccountRoleResultSuccessSuccess extends XdrEncodable  {
+  UINT64 roleID;
   ManageAccountRoleResultSuccessExt ext;
 
   ManageAccountRoleResultSuccessSuccess(
-    this.roleID,
-    this.ext,
-  );
+      this.roleID,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     roleID.toXdr(stream);
     ext.toXdr(stream);
   }
 }
-
 abstract class ManageAccountRoleResultSuccessExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   ManageAccountRoleResultSuccessExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
-class ManageAccountRoleResultSuccessExtEmptyVersion
-    extends ManageAccountRoleResultSuccessExt {
-  ManageAccountRoleResultSuccessExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+class ManageAccountRoleResultSuccessExtEmptyVersion extends ManageAccountRoleResultSuccessExt {
+  ManageAccountRoleResultSuccessExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
 
 class ManageAccountRuleAction extends XdrEncodable {
   static const CREATE = 0;
   static const UPDATE = 1;
   static const REMOVE = 2;
-  var value;
-
+  int value;
   ManageAccountRuleAction(this.value);
+  @override toXdr(XdrDataOutputStream stream) {
+    value.toXdr(stream);
+  }
+
 }
 // === xdr source ============================================================
 
@@ -12401,23 +10878,22 @@ class ManageAccountRuleAction extends XdrEncodable {
 //  };
 
 //  ===========================================================================
-class CreateAccountRuleData extends XdrEncodable {
+class CreateAccountRuleData extends XdrEncodable  {
   AccountRuleResource resource;
   AccountRuleAction action;
   bool forbids;
-  Longstring details;
+  LONGSTRING details;
   CreateAccountRuleDataExt ext;
 
   CreateAccountRuleData(
-    this.resource,
-    this.action,
-    this.forbids,
-    this.details,
-    this.ext,
-  );
+      this.resource,
+      this.action,
+      this.forbids,
+      this.details,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     resource.toXdr(stream);
     action.toXdr(stream);
     forbids.toXdr(stream);
@@ -12425,21 +10901,16 @@ class CreateAccountRuleData extends XdrEncodable {
     ext.toXdr(stream);
   }
 }
-
 abstract class CreateAccountRuleDataExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   CreateAccountRuleDataExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class CreateAccountRuleDataExtEmptyVersion extends CreateAccountRuleDataExt {
-  CreateAccountRuleDataExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+  CreateAccountRuleDataExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
 // === xdr source ============================================================
 
@@ -12466,25 +10937,24 @@ class CreateAccountRuleDataExtEmptyVersion extends CreateAccountRuleDataExt {
 //  };
 
 //  ===========================================================================
-class UpdateAccountRuleData extends XdrEncodable {
-  Uint64 ruleID;
+class UpdateAccountRuleData extends XdrEncodable  {
+  UINT64 ruleID;
   AccountRuleResource resource;
   AccountRuleAction action;
   bool forbids;
-  Longstring details;
+  LONGSTRING details;
   UpdateAccountRuleDataExt ext;
 
   UpdateAccountRuleData(
-    this.ruleID,
-    this.resource,
-    this.action,
-    this.forbids,
-    this.details,
-    this.ext,
-  );
+      this.ruleID,
+      this.resource,
+      this.action,
+      this.forbids,
+      this.details,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     ruleID.toXdr(stream);
     resource.toXdr(stream);
     action.toXdr(stream);
@@ -12493,21 +10963,16 @@ class UpdateAccountRuleData extends XdrEncodable {
     ext.toXdr(stream);
   }
 }
-
 abstract class UpdateAccountRuleDataExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   UpdateAccountRuleDataExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class UpdateAccountRuleDataExtEmptyVersion extends UpdateAccountRuleDataExt {
-  UpdateAccountRuleDataExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+  UpdateAccountRuleDataExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
 // === xdr source ============================================================
 
@@ -12526,36 +10991,30 @@ class UpdateAccountRuleDataExtEmptyVersion extends UpdateAccountRuleDataExt {
 //  };
 
 //  ===========================================================================
-class RemoveAccountRuleData extends XdrEncodable {
-  Uint64 ruleID;
+class RemoveAccountRuleData extends XdrEncodable  {
+  UINT64 ruleID;
   RemoveAccountRuleDataExt ext;
 
   RemoveAccountRuleData(
-    this.ruleID,
-    this.ext,
-  );
+      this.ruleID,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     ruleID.toXdr(stream);
     ext.toXdr(stream);
   }
 }
-
 abstract class RemoveAccountRuleDataExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   RemoveAccountRuleDataExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class RemoveAccountRuleDataExtEmptyVersion extends RemoveAccountRuleDataExt {
-  RemoveAccountRuleDataExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+  RemoveAccountRuleDataExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
 // === xdr source ============================================================
 
@@ -12583,64 +11042,50 @@ class RemoveAccountRuleDataExtEmptyVersion extends RemoveAccountRuleDataExt {
 //  };
 
 //  ===========================================================================
-class ManageAccountRuleOp extends XdrEncodable {
+class ManageAccountRuleOp extends XdrEncodable  {
   ManageAccountRuleOpData data;
   ManageAccountRuleOpExt ext;
 
   ManageAccountRuleOp(
-    this.data,
-    this.ext,
-  );
+      this.data,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     data.toXdr(stream);
     ext.toXdr(stream);
   }
 }
-
 abstract class ManageAccountRuleOpData extends XdrEncodable {
   ManageAccountRuleAction discriminant;
-
   ManageAccountRuleOpData(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class ManageAccountRuleOpDataCreate extends ManageAccountRuleOpData {
-  ManageAccountRuleOpDataCreate(this.createData)
-      : super(ManageAccountRuleAction(ManageAccountRuleAction.CREATE));
+  ManageAccountRuleOpDataCreate(this.createData) : super(ManageAccountRuleAction(ManageAccountRuleAction.CREATE));
   late CreateAccountRuleData createData;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     createData.toXdr(stream);
   }
 }
 
 class ManageAccountRuleOpDataUpdate extends ManageAccountRuleOpData {
-  ManageAccountRuleOpDataUpdate(this.updateData)
-      : super(ManageAccountRuleAction(ManageAccountRuleAction.UPDATE));
+  ManageAccountRuleOpDataUpdate(this.updateData) : super(ManageAccountRuleAction(ManageAccountRuleAction.UPDATE));
   late UpdateAccountRuleData updateData;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     updateData.toXdr(stream);
   }
 }
 
 class ManageAccountRuleOpDataRemove extends ManageAccountRuleOpData {
-  ManageAccountRuleOpDataRemove(this.removeData)
-      : super(ManageAccountRuleAction(ManageAccountRuleAction.REMOVE));
+  ManageAccountRuleOpDataRemove(this.removeData) : super(ManageAccountRuleAction(ManageAccountRuleAction.REMOVE));
   late RemoveAccountRuleData removeData;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     removeData.toXdr(stream);
   }
@@ -12648,65 +11093,52 @@ class ManageAccountRuleOpDataRemove extends ManageAccountRuleOpData {
 
 abstract class ManageAccountRuleOpExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   ManageAccountRuleOpExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class ManageAccountRuleOpExtEmptyVersion extends ManageAccountRuleOpExt {
-  ManageAccountRuleOpExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+  ManageAccountRuleOpExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
-
 class ManageAccountRuleResultCode extends XdrEncodable {
   static const SUCCESS = 0;
   static const NOT_FOUND = -1;
   static const RULE_IS_USED = -2;
   static const INVALID_DETAILS = -3;
   static const INVALID_ACTION = -4;
-  var value;
-
+  int value;
   ManageAccountRuleResultCode(this.value);
-}
+  @override toXdr(XdrDataOutputStream stream) {
+    value.toXdr(stream);
+  }
 
+}
 abstract class ManageAccountRuleResult extends XdrEncodable {
   ManageAccountRuleResultCode discriminant;
-
   ManageAccountRuleResult(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class ManageAccountRuleResultSuccess extends ManageAccountRuleResult {
-  ManageAccountRuleResultSuccess(this.success)
-      : super(ManageAccountRuleResultCode(ManageAccountRuleResultCode.SUCCESS));
+  ManageAccountRuleResultSuccess(this.success) : super(ManageAccountRuleResultCode(ManageAccountRuleResultCode.SUCCESS));
   late ManageAccountRuleResultSuccessSuccess success;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     success.toXdr(stream);
   }
 }
 
 class ManageAccountRuleResultRuleIsUsed extends ManageAccountRuleResult {
-  ManageAccountRuleResultRuleIsUsed(this.roleIDs)
-      : super(ManageAccountRuleResultCode(
-            ManageAccountRuleResultCode.RULE_IS_USED));
-  late List<Uint64> roleIDs;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  ManageAccountRuleResultRuleIsUsed(this.roleIDs) : super(ManageAccountRuleResultCode(ManageAccountRuleResultCode.RULE_IS_USED));
+  late List<UINT64> roleIDs;
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     roleIDs.length.toXdr(stream);
-    roleIDs.forEach((element) {
+    roleIDs.forEach ((element) {
       element.toXdr(stream);
     });
   }
@@ -12727,45 +11159,41 @@ class ManageAccountRuleResultRuleIsUsed extends ManageAccountRuleResult {
 //          }
 
 //  ===========================================================================
-class ManageAccountRuleResultSuccessSuccess extends XdrEncodable {
-  Uint64 ruleID;
+class ManageAccountRuleResultSuccessSuccess extends XdrEncodable  {
+  UINT64 ruleID;
   ManageAccountRuleResultSuccessExt ext;
 
   ManageAccountRuleResultSuccessSuccess(
-    this.ruleID,
-    this.ext,
-  );
+      this.ruleID,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     ruleID.toXdr(stream);
     ext.toXdr(stream);
   }
 }
-
 abstract class ManageAccountRuleResultSuccessExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   ManageAccountRuleResultSuccessExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
-class ManageAccountRuleResultSuccessExtEmptyVersion
-    extends ManageAccountRuleResultSuccessExt {
-  ManageAccountRuleResultSuccessExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+class ManageAccountRuleResultSuccessExtEmptyVersion extends ManageAccountRuleResultSuccessExt {
+  ManageAccountRuleResultSuccessExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
 
 class ManageAccountSpecificRuleAction extends XdrEncodable {
   static const CREATE = 0;
   static const REMOVE = 1;
-  var value;
-
+  int value;
   ManageAccountSpecificRuleAction(this.value);
+  @override toXdr(XdrDataOutputStream stream) {
+    value.toXdr(stream);
+  }
+
 }
 // === xdr source ============================================================
 
@@ -12788,21 +11216,20 @@ class ManageAccountSpecificRuleAction extends XdrEncodable {
 //  };
 
 //  ===========================================================================
-class CreateAccountSpecificRuleData extends XdrEncodable {
+class CreateAccountSpecificRuleData extends XdrEncodable  {
   LedgerKey ledgerKey;
-  AccountID? accountID;
+  ACCOUNTID? accountID;
   bool forbids;
   CreateAccountSpecificRuleDataExt ext;
 
   CreateAccountSpecificRuleData(
-    this.ledgerKey,
-    this.accountID,
-    this.forbids,
-    this.ext,
-  );
+      this.ledgerKey,
+      this.accountID,
+      this.forbids,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     ledgerKey.toXdr(stream);
     if (accountID != null) {
       true.toXdr(stream);
@@ -12814,22 +11241,16 @@ class CreateAccountSpecificRuleData extends XdrEncodable {
     ext.toXdr(stream);
   }
 }
-
 abstract class CreateAccountSpecificRuleDataExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   CreateAccountSpecificRuleDataExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
-class CreateAccountSpecificRuleDataExtEmptyVersion
-    extends CreateAccountSpecificRuleDataExt {
-  CreateAccountSpecificRuleDataExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+class CreateAccountSpecificRuleDataExtEmptyVersion extends CreateAccountSpecificRuleDataExt {
+  CreateAccountSpecificRuleDataExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
 // === xdr source ============================================================
 
@@ -12848,37 +11269,30 @@ class CreateAccountSpecificRuleDataExtEmptyVersion
 //  };
 
 //  ===========================================================================
-class RemoveAccountSpecificRuleData extends XdrEncodable {
-  Uint64 ruleID;
+class RemoveAccountSpecificRuleData extends XdrEncodable  {
+  UINT64 ruleID;
   RemoveAccountSpecificRuleDataExt ext;
 
   RemoveAccountSpecificRuleData(
-    this.ruleID,
-    this.ext,
-  );
+      this.ruleID,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     ruleID.toXdr(stream);
     ext.toXdr(stream);
   }
 }
-
 abstract class RemoveAccountSpecificRuleDataExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   RemoveAccountSpecificRuleDataExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
-class RemoveAccountSpecificRuleDataExtEmptyVersion
-    extends RemoveAccountSpecificRuleDataExt {
-  RemoveAccountSpecificRuleDataExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+class RemoveAccountSpecificRuleDataExtEmptyVersion extends RemoveAccountSpecificRuleDataExt {
+  RemoveAccountSpecificRuleDataExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
 // === xdr source ============================================================
 
@@ -12904,56 +11318,41 @@ class RemoveAccountSpecificRuleDataExtEmptyVersion
 //  };
 
 //  ===========================================================================
-class ManageAccountSpecificRuleOp extends XdrEncodable {
+class ManageAccountSpecificRuleOp extends XdrEncodable  {
   ManageAccountSpecificRuleOpData data;
   ManageAccountSpecificRuleOpExt ext;
 
   ManageAccountSpecificRuleOp(
-    this.data,
-    this.ext,
-  );
+      this.data,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     data.toXdr(stream);
     ext.toXdr(stream);
   }
 }
-
 abstract class ManageAccountSpecificRuleOpData extends XdrEncodable {
   ManageAccountSpecificRuleAction discriminant;
-
   ManageAccountSpecificRuleOpData(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
-class ManageAccountSpecificRuleOpDataCreate
-    extends ManageAccountSpecificRuleOpData {
-  ManageAccountSpecificRuleOpDataCreate(this.createData)
-      : super(ManageAccountSpecificRuleAction(
-            ManageAccountSpecificRuleAction.CREATE));
+class ManageAccountSpecificRuleOpDataCreate extends ManageAccountSpecificRuleOpData {
+  ManageAccountSpecificRuleOpDataCreate(this.createData) : super(ManageAccountSpecificRuleAction(ManageAccountSpecificRuleAction.CREATE));
   late CreateAccountSpecificRuleData createData;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     createData.toXdr(stream);
   }
 }
 
-class ManageAccountSpecificRuleOpDataRemove
-    extends ManageAccountSpecificRuleOpData {
-  ManageAccountSpecificRuleOpDataRemove(this.removeData)
-      : super(ManageAccountSpecificRuleAction(
-            ManageAccountSpecificRuleAction.REMOVE));
+class ManageAccountSpecificRuleOpDataRemove extends ManageAccountSpecificRuleOpData {
+  ManageAccountSpecificRuleOpDataRemove(this.removeData) : super(ManageAccountSpecificRuleAction(ManageAccountSpecificRuleAction.REMOVE));
   late RemoveAccountSpecificRuleData removeData;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     removeData.toXdr(stream);
   }
@@ -12961,21 +11360,15 @@ class ManageAccountSpecificRuleOpDataRemove
 
 abstract class ManageAccountSpecificRuleOpExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   ManageAccountSpecificRuleOpExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
-class ManageAccountSpecificRuleOpExtEmptyVersion
-    extends ManageAccountSpecificRuleOpExt {
-  ManageAccountSpecificRuleOpExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+class ManageAccountSpecificRuleOpExtEmptyVersion extends ManageAccountSpecificRuleOpExt {
+  ManageAccountSpecificRuleOpExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
-
 class ManageAccountSpecificRuleResultCode extends XdrEncodable {
   static const SUCCESS = 0;
   static const NOT_FOUND = -1;
@@ -12987,31 +11380,25 @@ class ManageAccountSpecificRuleResultCode extends XdrEncodable {
   static const ACCOUNT_NOT_FOUND = -7;
   static const SPECIFIC_RULE_NOT_SUPPORTED = -8;
   static const REMOVING_GLOBAL_RULE_FORBIDDEN = -9;
-  var value;
-
+  int value;
   ManageAccountSpecificRuleResultCode(this.value);
-}
+  @override toXdr(XdrDataOutputStream stream) {
+    value.toXdr(stream);
+  }
 
+}
 abstract class ManageAccountSpecificRuleResult extends XdrEncodable {
   ManageAccountSpecificRuleResultCode discriminant;
-
   ManageAccountSpecificRuleResult(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
-class ManageAccountSpecificRuleResultSuccess
-    extends ManageAccountSpecificRuleResult {
-  ManageAccountSpecificRuleResultSuccess(this.success)
-      : super(ManageAccountSpecificRuleResultCode(
-            ManageAccountSpecificRuleResultCode.SUCCESS));
+class ManageAccountSpecificRuleResultSuccess extends ManageAccountSpecificRuleResult {
+  ManageAccountSpecificRuleResultSuccess(this.success) : super(ManageAccountSpecificRuleResultCode(ManageAccountSpecificRuleResultCode.SUCCESS));
   late ManageAccountSpecificRuleResultSuccessSuccess success;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     success.toXdr(stream);
   }
@@ -13032,46 +11419,42 @@ class ManageAccountSpecificRuleResultSuccess
 //      }
 
 //  ===========================================================================
-class ManageAccountSpecificRuleResultSuccessSuccess extends XdrEncodable {
-  Uint64 ruleID;
+class ManageAccountSpecificRuleResultSuccessSuccess extends XdrEncodable  {
+  UINT64 ruleID;
   ManageAccountSpecificRuleResultSuccessExt ext;
 
   ManageAccountSpecificRuleResultSuccessSuccess(
-    this.ruleID,
-    this.ext,
-  );
+      this.ruleID,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     ruleID.toXdr(stream);
     ext.toXdr(stream);
   }
 }
-
 abstract class ManageAccountSpecificRuleResultSuccessExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   ManageAccountSpecificRuleResultSuccessExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
-class ManageAccountSpecificRuleResultSuccessExtEmptyVersion
-    extends ManageAccountSpecificRuleResultSuccessExt {
-  ManageAccountSpecificRuleResultSuccessExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+class ManageAccountSpecificRuleResultSuccessExtEmptyVersion extends ManageAccountSpecificRuleResultSuccessExt {
+  ManageAccountSpecificRuleResultSuccessExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
 
 class ManageAssetPairAction extends XdrEncodable {
   static const CREATE = 0;
   static const UPDATE_PRICE = 1;
   static const UPDATE_POLICIES = 2;
-  var value;
-
+  int value;
   ManageAssetPairAction(this.value);
+  @override toXdr(XdrDataOutputStream stream) {
+    value.toXdr(stream);
+  }
+
 }
 // === xdr source ============================================================
 
@@ -13106,29 +11489,28 @@ class ManageAssetPairAction extends XdrEncodable {
 //  };
 
 //  ===========================================================================
-class ManageAssetPairOp extends XdrEncodable {
+class ManageAssetPairOp extends XdrEncodable  {
   ManageAssetPairAction action;
-  AssetCode base;
-  AssetCode quote;
-  Int64 physicalPrice;
-  Int64 physicalPriceCorrection;
-  Int64 maxPriceStep;
-  Int32 policies;
+  ASSETCODE base;
+  ASSETCODE quote;
+  INT64 physicalPrice;
+  INT64 physicalPriceCorrection;
+  INT64 maxPriceStep;
+  INT32 policies;
   ManageAssetPairOpExt ext;
 
   ManageAssetPairOp(
-    this.action,
-    this.base,
-    this.quote,
-    this.physicalPrice,
-    this.physicalPriceCorrection,
-    this.maxPriceStep,
-    this.policies,
-    this.ext,
-  );
+      this.action,
+      this.base,
+      this.quote,
+      this.physicalPrice,
+      this.physicalPriceCorrection,
+      this.maxPriceStep,
+      this.policies,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     action.toXdr(stream);
     base.toXdr(stream);
     quote.toXdr(stream);
@@ -13139,23 +11521,17 @@ class ManageAssetPairOp extends XdrEncodable {
     ext.toXdr(stream);
   }
 }
-
 abstract class ManageAssetPairOpExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   ManageAssetPairOpExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class ManageAssetPairOpExtEmptyVersion extends ManageAssetPairOpExt {
-  ManageAssetPairOpExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+  ManageAssetPairOpExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
-
 class ManageAssetPairResultCode extends XdrEncodable {
   static const SUCCESS = 0;
   static const NOT_FOUND = -1;
@@ -13166,9 +11542,12 @@ class ManageAssetPairResultCode extends XdrEncodable {
   static const INVALID_POLICIES = -6;
   static const ASSET_NOT_FOUND = -7;
   static const SAME_ASSET = -8;
-  var value;
-
+  int value;
   ManageAssetPairResultCode(this.value);
+  @override toXdr(XdrDataOutputStream stream) {
+    value.toXdr(stream);
+  }
+
 }
 // === xdr source ============================================================
 
@@ -13187,56 +11566,43 @@ class ManageAssetPairResultCode extends XdrEncodable {
 //  };
 
 //  ===========================================================================
-class ManageAssetPairSuccess extends XdrEncodable {
-  Int64 currentPrice;
+class ManageAssetPairSuccess extends XdrEncodable  {
+  INT64 currentPrice;
   ManageAssetPairSuccessExt ext;
 
   ManageAssetPairSuccess(
-    this.currentPrice,
-    this.ext,
-  );
+      this.currentPrice,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     currentPrice.toXdr(stream);
     ext.toXdr(stream);
   }
 }
-
 abstract class ManageAssetPairSuccessExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   ManageAssetPairSuccessExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class ManageAssetPairSuccessExtEmptyVersion extends ManageAssetPairSuccessExt {
-  ManageAssetPairSuccessExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+  ManageAssetPairSuccessExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
-
 abstract class ManageAssetPairResult extends XdrEncodable {
   ManageAssetPairResultCode discriminant;
-
   ManageAssetPairResult(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class ManageAssetPairResultSuccess extends ManageAssetPairResult {
-  ManageAssetPairResultSuccess(this.success)
-      : super(ManageAssetPairResultCode(ManageAssetPairResultCode.SUCCESS));
+  ManageAssetPairResultSuccess(this.success) : super(ManageAssetPairResultCode(ManageAssetPairResultCode.SUCCESS));
   late ManageAssetPairSuccess success;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     success.toXdr(stream);
   }
@@ -13248,9 +11614,12 @@ class ManageAssetAction extends XdrEncodable {
   static const CANCEL_ASSET_REQUEST = 2;
   static const CHANGE_PREISSUED_ASSET_SIGNER = 3;
   static const UPDATE_MAX_ISSUANCE = 4;
-  var value;
-
+  int value;
   ManageAssetAction(this.value);
+  @override toXdr(XdrDataOutputStream stream) {
+    value.toXdr(stream);
+  }
+
 }
 // === xdr source ============================================================
 
@@ -13267,33 +11636,27 @@ class ManageAssetAction extends XdrEncodable {
 //  };
 
 //  ===========================================================================
-class CancelAssetRequest extends XdrEncodable {
+class CancelAssetRequest extends XdrEncodable  {
   CancelAssetRequestExt ext;
 
   CancelAssetRequest(
-    this.ext,
-  );
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     ext.toXdr(stream);
   }
 }
-
 abstract class CancelAssetRequestExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   CancelAssetRequestExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class CancelAssetRequestExtEmptyVersion extends CancelAssetRequestExt {
-  CancelAssetRequestExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+  CancelAssetRequestExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
 // === xdr source ============================================================
 
@@ -13315,39 +11678,33 @@ class CancelAssetRequestExtEmptyVersion extends CancelAssetRequestExt {
 //  };
 
 //  ===========================================================================
-class UpdateMaxIssuance extends XdrEncodable {
-  AssetCode assetCode;
-  Uint64 maxIssuanceAmount;
+class UpdateMaxIssuance extends XdrEncodable  {
+  ASSETCODE assetCode;
+  UINT64 maxIssuanceAmount;
   UpdateMaxIssuanceExt ext;
 
   UpdateMaxIssuance(
-    this.assetCode,
-    this.maxIssuanceAmount,
-    this.ext,
-  );
+      this.assetCode,
+      this.maxIssuanceAmount,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     assetCode.toXdr(stream);
     maxIssuanceAmount.toXdr(stream);
     ext.toXdr(stream);
   }
 }
-
 abstract class UpdateMaxIssuanceExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   UpdateMaxIssuanceExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class UpdateMaxIssuanceExtEmptyVersion extends UpdateMaxIssuanceExt {
-  UpdateMaxIssuanceExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+  UpdateMaxIssuanceExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
 // === xdr source ============================================================
 
@@ -13423,99 +11780,71 @@ class UpdateMaxIssuanceExtEmptyVersion extends UpdateMaxIssuanceExt {
 //  };
 
 //  ===========================================================================
-class ManageAssetOp extends XdrEncodable {
-  Uint64 requestID;
+class ManageAssetOp extends XdrEncodable  {
+  UINT64 requestID;
   ManageAssetOpRequest request;
   ManageAssetOpExt ext;
 
   ManageAssetOp(
-    this.requestID,
-    this.request,
-    this.ext,
-  );
+      this.requestID,
+      this.request,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     requestID.toXdr(stream);
     request.toXdr(stream);
     ext.toXdr(stream);
   }
 }
-
 abstract class ManageAssetOpRequest extends XdrEncodable {
   ManageAssetAction discriminant;
-
   ManageAssetOpRequest(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
-class ManageAssetOpRequestCreateAssetCreationRequest
-    extends ManageAssetOpRequest {
-  ManageAssetOpRequestCreateAssetCreationRequest(
-      this.createAssetCreationRequest)
-      : super(
-            ManageAssetAction(ManageAssetAction.CREATE_ASSET_CREATION_REQUEST));
-  late ManageAssetOpCreateAssetCreationRequestCreateAssetCreationRequest
-      createAssetCreationRequest;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+class ManageAssetOpRequestCreateAssetCreationRequest extends ManageAssetOpRequest {
+  ManageAssetOpRequestCreateAssetCreationRequest(this.createAssetCreationRequest) : super(ManageAssetAction(ManageAssetAction.CREATE_ASSET_CREATION_REQUEST));
+  late ManageAssetOpCreateAssetCreationRequestCreateAssetCreationRequest createAssetCreationRequest;
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     createAssetCreationRequest.toXdr(stream);
   }
 }
 
-class ManageAssetOpRequestCreateAssetUpdateRequest
-    extends ManageAssetOpRequest {
-  ManageAssetOpRequestCreateAssetUpdateRequest(this.createAssetUpdateRequest)
-      : super(ManageAssetAction(ManageAssetAction.CREATE_ASSET_UPDATE_REQUEST));
-  late ManageAssetOpCreateAssetUpdateRequestCreateAssetUpdateRequest
-      createAssetUpdateRequest;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+class ManageAssetOpRequestCreateAssetUpdateRequest extends ManageAssetOpRequest {
+  ManageAssetOpRequestCreateAssetUpdateRequest(this.createAssetUpdateRequest) : super(ManageAssetAction(ManageAssetAction.CREATE_ASSET_UPDATE_REQUEST));
+  late ManageAssetOpCreateAssetUpdateRequestCreateAssetUpdateRequest createAssetUpdateRequest;
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     createAssetUpdateRequest.toXdr(stream);
   }
 }
 
 class ManageAssetOpRequestCancelAssetRequest extends ManageAssetOpRequest {
-  ManageAssetOpRequestCancelAssetRequest(this.cancelRequest)
-      : super(ManageAssetAction(ManageAssetAction.CANCEL_ASSET_REQUEST));
+  ManageAssetOpRequestCancelAssetRequest(this.cancelRequest) : super(ManageAssetAction(ManageAssetAction.CANCEL_ASSET_REQUEST));
   late CancelAssetRequest cancelRequest;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     cancelRequest.toXdr(stream);
   }
 }
 
-class ManageAssetOpRequestChangePreissuedAssetSigner
-    extends ManageAssetOpRequest {
-  ManageAssetOpRequestChangePreissuedAssetSigner(this.changePreissuedSigner)
-      : super(
-            ManageAssetAction(ManageAssetAction.CHANGE_PREISSUED_ASSET_SIGNER));
+class ManageAssetOpRequestChangePreissuedAssetSigner extends ManageAssetOpRequest {
+  ManageAssetOpRequestChangePreissuedAssetSigner(this.changePreissuedSigner) : super(ManageAssetAction(ManageAssetAction.CHANGE_PREISSUED_ASSET_SIGNER));
   late AssetChangePreissuedSigner changePreissuedSigner;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     changePreissuedSigner.toXdr(stream);
   }
 }
 
 class ManageAssetOpRequestUpdateMaxIssuance extends ManageAssetOpRequest {
-  ManageAssetOpRequestUpdateMaxIssuance(this.updateMaxIssuance)
-      : super(ManageAssetAction(ManageAssetAction.UPDATE_MAX_ISSUANCE));
+  ManageAssetOpRequestUpdateMaxIssuance(this.updateMaxIssuance) : super(ManageAssetAction(ManageAssetAction.UPDATE_MAX_ISSUANCE));
   late UpdateMaxIssuance updateMaxIssuance;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     updateMaxIssuance.toXdr(stream);
   }
@@ -13540,20 +11869,18 @@ class ManageAssetOpRequestUpdateMaxIssuance extends ManageAssetOpRequest {
 //          }
 
 //  ===========================================================================
-class ManageAssetOpCreateAssetCreationRequestCreateAssetCreationRequest
-    extends XdrEncodable {
+class ManageAssetOpCreateAssetCreationRequestCreateAssetCreationRequest extends XdrEncodable  {
   AssetCreationRequest createAsset;
-  Uint32? allTasks;
+  UINT32? allTasks;
   ManageAssetOpCreateAssetCreationRequestExt ext;
 
   ManageAssetOpCreateAssetCreationRequestCreateAssetCreationRequest(
-    this.createAsset,
-    this.allTasks,
-    this.ext,
-  );
+      this.createAsset,
+      this.allTasks,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     createAsset.toXdr(stream);
     if (allTasks != null) {
       true.toXdr(stream);
@@ -13564,22 +11891,16 @@ class ManageAssetOpCreateAssetCreationRequestCreateAssetCreationRequest
     ext.toXdr(stream);
   }
 }
-
 abstract class ManageAssetOpCreateAssetCreationRequestExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   ManageAssetOpCreateAssetCreationRequestExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
-class ManageAssetOpCreateAssetCreationRequestExtEmptyVersion
-    extends ManageAssetOpCreateAssetCreationRequestExt {
-  ManageAssetOpCreateAssetCreationRequestExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+class ManageAssetOpCreateAssetCreationRequestExtEmptyVersion extends ManageAssetOpCreateAssetCreationRequestExt {
+  ManageAssetOpCreateAssetCreationRequestExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
 // === xdr source ============================================================
 
@@ -13601,20 +11922,18 @@ class ManageAssetOpCreateAssetCreationRequestExtEmptyVersion
 //          }
 
 //  ===========================================================================
-class ManageAssetOpCreateAssetUpdateRequestCreateAssetUpdateRequest
-    extends XdrEncodable {
+class ManageAssetOpCreateAssetUpdateRequestCreateAssetUpdateRequest extends XdrEncodable  {
   AssetUpdateRequest updateAsset;
-  Uint32? allTasks;
+  UINT32? allTasks;
   ManageAssetOpCreateAssetUpdateRequestExt ext;
 
   ManageAssetOpCreateAssetUpdateRequestCreateAssetUpdateRequest(
-    this.updateAsset,
-    this.allTasks,
-    this.ext,
-  );
+      this.updateAsset,
+      this.allTasks,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     updateAsset.toXdr(stream);
     if (allTasks != null) {
       true.toXdr(stream);
@@ -13625,40 +11944,29 @@ class ManageAssetOpCreateAssetUpdateRequestCreateAssetUpdateRequest
     ext.toXdr(stream);
   }
 }
-
 abstract class ManageAssetOpCreateAssetUpdateRequestExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   ManageAssetOpCreateAssetUpdateRequestExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
-class ManageAssetOpCreateAssetUpdateRequestExtEmptyVersion
-    extends ManageAssetOpCreateAssetUpdateRequestExt {
-  ManageAssetOpCreateAssetUpdateRequestExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+class ManageAssetOpCreateAssetUpdateRequestExtEmptyVersion extends ManageAssetOpCreateAssetUpdateRequestExt {
+  ManageAssetOpCreateAssetUpdateRequestExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
 
 abstract class ManageAssetOpExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   ManageAssetOpExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
-    discriminant.value.toXdr(stream);
+  @override toXdr(XdrDataOutputStream stream) {
+    discriminant.toXdr(stream);
   }
 }
 
 class ManageAssetOpExtEmptyVersion extends ManageAssetOpExt {
-  ManageAssetOpExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+  ManageAssetOpExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
-
 class ManageAssetResultCode extends XdrEncodable {
   static const SUCCESS = 0;
   static const REQUEST_NOT_FOUND = -1;
@@ -13679,9 +11987,12 @@ class ManageAssetResultCode extends XdrEncodable {
   static const ASSET_CREATE_TASKS_NOT_FOUND = -16;
   static const ASSET_UPDATE_TASKS_NOT_FOUND = -17;
   static const NOT_ALLOWED_TO_SET_TASKS_ON_UPDATE = -18;
-  var value;
-
+  int value;
   ManageAssetResultCode(this.value);
+  @override toXdr(XdrDataOutputStream stream) {
+    value.toXdr(stream);
+  }
+
 }
 // === xdr source ============================================================
 
@@ -13702,59 +12013,46 @@ class ManageAssetResultCode extends XdrEncodable {
 //  };
 
 //  ===========================================================================
-class ManageAssetSuccess extends XdrEncodable {
-  Uint64 requestID;
+class ManageAssetSuccess extends XdrEncodable  {
+  UINT64 requestID;
   bool fulfilled;
   ManageAssetSuccessExt ext;
 
   ManageAssetSuccess(
-    this.requestID,
-    this.fulfilled,
-    this.ext,
-  );
+      this.requestID,
+      this.fulfilled,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     requestID.toXdr(stream);
     fulfilled.toXdr(stream);
     ext.toXdr(stream);
   }
 }
-
 abstract class ManageAssetSuccessExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   ManageAssetSuccessExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class ManageAssetSuccessExtEmptyVersion extends ManageAssetSuccessExt {
-  ManageAssetSuccessExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+  ManageAssetSuccessExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
-
 abstract class ManageAssetResult extends XdrEncodable {
   ManageAssetResultCode discriminant;
-
   ManageAssetResult(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class ManageAssetResultSuccess extends ManageAssetResult {
-  ManageAssetResultSuccess(this.success)
-      : super(ManageAssetResultCode(ManageAssetResultCode.SUCCESS));
+  ManageAssetResultSuccess(this.success) : super(ManageAssetResultCode(ManageAssetResultCode.SUCCESS));
   late ManageAssetSuccess success;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     success.toXdr(stream);
   }
@@ -13764,9 +12062,12 @@ class ManageBalanceAction extends XdrEncodable {
   static const CREATE = 0;
   static const DELETE_BALANCE = 1;
   static const CREATE_UNIQUE = 2;
-  var value;
-
+  int value;
   ManageBalanceAction(this.value);
+  @override toXdr(XdrDataOutputStream stream) {
+    value.toXdr(stream);
+  }
+
 }
 // === xdr source ============================================================
 
@@ -13789,44 +12090,37 @@ class ManageBalanceAction extends XdrEncodable {
 //  };
 
 //  ===========================================================================
-class ManageBalanceOp extends XdrEncodable {
+class ManageBalanceOp extends XdrEncodable  {
   ManageBalanceAction action;
-  AccountID destination;
-  AssetCode asset;
+  ACCOUNTID destination;
+  ASSETCODE asset;
   ManageBalanceOpExt ext;
 
   ManageBalanceOp(
-    this.action,
-    this.destination,
-    this.asset,
-    this.ext,
-  );
+      this.action,
+      this.destination,
+      this.asset,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     action.toXdr(stream);
     destination.toXdr(stream);
     asset.toXdr(stream);
     ext.toXdr(stream);
   }
 }
-
 abstract class ManageBalanceOpExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   ManageBalanceOpExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class ManageBalanceOpExtEmptyVersion extends ManageBalanceOpExt {
-  ManageBalanceOpExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+  ManageBalanceOpExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
-
 class ManageBalanceResultCode extends XdrEncodable {
   static const SUCCESS = 0;
   static const MALFORMED = -1;
@@ -13836,9 +12130,12 @@ class ManageBalanceResultCode extends XdrEncodable {
   static const INVALID_ASSET = -5;
   static const BALANCE_ALREADY_EXISTS = -6;
   static const VERSION_IS_NOT_SUPPORTED_YET = -7;
-  var value;
-
+  int value;
   ManageBalanceResultCode(this.value);
+  @override toXdr(XdrDataOutputStream stream) {
+    value.toXdr(stream);
+  }
+
 }
 // === xdr source ============================================================
 
@@ -13855,56 +12152,43 @@ class ManageBalanceResultCode extends XdrEncodable {
 //  };
 
 //  ===========================================================================
-class ManageBalanceSuccess extends XdrEncodable {
-  BalanceID balanceID;
+class ManageBalanceSuccess extends XdrEncodable  {
+  BALANCEID balanceID;
   ManageBalanceSuccessExt ext;
 
   ManageBalanceSuccess(
-    this.balanceID,
-    this.ext,
-  );
+      this.balanceID,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     balanceID.toXdr(stream);
     ext.toXdr(stream);
   }
 }
-
 abstract class ManageBalanceSuccessExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   ManageBalanceSuccessExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class ManageBalanceSuccessExtEmptyVersion extends ManageBalanceSuccessExt {
-  ManageBalanceSuccessExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+  ManageBalanceSuccessExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
-
 abstract class ManageBalanceResult extends XdrEncodable {
   ManageBalanceResultCode discriminant;
-
   ManageBalanceResult(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class ManageBalanceResultSuccess extends ManageBalanceResult {
-  ManageBalanceResultSuccess(this.success)
-      : super(ManageBalanceResultCode(ManageBalanceResultCode.SUCCESS));
+  ManageBalanceResultSuccess(this.success) : super(ManageBalanceResultCode(ManageBalanceResultCode.SUCCESS));
   late ManageBalanceSuccess success;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     success.toXdr(stream);
   }
@@ -13913,9 +12197,12 @@ class ManageBalanceResultSuccess extends ManageBalanceResult {
 class ManageContractRequestAction extends XdrEncodable {
   static const CREATE = 0;
   static const REMOVE = 1;
-  var value;
-
+  int value;
   ManageContractRequestAction(this.value);
+  @override toXdr(XdrDataOutputStream stream) {
+    value.toXdr(stream);
+  }
+
 }
 // === xdr source ============================================================
 
@@ -13934,19 +12221,18 @@ class ManageContractRequestAction extends XdrEncodable {
 //  };
 
 //  ===========================================================================
-class CreateContractRequest extends XdrEncodable {
+class CreateContractRequest extends XdrEncodable  {
   ContractRequest contractRequest;
-  Uint32? allTasks;
+  UINT32? allTasks;
   CreateContractRequestExt ext;
 
   CreateContractRequest(
-    this.contractRequest,
-    this.allTasks,
-    this.ext,
-  );
+      this.contractRequest,
+      this.allTasks,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     contractRequest.toXdr(stream);
     if (allTasks != null) {
       true.toXdr(stream);
@@ -13957,21 +12243,16 @@ class CreateContractRequest extends XdrEncodable {
     ext.toXdr(stream);
   }
 }
-
 abstract class CreateContractRequestExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   CreateContractRequestExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class CreateContractRequestExtEmptyVersion extends CreateContractRequestExt {
-  CreateContractRequestExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+  CreateContractRequestExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
 // === xdr source ============================================================
 
@@ -13994,54 +12275,41 @@ class CreateContractRequestExtEmptyVersion extends CreateContractRequestExt {
 //  };
 
 //  ===========================================================================
-class ManageContractRequestOp extends XdrEncodable {
+class ManageContractRequestOp extends XdrEncodable  {
   ManageContractRequestOpDetails details;
   ManageContractRequestOpExt ext;
 
   ManageContractRequestOp(
-    this.details,
-    this.ext,
-  );
+      this.details,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     details.toXdr(stream);
     ext.toXdr(stream);
   }
 }
-
 abstract class ManageContractRequestOpDetails extends XdrEncodable {
   ManageContractRequestAction discriminant;
-
   ManageContractRequestOpDetails(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
-class ManageContractRequestOpDetailsCreate
-    extends ManageContractRequestOpDetails {
-  ManageContractRequestOpDetailsCreate(this.createContractRequest)
-      : super(ManageContractRequestAction(ManageContractRequestAction.CREATE));
+class ManageContractRequestOpDetailsCreate extends ManageContractRequestOpDetails {
+  ManageContractRequestOpDetailsCreate(this.createContractRequest) : super(ManageContractRequestAction(ManageContractRequestAction.CREATE));
   late CreateContractRequest createContractRequest;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     createContractRequest.toXdr(stream);
   }
 }
 
-class ManageContractRequestOpDetailsRemove
-    extends ManageContractRequestOpDetails {
-  ManageContractRequestOpDetailsRemove(this.requestID)
-      : super(ManageContractRequestAction(ManageContractRequestAction.REMOVE));
-  late Uint64 requestID;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+class ManageContractRequestOpDetailsRemove extends ManageContractRequestOpDetails {
+  ManageContractRequestOpDetailsRemove(this.requestID) : super(ManageContractRequestAction(ManageContractRequestAction.REMOVE));
+  late UINT64 requestID;
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     requestID.toXdr(stream);
   }
@@ -14049,21 +12317,15 @@ class ManageContractRequestOpDetailsRemove
 
 abstract class ManageContractRequestOpExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   ManageContractRequestOpExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
-class ManageContractRequestOpExtEmptyVersion
-    extends ManageContractRequestOpExt {
-  ManageContractRequestOpExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+class ManageContractRequestOpExtEmptyVersion extends ManageContractRequestOpExt {
+  ManageContractRequestOpExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
-
 class ManageContractRequestResultCode extends XdrEncodable {
   static const SUCCESS = 0;
   static const MALFORMED = -1;
@@ -14072,9 +12334,12 @@ class ManageContractRequestResultCode extends XdrEncodable {
   static const NOT_ALLOWED_TO_REMOVE = -4;
   static const DETAILS_TOO_LONG = -5;
   static const CONTRACT_CREATE_TASKS_NOT_FOUND = -6;
-  var value;
-
+  int value;
   ManageContractRequestResultCode(this.value);
+  @override toXdr(XdrDataOutputStream stream) {
+    value.toXdr(stream);
+  }
+
 }
 // === xdr source ============================================================
 
@@ -14092,61 +12357,46 @@ class ManageContractRequestResultCode extends XdrEncodable {
 //  };
 
 //  ===========================================================================
-class CreateContractRequestResponse extends XdrEncodable {
-  Uint64 requestID;
+class CreateContractRequestResponse extends XdrEncodable  {
+  UINT64 requestID;
   bool fulfilled;
   CreateContractRequestResponseExt ext;
 
   CreateContractRequestResponse(
-    this.requestID,
-    this.fulfilled,
-    this.ext,
-  );
+      this.requestID,
+      this.fulfilled,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     requestID.toXdr(stream);
     fulfilled.toXdr(stream);
     ext.toXdr(stream);
   }
 }
-
 abstract class CreateContractRequestResponseExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   CreateContractRequestResponseExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
-class CreateContractRequestResponseExtEmptyVersion
-    extends CreateContractRequestResponseExt {
-  CreateContractRequestResponseExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+class CreateContractRequestResponseExtEmptyVersion extends CreateContractRequestResponseExt {
+  CreateContractRequestResponseExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
-
 abstract class ManageContractRequestResult extends XdrEncodable {
   ManageContractRequestResultCode discriminant;
-
   ManageContractRequestResult(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class ManageContractRequestResultSuccess extends ManageContractRequestResult {
-  ManageContractRequestResultSuccess(this.success)
-      : super(ManageContractRequestResultCode(
-            ManageContractRequestResultCode.SUCCESS));
+  ManageContractRequestResultSuccess(this.success) : super(ManageContractRequestResultCode(ManageContractRequestResultCode.SUCCESS));
   late ManageContractRequestResultSuccessSuccess success;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     success.toXdr(stream);
   }
@@ -14172,67 +12422,51 @@ class ManageContractRequestResultSuccess extends ManageContractRequestResult {
 //      }
 
 //  ===========================================================================
-class ManageContractRequestResultSuccessSuccess extends XdrEncodable {
+class ManageContractRequestResultSuccessSuccess extends XdrEncodable  {
   ManageContractRequestResultSuccessDetails details;
   ManageContractRequestResultSuccessExt ext;
 
   ManageContractRequestResultSuccessSuccess(
-    this.details,
-    this.ext,
-  );
+      this.details,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     details.toXdr(stream);
     ext.toXdr(stream);
   }
 }
-
 abstract class ManageContractRequestResultSuccessDetails extends XdrEncodable {
   ManageContractRequestAction discriminant;
-
   ManageContractRequestResultSuccessDetails(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
-class ManageContractRequestResultSuccessDetailsCreate
-    extends ManageContractRequestResultSuccessDetails {
-  ManageContractRequestResultSuccessDetailsCreate(this.response)
-      : super(ManageContractRequestAction(ManageContractRequestAction.CREATE));
+class ManageContractRequestResultSuccessDetailsCreate extends ManageContractRequestResultSuccessDetails {
+  ManageContractRequestResultSuccessDetailsCreate(this.response) : super(ManageContractRequestAction(ManageContractRequestAction.CREATE));
   late CreateContractRequestResponse response;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     response.toXdr(stream);
   }
 }
 
-class ManageContractRequestResultSuccessDetailsRemove
-    extends ManageContractRequestResultSuccessDetails {
-  ManageContractRequestResultSuccessDetailsRemove()
-      : super(ManageContractRequestAction(ManageContractRequestAction.REMOVE));
+class ManageContractRequestResultSuccessDetailsRemove extends ManageContractRequestResultSuccessDetails {
+  ManageContractRequestResultSuccessDetailsRemove() : super(ManageContractRequestAction(ManageContractRequestAction.REMOVE));
 }
 
 abstract class ManageContractRequestResultSuccessExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   ManageContractRequestResultSuccessExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
-class ManageContractRequestResultSuccessExtEmptyVersion
-    extends ManageContractRequestResultSuccessExt {
-  ManageContractRequestResultSuccessExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+class ManageContractRequestResultSuccessExtEmptyVersion extends ManageContractRequestResultSuccessExt {
+  ManageContractRequestResultSuccessExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
 
 class ManageContractAction extends XdrEncodable {
@@ -14240,9 +12474,12 @@ class ManageContractAction extends XdrEncodable {
   static const CONFIRM_COMPLETED = 1;
   static const START_DISPUTE = 2;
   static const RESOLVE_DISPUTE = 3;
-  var value;
-
+  int value;
   ManageContractAction(this.value);
+  @override toXdr(XdrDataOutputStream stream) {
+    value.toXdr(stream);
+  }
+
 }
 // === xdr source ============================================================
 
@@ -14273,72 +12510,57 @@ class ManageContractAction extends XdrEncodable {
 //  };
 
 //  ===========================================================================
-class ManageContractOp extends XdrEncodable {
-  Uint64 contractID;
+class ManageContractOp extends XdrEncodable  {
+  UINT64 contractID;
   ManageContractOpData data;
   ManageContractOpExt ext;
 
   ManageContractOp(
-    this.contractID,
-    this.data,
-    this.ext,
-  );
+      this.contractID,
+      this.data,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     contractID.toXdr(stream);
     data.toXdr(stream);
     ext.toXdr(stream);
   }
 }
-
 abstract class ManageContractOpData extends XdrEncodable {
   ManageContractAction discriminant;
-
   ManageContractOpData(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class ManageContractOpDataAddDetails extends ManageContractOpData {
-  ManageContractOpDataAddDetails(this.details)
-      : super(ManageContractAction(ManageContractAction.ADD_DETAILS));
-  late Longstring details;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  ManageContractOpDataAddDetails(this.details) : super(ManageContractAction(ManageContractAction.ADD_DETAILS));
+  late LONGSTRING details;
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     details.toXdr(stream);
   }
 }
 
 class ManageContractOpDataConfirmCompleted extends ManageContractOpData {
-  ManageContractOpDataConfirmCompleted()
-      : super(ManageContractAction(ManageContractAction.CONFIRM_COMPLETED));
+  ManageContractOpDataConfirmCompleted() : super(ManageContractAction(ManageContractAction.CONFIRM_COMPLETED));
 }
 
 class ManageContractOpDataStartDispute extends ManageContractOpData {
-  ManageContractOpDataStartDispute(this.disputeReason)
-      : super(ManageContractAction(ManageContractAction.START_DISPUTE));
-  late Longstring disputeReason;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  ManageContractOpDataStartDispute(this.disputeReason) : super(ManageContractAction(ManageContractAction.START_DISPUTE));
+  late LONGSTRING disputeReason;
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     disputeReason.toXdr(stream);
   }
 }
 
 class ManageContractOpDataResolveDispute extends ManageContractOpData {
-  ManageContractOpDataResolveDispute(this.isRevert)
-      : super(ManageContractAction(ManageContractAction.RESOLVE_DISPUTE));
+  ManageContractOpDataResolveDispute(this.isRevert) : super(ManageContractAction(ManageContractAction.RESOLVE_DISPUTE));
   late bool isRevert;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     isRevert.toXdr(stream);
   }
@@ -14346,20 +12568,15 @@ class ManageContractOpDataResolveDispute extends ManageContractOpData {
 
 abstract class ManageContractOpExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   ManageContractOpExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class ManageContractOpExtEmptyVersion extends ManageContractOpExt {
-  ManageContractOpExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+  ManageContractOpExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
-
 class ManageContractResultCode extends XdrEncodable {
   static const SUCCESS = 0;
   static const MALFORMED = -1;
@@ -14372,9 +12589,12 @@ class ManageContractResultCode extends XdrEncodable {
   static const DISPUTE_ALREADY_STARTED = -8;
   static const CUSTOMER_BALANCE_OVERFLOW = -9;
   static const INCORRECT_PRECISION = -10;
-  var value;
-
+  int value;
   ManageContractResultCode(this.value);
+  @override toXdr(XdrDataOutputStream stream) {
+    value.toXdr(stream);
+  }
+
 }
 // === xdr source ============================================================
 
@@ -14399,41 +12619,32 @@ class ManageContractResultCode extends XdrEncodable {
 //  };
 
 //  ===========================================================================
-class ManageContractResponse extends XdrEncodable {
+class ManageContractResponse extends XdrEncodable  {
   ManageContractResponseData data;
   ManageContractResponseExt ext;
 
   ManageContractResponse(
-    this.data,
-    this.ext,
-  );
+      this.data,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     data.toXdr(stream);
     ext.toXdr(stream);
   }
 }
-
 abstract class ManageContractResponseData extends XdrEncodable {
   ManageContractAction discriminant;
-
   ManageContractResponseData(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
-class ManageContractResponseDataConfirmCompleted
-    extends ManageContractResponseData {
-  ManageContractResponseDataConfirmCompleted(this.isCompleted)
-      : super(ManageContractAction(ManageContractAction.CONFIRM_COMPLETED));
+class ManageContractResponseDataConfirmCompleted extends ManageContractResponseData {
+  ManageContractResponseDataConfirmCompleted(this.isCompleted) : super(ManageContractAction(ManageContractAction.CONFIRM_COMPLETED));
   late bool isCompleted;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     isCompleted.toXdr(stream);
   }
@@ -14441,38 +12652,27 @@ class ManageContractResponseDataConfirmCompleted
 
 abstract class ManageContractResponseExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   ManageContractResponseExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class ManageContractResponseExtEmptyVersion extends ManageContractResponseExt {
-  ManageContractResponseExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+  ManageContractResponseExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
-
 abstract class ManageContractResult extends XdrEncodable {
   ManageContractResultCode discriminant;
-
   ManageContractResult(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class ManageContractResultSuccess extends ManageContractResult {
-  ManageContractResultSuccess(this.response)
-      : super(ManageContractResultCode(ManageContractResultCode.SUCCESS));
+  ManageContractResultSuccess(this.response) : super(ManageContractResultCode(ManageContractResultCode.SUCCESS));
   late ManageContractResponse response;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     response.toXdr(stream);
   }
@@ -14481,9 +12681,12 @@ class ManageContractResultSuccess extends ManageContractResult {
 class ManageCreatePollRequestAction extends XdrEncodable {
   static const CREATE = 0;
   static const CANCEL = 1;
-  var value;
-
+  int value;
   ManageCreatePollRequestAction(this.value);
+  @override toXdr(XdrDataOutputStream stream) {
+    value.toXdr(stream);
+  }
+
 }
 // === xdr source ============================================================
 
@@ -14507,19 +12710,18 @@ class ManageCreatePollRequestAction extends XdrEncodable {
 //  };
 
 //  ===========================================================================
-class CreatePollRequestData extends XdrEncodable {
+class CreatePollRequestData extends XdrEncodable  {
   CreatePollRequest request;
-  Uint32? allTasks;
+  UINT32? allTasks;
   CreatePollRequestDataExt ext;
 
   CreatePollRequestData(
-    this.request,
-    this.allTasks,
-    this.ext,
-  );
+      this.request,
+      this.allTasks,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     request.toXdr(stream);
     if (allTasks != null) {
       true.toXdr(stream);
@@ -14530,21 +12732,16 @@ class CreatePollRequestData extends XdrEncodable {
     ext.toXdr(stream);
   }
 }
-
 abstract class CreatePollRequestDataExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   CreatePollRequestDataExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class CreatePollRequestDataExtEmptyVersion extends CreatePollRequestDataExt {
-  CreatePollRequestDataExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+  CreatePollRequestDataExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
 // === xdr source ============================================================
 
@@ -14564,36 +12761,30 @@ class CreatePollRequestDataExtEmptyVersion extends CreatePollRequestDataExt {
 //  };
 
 //  ===========================================================================
-class CancelPollRequestData extends XdrEncodable {
-  Uint64 requestID;
+class CancelPollRequestData extends XdrEncodable  {
+  UINT64 requestID;
   CancelPollRequestDataExt ext;
 
   CancelPollRequestData(
-    this.requestID,
-    this.ext,
-  );
+      this.requestID,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     requestID.toXdr(stream);
     ext.toXdr(stream);
   }
 }
-
 abstract class CancelPollRequestDataExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   CancelPollRequestDataExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class CancelPollRequestDataExtEmptyVersion extends CancelPollRequestDataExt {
-  CancelPollRequestDataExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+  CancelPollRequestDataExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
 // === xdr source ============================================================
 
@@ -14620,56 +12811,41 @@ class CancelPollRequestDataExtEmptyVersion extends CancelPollRequestDataExt {
 //  };
 
 //  ===========================================================================
-class ManageCreatePollRequestOp extends XdrEncodable {
+class ManageCreatePollRequestOp extends XdrEncodable  {
   ManageCreatePollRequestOpData data;
   ManageCreatePollRequestOpExt ext;
 
   ManageCreatePollRequestOp(
-    this.data,
-    this.ext,
-  );
+      this.data,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     data.toXdr(stream);
     ext.toXdr(stream);
   }
 }
-
 abstract class ManageCreatePollRequestOpData extends XdrEncodable {
   ManageCreatePollRequestAction discriminant;
-
   ManageCreatePollRequestOpData(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
-class ManageCreatePollRequestOpDataCreate
-    extends ManageCreatePollRequestOpData {
-  ManageCreatePollRequestOpDataCreate(this.createData)
-      : super(ManageCreatePollRequestAction(
-            ManageCreatePollRequestAction.CREATE));
+class ManageCreatePollRequestOpDataCreate extends ManageCreatePollRequestOpData {
+  ManageCreatePollRequestOpDataCreate(this.createData) : super(ManageCreatePollRequestAction(ManageCreatePollRequestAction.CREATE));
   late CreatePollRequestData createData;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     createData.toXdr(stream);
   }
 }
 
-class ManageCreatePollRequestOpDataCancel
-    extends ManageCreatePollRequestOpData {
-  ManageCreatePollRequestOpDataCancel(this.cancelData)
-      : super(ManageCreatePollRequestAction(
-            ManageCreatePollRequestAction.CANCEL));
+class ManageCreatePollRequestOpDataCancel extends ManageCreatePollRequestOpData {
+  ManageCreatePollRequestOpDataCancel(this.cancelData) : super(ManageCreatePollRequestAction(ManageCreatePollRequestAction.CANCEL));
   late CancelPollRequestData cancelData;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     cancelData.toXdr(stream);
   }
@@ -14677,21 +12853,15 @@ class ManageCreatePollRequestOpDataCancel
 
 abstract class ManageCreatePollRequestOpExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   ManageCreatePollRequestOpExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
-class ManageCreatePollRequestOpExtEmptyVersion
-    extends ManageCreatePollRequestOpExt {
-  ManageCreatePollRequestOpExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+class ManageCreatePollRequestOpExtEmptyVersion extends ManageCreatePollRequestOpExt {
+  ManageCreatePollRequestOpExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
-
 class ManageCreatePollRequestResultCode extends XdrEncodable {
   static const SUCCESS = 0;
   static const INVALID_CREATOR_DETAILS = -1;
@@ -14701,9 +12871,12 @@ class ManageCreatePollRequestResultCode extends XdrEncodable {
   static const RESULT_PROVIDER_NOT_FOUND = -5;
   static const CREATE_POLL_TASKS_NOT_FOUND = -6;
   static const INVALID_NUMBER_OF_CHOICES = -7;
-  var value;
-
+  int value;
   ManageCreatePollRequestResultCode(this.value);
+  @override toXdr(XdrDataOutputStream stream) {
+    value.toXdr(stream);
+  }
+
 }
 // === xdr source ============================================================
 
@@ -14730,21 +12903,20 @@ class ManageCreatePollRequestResultCode extends XdrEncodable {
 //  };
 
 //  ===========================================================================
-class CreatePollRequestResponse extends XdrEncodable {
-  Uint64 requestID;
+class CreatePollRequestResponse extends XdrEncodable  {
+  UINT64 requestID;
   bool fulfilled;
-  Uint64? pollID;
+  UINT64? pollID;
   CreatePollRequestResponseExt ext;
 
   CreatePollRequestResponse(
-    this.requestID,
-    this.fulfilled,
-    this.pollID,
-    this.ext,
-  );
+      this.requestID,
+      this.fulfilled,
+      this.pollID,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     requestID.toXdr(stream);
     fulfilled.toXdr(stream);
     if (pollID != null) {
@@ -14756,22 +12928,16 @@ class CreatePollRequestResponse extends XdrEncodable {
     ext.toXdr(stream);
   }
 }
-
 abstract class CreatePollRequestResponseExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   CreatePollRequestResponseExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
-class CreatePollRequestResponseExtEmptyVersion
-    extends CreatePollRequestResponseExt {
-  CreatePollRequestResponseExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+class CreatePollRequestResponseExtEmptyVersion extends CreatePollRequestResponseExt {
+  CreatePollRequestResponseExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
 // === xdr source ============================================================
 
@@ -14797,92 +12963,64 @@ class CreatePollRequestResponseExtEmptyVersion
 //  };
 
 //  ===========================================================================
-class ManageCreatePollRequestSuccessResult extends XdrEncodable {
+class ManageCreatePollRequestSuccessResult extends XdrEncodable  {
   ManageCreatePollRequestSuccessResultDetails details;
   ManageCreatePollRequestSuccessResultExt ext;
 
   ManageCreatePollRequestSuccessResult(
-    this.details,
-    this.ext,
-  );
+      this.details,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     details.toXdr(stream);
     ext.toXdr(stream);
   }
 }
-
-abstract class ManageCreatePollRequestSuccessResultDetails
-    extends XdrEncodable {
+abstract class ManageCreatePollRequestSuccessResultDetails extends XdrEncodable {
   ManageCreatePollRequestAction discriminant;
-
   ManageCreatePollRequestSuccessResultDetails(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
-class ManageCreatePollRequestSuccessResultDetailsCreate
-    extends ManageCreatePollRequestSuccessResultDetails {
-  ManageCreatePollRequestSuccessResultDetailsCreate(this.response)
-      : super(ManageCreatePollRequestAction(
-            ManageCreatePollRequestAction.CREATE));
+class ManageCreatePollRequestSuccessResultDetailsCreate extends ManageCreatePollRequestSuccessResultDetails {
+  ManageCreatePollRequestSuccessResultDetailsCreate(this.response) : super(ManageCreatePollRequestAction(ManageCreatePollRequestAction.CREATE));
   late CreatePollRequestResponse response;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     response.toXdr(stream);
   }
 }
 
-class ManageCreatePollRequestSuccessResultDetailsCancel
-    extends ManageCreatePollRequestSuccessResultDetails {
-  ManageCreatePollRequestSuccessResultDetailsCancel()
-      : super(ManageCreatePollRequestAction(
-            ManageCreatePollRequestAction.CANCEL));
+class ManageCreatePollRequestSuccessResultDetailsCancel extends ManageCreatePollRequestSuccessResultDetails {
+  ManageCreatePollRequestSuccessResultDetailsCancel() : super(ManageCreatePollRequestAction(ManageCreatePollRequestAction.CANCEL));
 }
 
 abstract class ManageCreatePollRequestSuccessResultExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   ManageCreatePollRequestSuccessResultExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
-class ManageCreatePollRequestSuccessResultExtEmptyVersion
-    extends ManageCreatePollRequestSuccessResultExt {
-  ManageCreatePollRequestSuccessResultExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+class ManageCreatePollRequestSuccessResultExtEmptyVersion extends ManageCreatePollRequestSuccessResultExt {
+  ManageCreatePollRequestSuccessResultExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
-
 abstract class ManageCreatePollRequestResult extends XdrEncodable {
   ManageCreatePollRequestResultCode discriminant;
-
   ManageCreatePollRequestResult(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
-class ManageCreatePollRequestResultSuccess
-    extends ManageCreatePollRequestResult {
-  ManageCreatePollRequestResultSuccess(this.success)
-      : super(ManageCreatePollRequestResultCode(
-            ManageCreatePollRequestResultCode.SUCCESS));
+class ManageCreatePollRequestResultSuccess extends ManageCreatePollRequestResult {
+  ManageCreatePollRequestResultSuccess(this.success) : super(ManageCreatePollRequestResultCode(ManageCreatePollRequestResultCode.SUCCESS));
   late ManageCreatePollRequestSuccessResult success;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     success.toXdr(stream);
   }
@@ -14891,9 +13029,12 @@ class ManageCreatePollRequestResultSuccess
 class ManageExternalSystemAccountIdPoolEntryAction extends XdrEncodable {
   static const CREATE = 0;
   static const REMOVE = 1;
-  var value;
-
+  int value;
   ManageExternalSystemAccountIdPoolEntryAction(this.value);
+  @override toXdr(XdrDataOutputStream stream) {
+    value.toXdr(stream);
+  }
+
 }
 // === xdr source ============================================================
 
@@ -14918,44 +13059,36 @@ class ManageExternalSystemAccountIdPoolEntryAction extends XdrEncodable {
 //  };
 
 //  ===========================================================================
-class CreateExternalSystemAccountIdPoolEntryActionInput extends XdrEncodable {
-  Int32 externalSystemType;
-  Longstring data;
-  Uint64 parent;
+class CreateExternalSystemAccountIdPoolEntryActionInput extends XdrEncodable  {
+  INT32 externalSystemType;
+  LONGSTRING data;
+  UINT64 parent;
   CreateExternalSystemAccountIdPoolEntryActionInputExt ext;
 
   CreateExternalSystemAccountIdPoolEntryActionInput(
-    this.externalSystemType,
-    this.data,
-    this.parent,
-    this.ext,
-  );
+      this.externalSystemType,
+      this.data,
+      this.parent,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     externalSystemType.toXdr(stream);
     data.toXdr(stream);
     parent.toXdr(stream);
     ext.toXdr(stream);
   }
 }
-
-abstract class CreateExternalSystemAccountIdPoolEntryActionInputExt
-    extends XdrEncodable {
+abstract class CreateExternalSystemAccountIdPoolEntryActionInputExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   CreateExternalSystemAccountIdPoolEntryActionInputExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
-class CreateExternalSystemAccountIdPoolEntryActionInputExtEmptyVersion
-    extends CreateExternalSystemAccountIdPoolEntryActionInputExt {
-  CreateExternalSystemAccountIdPoolEntryActionInputExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+class CreateExternalSystemAccountIdPoolEntryActionInputExtEmptyVersion extends CreateExternalSystemAccountIdPoolEntryActionInputExt {
+  CreateExternalSystemAccountIdPoolEntryActionInputExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
 // === xdr source ============================================================
 
@@ -14976,38 +13109,30 @@ class CreateExternalSystemAccountIdPoolEntryActionInputExtEmptyVersion
 //  };
 
 //  ===========================================================================
-class DeleteExternalSystemAccountIdPoolEntryActionInput extends XdrEncodable {
-  Uint64 poolEntryID;
+class DeleteExternalSystemAccountIdPoolEntryActionInput extends XdrEncodable  {
+  UINT64 poolEntryID;
   DeleteExternalSystemAccountIdPoolEntryActionInputExt ext;
 
   DeleteExternalSystemAccountIdPoolEntryActionInput(
-    this.poolEntryID,
-    this.ext,
-  );
+      this.poolEntryID,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     poolEntryID.toXdr(stream);
     ext.toXdr(stream);
   }
 }
-
-abstract class DeleteExternalSystemAccountIdPoolEntryActionInputExt
-    extends XdrEncodable {
+abstract class DeleteExternalSystemAccountIdPoolEntryActionInputExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   DeleteExternalSystemAccountIdPoolEntryActionInputExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
-class DeleteExternalSystemAccountIdPoolEntryActionInputExtEmptyVersion
-    extends DeleteExternalSystemAccountIdPoolEntryActionInputExt {
-  DeleteExternalSystemAccountIdPoolEntryActionInputExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+class DeleteExternalSystemAccountIdPoolEntryActionInputExtEmptyVersion extends DeleteExternalSystemAccountIdPoolEntryActionInputExt {
+  DeleteExternalSystemAccountIdPoolEntryActionInputExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
 // === xdr source ============================================================
 
@@ -15035,92 +13160,68 @@ class DeleteExternalSystemAccountIdPoolEntryActionInputExtEmptyVersion
 //  };
 
 //  ===========================================================================
-class ManageExternalSystemAccountIdPoolEntryOp extends XdrEncodable {
+class ManageExternalSystemAccountIdPoolEntryOp extends XdrEncodable  {
   ManageExternalSystemAccountIdPoolEntryOpActionInput actionInput;
   ManageExternalSystemAccountIdPoolEntryOpExt ext;
 
   ManageExternalSystemAccountIdPoolEntryOp(
-    this.actionInput,
-    this.ext,
-  );
+      this.actionInput,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     actionInput.toXdr(stream);
     ext.toXdr(stream);
   }
 }
-
-abstract class ManageExternalSystemAccountIdPoolEntryOpActionInput
-    extends XdrEncodable {
+abstract class ManageExternalSystemAccountIdPoolEntryOpActionInput extends XdrEncodable {
   ManageExternalSystemAccountIdPoolEntryAction discriminant;
-
   ManageExternalSystemAccountIdPoolEntryOpActionInput(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
-class ManageExternalSystemAccountIdPoolEntryOpActionInputCreate
-    extends ManageExternalSystemAccountIdPoolEntryOpActionInput {
-  ManageExternalSystemAccountIdPoolEntryOpActionInputCreate(
-      this.createExternalSystemAccountIdPoolEntryActionInput)
-      : super(ManageExternalSystemAccountIdPoolEntryAction(
-            ManageExternalSystemAccountIdPoolEntryAction.CREATE));
-  late CreateExternalSystemAccountIdPoolEntryActionInput
-      createExternalSystemAccountIdPoolEntryActionInput;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+class ManageExternalSystemAccountIdPoolEntryOpActionInputCreate extends ManageExternalSystemAccountIdPoolEntryOpActionInput {
+  ManageExternalSystemAccountIdPoolEntryOpActionInputCreate(this.createExternalSystemAccountIdPoolEntryActionInput) : super(ManageExternalSystemAccountIdPoolEntryAction(ManageExternalSystemAccountIdPoolEntryAction.CREATE));
+  late CreateExternalSystemAccountIdPoolEntryActionInput createExternalSystemAccountIdPoolEntryActionInput;
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     createExternalSystemAccountIdPoolEntryActionInput.toXdr(stream);
   }
 }
 
-class ManageExternalSystemAccountIdPoolEntryOpActionInputRemove
-    extends ManageExternalSystemAccountIdPoolEntryOpActionInput {
-  ManageExternalSystemAccountIdPoolEntryOpActionInputRemove(
-      this.deleteExternalSystemAccountIdPoolEntryActionInput)
-      : super(ManageExternalSystemAccountIdPoolEntryAction(
-            ManageExternalSystemAccountIdPoolEntryAction.REMOVE));
-  late DeleteExternalSystemAccountIdPoolEntryActionInput
-      deleteExternalSystemAccountIdPoolEntryActionInput;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+class ManageExternalSystemAccountIdPoolEntryOpActionInputRemove extends ManageExternalSystemAccountIdPoolEntryOpActionInput {
+  ManageExternalSystemAccountIdPoolEntryOpActionInputRemove(this.deleteExternalSystemAccountIdPoolEntryActionInput) : super(ManageExternalSystemAccountIdPoolEntryAction(ManageExternalSystemAccountIdPoolEntryAction.REMOVE));
+  late DeleteExternalSystemAccountIdPoolEntryActionInput deleteExternalSystemAccountIdPoolEntryActionInput;
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     deleteExternalSystemAccountIdPoolEntryActionInput.toXdr(stream);
   }
 }
 
-abstract class ManageExternalSystemAccountIdPoolEntryOpExt
-    extends XdrEncodable {
+abstract class ManageExternalSystemAccountIdPoolEntryOpExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   ManageExternalSystemAccountIdPoolEntryOpExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
-class ManageExternalSystemAccountIdPoolEntryOpExtEmptyVersion
-    extends ManageExternalSystemAccountIdPoolEntryOpExt {
-  ManageExternalSystemAccountIdPoolEntryOpExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+class ManageExternalSystemAccountIdPoolEntryOpExtEmptyVersion extends ManageExternalSystemAccountIdPoolEntryOpExt {
+  ManageExternalSystemAccountIdPoolEntryOpExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
-
 class ManageExternalSystemAccountIdPoolEntryResultCode extends XdrEncodable {
   static const SUCCESS = 0;
   static const MALFORMED = -1;
   static const ALREADY_EXISTS = -2;
   static const NOT_FOUND = -3;
-  var value;
-
+  int value;
   ManageExternalSystemAccountIdPoolEntryResultCode(this.value);
+  @override toXdr(XdrDataOutputStream stream) {
+    value.toXdr(stream);
+  }
+
 }
 // === xdr source ============================================================
 
@@ -15140,61 +13241,43 @@ class ManageExternalSystemAccountIdPoolEntryResultCode extends XdrEncodable {
 //  };
 
 //  ===========================================================================
-class ManageExternalSystemAccountIdPoolEntrySuccess extends XdrEncodable {
-  Uint64 poolEntryID;
+class ManageExternalSystemAccountIdPoolEntrySuccess extends XdrEncodable  {
+  UINT64 poolEntryID;
   ManageExternalSystemAccountIdPoolEntrySuccessExt ext;
 
   ManageExternalSystemAccountIdPoolEntrySuccess(
-    this.poolEntryID,
-    this.ext,
-  );
+      this.poolEntryID,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     poolEntryID.toXdr(stream);
     ext.toXdr(stream);
   }
 }
-
-abstract class ManageExternalSystemAccountIdPoolEntrySuccessExt
-    extends XdrEncodable {
+abstract class ManageExternalSystemAccountIdPoolEntrySuccessExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   ManageExternalSystemAccountIdPoolEntrySuccessExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
-class ManageExternalSystemAccountIdPoolEntrySuccessExtEmptyVersion
-    extends ManageExternalSystemAccountIdPoolEntrySuccessExt {
-  ManageExternalSystemAccountIdPoolEntrySuccessExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+class ManageExternalSystemAccountIdPoolEntrySuccessExtEmptyVersion extends ManageExternalSystemAccountIdPoolEntrySuccessExt {
+  ManageExternalSystemAccountIdPoolEntrySuccessExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
-
-abstract class ManageExternalSystemAccountIdPoolEntryResult
-    extends XdrEncodable {
+abstract class ManageExternalSystemAccountIdPoolEntryResult extends XdrEncodable {
   ManageExternalSystemAccountIdPoolEntryResultCode discriminant;
-
   ManageExternalSystemAccountIdPoolEntryResult(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
-class ManageExternalSystemAccountIdPoolEntryResultSuccess
-    extends ManageExternalSystemAccountIdPoolEntryResult {
-  ManageExternalSystemAccountIdPoolEntryResultSuccess(this.success)
-      : super(ManageExternalSystemAccountIdPoolEntryResultCode(
-            ManageExternalSystemAccountIdPoolEntryResultCode.SUCCESS));
+class ManageExternalSystemAccountIdPoolEntryResultSuccess extends ManageExternalSystemAccountIdPoolEntryResult {
+  ManageExternalSystemAccountIdPoolEntryResultSuccess(this.success) : super(ManageExternalSystemAccountIdPoolEntryResultCode(ManageExternalSystemAccountIdPoolEntryResultCode.SUCCESS));
   late ManageExternalSystemAccountIdPoolEntrySuccess success;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     success.toXdr(stream);
   }
@@ -15203,9 +13286,12 @@ class ManageExternalSystemAccountIdPoolEntryResultSuccess
 class ManageInvoiceRequestAction extends XdrEncodable {
   static const CREATE = 0;
   static const REMOVE = 1;
-  var value;
-
+  int value;
   ManageInvoiceRequestAction(this.value);
+  @override toXdr(XdrDataOutputStream stream) {
+    value.toXdr(stream);
+  }
+
 }
 // === xdr source ============================================================
 
@@ -15230,27 +13316,26 @@ class ManageInvoiceRequestAction extends XdrEncodable {
 //  };
 
 //  ===========================================================================
-class InvoiceCreationRequest extends XdrEncodable {
-  AssetCode asset;
-  AccountID sender;
-  Uint64 amount;
-  Uint64? contractID;
-  Longstring details;
-  Uint32? allTasks;
+class InvoiceCreationRequest extends XdrEncodable  {
+  ASSETCODE asset;
+  ACCOUNTID sender;
+  UINT64 amount;
+  UINT64? contractID;
+  LONGSTRING details;
+  UINT32? allTasks;
   InvoiceCreationRequestExt ext;
 
   InvoiceCreationRequest(
-    this.asset,
-    this.sender,
-    this.amount,
-    this.contractID,
-    this.details,
-    this.allTasks,
-    this.ext,
-  );
+      this.asset,
+      this.sender,
+      this.amount,
+      this.contractID,
+      this.details,
+      this.allTasks,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     asset.toXdr(stream);
     sender.toXdr(stream);
     amount.toXdr(stream);
@@ -15270,21 +13355,16 @@ class InvoiceCreationRequest extends XdrEncodable {
     ext.toXdr(stream);
   }
 }
-
 abstract class InvoiceCreationRequestExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   InvoiceCreationRequestExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class InvoiceCreationRequestExtEmptyVersion extends InvoiceCreationRequestExt {
-  InvoiceCreationRequestExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+  InvoiceCreationRequestExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
 // === xdr source ============================================================
 
@@ -15307,54 +13387,41 @@ class InvoiceCreationRequestExtEmptyVersion extends InvoiceCreationRequestExt {
 //  };
 
 //  ===========================================================================
-class ManageInvoiceRequestOp extends XdrEncodable {
+class ManageInvoiceRequestOp extends XdrEncodable  {
   ManageInvoiceRequestOpDetails details;
   ManageInvoiceRequestOpExt ext;
 
   ManageInvoiceRequestOp(
-    this.details,
-    this.ext,
-  );
+      this.details,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     details.toXdr(stream);
     ext.toXdr(stream);
   }
 }
-
 abstract class ManageInvoiceRequestOpDetails extends XdrEncodable {
   ManageInvoiceRequestAction discriminant;
-
   ManageInvoiceRequestOpDetails(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
-class ManageInvoiceRequestOpDetailsCreate
-    extends ManageInvoiceRequestOpDetails {
-  ManageInvoiceRequestOpDetailsCreate(this.invoiceRequest)
-      : super(ManageInvoiceRequestAction(ManageInvoiceRequestAction.CREATE));
+class ManageInvoiceRequestOpDetailsCreate extends ManageInvoiceRequestOpDetails {
+  ManageInvoiceRequestOpDetailsCreate(this.invoiceRequest) : super(ManageInvoiceRequestAction(ManageInvoiceRequestAction.CREATE));
   late InvoiceCreationRequest invoiceRequest;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     invoiceRequest.toXdr(stream);
   }
 }
 
-class ManageInvoiceRequestOpDetailsRemove
-    extends ManageInvoiceRequestOpDetails {
-  ManageInvoiceRequestOpDetailsRemove(this.requestID)
-      : super(ManageInvoiceRequestAction(ManageInvoiceRequestAction.REMOVE));
-  late Uint64 requestID;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+class ManageInvoiceRequestOpDetailsRemove extends ManageInvoiceRequestOpDetails {
+  ManageInvoiceRequestOpDetailsRemove(this.requestID) : super(ManageInvoiceRequestAction(ManageInvoiceRequestAction.REMOVE));
+  late UINT64 requestID;
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     requestID.toXdr(stream);
   }
@@ -15362,20 +13429,15 @@ class ManageInvoiceRequestOpDetailsRemove
 
 abstract class ManageInvoiceRequestOpExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   ManageInvoiceRequestOpExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class ManageInvoiceRequestOpExtEmptyVersion extends ManageInvoiceRequestOpExt {
-  ManageInvoiceRequestOpExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+  ManageInvoiceRequestOpExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
-
 class ManageInvoiceRequestResultCode extends XdrEncodable {
   static const SUCCESS = 0;
   static const MALFORMED = -1;
@@ -15389,9 +13451,12 @@ class ManageInvoiceRequestResultCode extends XdrEncodable {
   static const SENDER_ACCOUNT_MISMATCHED = -9;
   static const INVOICE_IS_APPROVED = -10;
   static const INVOICE_TASKS_NOT_FOUND = -11;
-  var value;
-
+  int value;
   ManageInvoiceRequestResultCode(this.value);
+  @override toXdr(XdrDataOutputStream stream) {
+    value.toXdr(stream);
+  }
+
 }
 // === xdr source ============================================================
 
@@ -15411,64 +13476,49 @@ class ManageInvoiceRequestResultCode extends XdrEncodable {
 //  };
 
 //  ===========================================================================
-class CreateInvoiceRequestResponse extends XdrEncodable {
-  BalanceID receiverBalance;
-  BalanceID senderBalance;
-  Uint64 requestID;
+class CreateInvoiceRequestResponse extends XdrEncodable  {
+  BALANCEID receiverBalance;
+  BALANCEID senderBalance;
+  UINT64 requestID;
   CreateInvoiceRequestResponseExt ext;
 
   CreateInvoiceRequestResponse(
-    this.receiverBalance,
-    this.senderBalance,
-    this.requestID,
-    this.ext,
-  );
+      this.receiverBalance,
+      this.senderBalance,
+      this.requestID,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     receiverBalance.toXdr(stream);
     senderBalance.toXdr(stream);
     requestID.toXdr(stream);
     ext.toXdr(stream);
   }
 }
-
 abstract class CreateInvoiceRequestResponseExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   CreateInvoiceRequestResponseExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
-class CreateInvoiceRequestResponseExtEmptyVersion
-    extends CreateInvoiceRequestResponseExt {
-  CreateInvoiceRequestResponseExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+class CreateInvoiceRequestResponseExtEmptyVersion extends CreateInvoiceRequestResponseExt {
+  CreateInvoiceRequestResponseExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
-
 abstract class ManageInvoiceRequestResult extends XdrEncodable {
   ManageInvoiceRequestResultCode discriminant;
-
   ManageInvoiceRequestResult(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class ManageInvoiceRequestResultSuccess extends ManageInvoiceRequestResult {
-  ManageInvoiceRequestResultSuccess(this.success)
-      : super(ManageInvoiceRequestResultCode(
-            ManageInvoiceRequestResultCode.SUCCESS));
+  ManageInvoiceRequestResultSuccess(this.success) : super(ManageInvoiceRequestResultCode(ManageInvoiceRequestResultCode.SUCCESS));
   late ManageInvoiceRequestResultSuccessSuccess success;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     success.toXdr(stream);
   }
@@ -15495,78 +13545,65 @@ class ManageInvoiceRequestResultSuccess extends ManageInvoiceRequestResult {
 //      }
 
 //  ===========================================================================
-class ManageInvoiceRequestResultSuccessSuccess extends XdrEncodable {
+class ManageInvoiceRequestResultSuccessSuccess extends XdrEncodable  {
   bool fulfilled;
   ManageInvoiceRequestResultSuccessDetails details;
   ManageInvoiceRequestResultSuccessExt ext;
 
   ManageInvoiceRequestResultSuccessSuccess(
-    this.fulfilled,
-    this.details,
-    this.ext,
-  );
+      this.fulfilled,
+      this.details,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     fulfilled.toXdr(stream);
     details.toXdr(stream);
     ext.toXdr(stream);
   }
 }
-
 abstract class ManageInvoiceRequestResultSuccessDetails extends XdrEncodable {
   ManageInvoiceRequestAction discriminant;
-
   ManageInvoiceRequestResultSuccessDetails(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
-class ManageInvoiceRequestResultSuccessDetailsCreate
-    extends ManageInvoiceRequestResultSuccessDetails {
-  ManageInvoiceRequestResultSuccessDetailsCreate(this.response)
-      : super(ManageInvoiceRequestAction(ManageInvoiceRequestAction.CREATE));
+class ManageInvoiceRequestResultSuccessDetailsCreate extends ManageInvoiceRequestResultSuccessDetails {
+  ManageInvoiceRequestResultSuccessDetailsCreate(this.response) : super(ManageInvoiceRequestAction(ManageInvoiceRequestAction.CREATE));
   late CreateInvoiceRequestResponse response;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     response.toXdr(stream);
   }
 }
 
-class ManageInvoiceRequestResultSuccessDetailsRemove
-    extends ManageInvoiceRequestResultSuccessDetails {
-  ManageInvoiceRequestResultSuccessDetailsRemove()
-      : super(ManageInvoiceRequestAction(ManageInvoiceRequestAction.REMOVE));
+class ManageInvoiceRequestResultSuccessDetailsRemove extends ManageInvoiceRequestResultSuccessDetails {
+  ManageInvoiceRequestResultSuccessDetailsRemove() : super(ManageInvoiceRequestAction(ManageInvoiceRequestAction.REMOVE));
 }
 
 abstract class ManageInvoiceRequestResultSuccessExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   ManageInvoiceRequestResultSuccessExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
-class ManageInvoiceRequestResultSuccessExtEmptyVersion
-    extends ManageInvoiceRequestResultSuccessExt {
-  ManageInvoiceRequestResultSuccessExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+class ManageInvoiceRequestResultSuccessExtEmptyVersion extends ManageInvoiceRequestResultSuccessExt {
+  ManageInvoiceRequestResultSuccessExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
 
 class ManageKVAction extends XdrEncodable {
   static const PUT = 1;
   static const REMOVE = 2;
-  var value;
-
+  int value;
   ManageKVAction(this.value);
+  @override toXdr(XdrDataOutputStream stream) {
+    value.toXdr(stream);
+  }
+
 }
 // === xdr source ============================================================
 
@@ -15597,43 +13634,35 @@ class ManageKVAction extends XdrEncodable {
 //      };
 
 //  ===========================================================================
-class ManageKeyValueOp extends XdrEncodable {
-  Longstring key;
+class ManageKeyValueOp extends XdrEncodable  {
+  LONGSTRING key;
   ManageKeyValueOpAction action;
   ManageKeyValueOpExt ext;
 
   ManageKeyValueOp(
-    this.key,
-    this.action,
-    this.ext,
-  );
+      this.key,
+      this.action,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     key.toXdr(stream);
     action.toXdr(stream);
     ext.toXdr(stream);
   }
 }
-
 abstract class ManageKeyValueOpAction extends XdrEncodable {
   ManageKVAction discriminant;
-
   ManageKeyValueOpAction(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class ManageKeyValueOpActionPut extends ManageKeyValueOpAction {
-  ManageKeyValueOpActionPut(this.value)
-      : super(ManageKVAction(ManageKVAction.PUT));
+  ManageKeyValueOpActionPut(this.value) : super(ManageKVAction(ManageKVAction.PUT));
   late KeyValueEntryValue value;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     value.toXdr(stream);
   }
@@ -15645,18 +13674,14 @@ class ManageKeyValueOpActionRemove extends ManageKeyValueOpAction {
 
 abstract class ManageKeyValueOpExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   ManageKeyValueOpExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class ManageKeyValueOpExtEmptyVersion extends ManageKeyValueOpExt {
-  ManageKeyValueOpExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+  ManageKeyValueOpExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
 // === xdr source ============================================================
 
@@ -15673,63 +13698,52 @@ class ManageKeyValueOpExtEmptyVersion extends ManageKeyValueOpExt {
 //      };
 
 //  ===========================================================================
-class ManageKeyValueSuccess extends XdrEncodable {
+class ManageKeyValueSuccess extends XdrEncodable  {
   ManageKeyValueSuccessExt ext;
 
   ManageKeyValueSuccess(
-    this.ext,
-  );
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     ext.toXdr(stream);
   }
 }
-
 abstract class ManageKeyValueSuccessExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   ManageKeyValueSuccessExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class ManageKeyValueSuccessExtEmptyVersion extends ManageKeyValueSuccessExt {
-  ManageKeyValueSuccessExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+  ManageKeyValueSuccessExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
-
 class ManageKeyValueResultCode extends XdrEncodable {
   static const SUCCESS = 0;
   static const NOT_FOUND = -1;
   static const INVALID_TYPE = -2;
   static const ZERO_VALUE_NOT_ALLOWED = -3;
-  var value;
-
+  int value;
   ManageKeyValueResultCode(this.value);
-}
+  @override toXdr(XdrDataOutputStream stream) {
+    value.toXdr(stream);
+  }
 
+}
 abstract class ManageKeyValueResult extends XdrEncodable {
   ManageKeyValueResultCode discriminant;
-
   ManageKeyValueResult(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class ManageKeyValueResultSuccess extends ManageKeyValueResult {
-  ManageKeyValueResultSuccess(this.success)
-      : super(ManageKeyValueResultCode(ManageKeyValueResultCode.SUCCESS));
+  ManageKeyValueResultSuccess(this.success) : super(ManageKeyValueResultCode(ManageKeyValueResultCode.SUCCESS));
   late ManageKeyValueSuccess success;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     success.toXdr(stream);
   }
@@ -15738,9 +13752,12 @@ class ManageKeyValueResultSuccess extends ManageKeyValueResult {
 class ManageLimitsAction extends XdrEncodable {
   static const CREATE = 0;
   static const REMOVE = 1;
-  var value;
-
+  int value;
   ManageLimitsAction(this.value);
+  @override toXdr(XdrDataOutputStream stream) {
+    value.toXdr(stream);
+  }
+
 }
 // === xdr source ============================================================
 
@@ -15781,33 +13798,32 @@ class ManageLimitsAction extends XdrEncodable {
 //  };
 
 //  ===========================================================================
-class LimitsCreateDetails extends XdrEncodable {
-  Uint64? accountRole;
-  AccountID? accountID;
+class LimitsCreateDetails extends XdrEncodable  {
+  UINT64? accountRole;
+  ACCOUNTID? accountID;
   StatsOpType statsOpType;
-  AssetCode assetCode;
+  ASSETCODE assetCode;
   bool isConvertNeeded;
-  Uint64 dailyOut;
-  Uint64 weeklyOut;
-  Uint64 monthlyOut;
-  Uint64 annualOut;
+  UINT64 dailyOut;
+  UINT64 weeklyOut;
+  UINT64 monthlyOut;
+  UINT64 annualOut;
   LimitsCreateDetailsExt ext;
 
   LimitsCreateDetails(
-    this.accountRole,
-    this.accountID,
-    this.statsOpType,
-    this.assetCode,
-    this.isConvertNeeded,
-    this.dailyOut,
-    this.weeklyOut,
-    this.monthlyOut,
-    this.annualOut,
-    this.ext,
-  );
+      this.accountRole,
+      this.accountID,
+      this.statsOpType,
+      this.assetCode,
+      this.isConvertNeeded,
+      this.dailyOut,
+      this.weeklyOut,
+      this.monthlyOut,
+      this.annualOut,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     if (accountRole != null) {
       true.toXdr(stream);
       accountRole?.toXdr(stream);
@@ -15830,21 +13846,16 @@ class LimitsCreateDetails extends XdrEncodable {
     ext.toXdr(stream);
   }
 }
-
 abstract class LimitsCreateDetailsExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   LimitsCreateDetailsExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class LimitsCreateDetailsExtEmptyVersion extends LimitsCreateDetailsExt {
-  LimitsCreateDetailsExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+  LimitsCreateDetailsExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
 // === xdr source ============================================================
 
@@ -15870,52 +13881,41 @@ class LimitsCreateDetailsExtEmptyVersion extends LimitsCreateDetailsExt {
 //  };
 
 //  ===========================================================================
-class ManageLimitsOp extends XdrEncodable {
+class ManageLimitsOp extends XdrEncodable  {
   ManageLimitsOpDetails details;
   ManageLimitsOpExt ext;
 
   ManageLimitsOp(
-    this.details,
-    this.ext,
-  );
+      this.details,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     details.toXdr(stream);
     ext.toXdr(stream);
   }
 }
-
 abstract class ManageLimitsOpDetails extends XdrEncodable {
   ManageLimitsAction discriminant;
-
   ManageLimitsOpDetails(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class ManageLimitsOpDetailsCreate extends ManageLimitsOpDetails {
-  ManageLimitsOpDetailsCreate(this.limitsCreateDetails)
-      : super(ManageLimitsAction(ManageLimitsAction.CREATE));
+  ManageLimitsOpDetailsCreate(this.limitsCreateDetails) : super(ManageLimitsAction(ManageLimitsAction.CREATE));
   late LimitsCreateDetails limitsCreateDetails;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     limitsCreateDetails.toXdr(stream);
   }
 }
 
 class ManageLimitsOpDetailsRemove extends ManageLimitsOpDetails {
-  ManageLimitsOpDetailsRemove(this.id)
-      : super(ManageLimitsAction(ManageLimitsAction.REMOVE));
-  late Uint64 id;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  ManageLimitsOpDetailsRemove(this.id) : super(ManageLimitsAction(ManageLimitsAction.REMOVE));
+  late UINT64 id;
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     id.toXdr(stream);
   }
@@ -15923,20 +13923,15 @@ class ManageLimitsOpDetailsRemove extends ManageLimitsOpDetails {
 
 abstract class ManageLimitsOpExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   ManageLimitsOpExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class ManageLimitsOpExtEmptyVersion extends ManageLimitsOpExt {
-  ManageLimitsOpExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+  ManageLimitsOpExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
-
 class ManageLimitsResultCode extends XdrEncodable {
   static const SUCCESS = 0;
   static const ACCOUNT_NOT_FOUND = -1;
@@ -15945,29 +13940,25 @@ class ManageLimitsResultCode extends XdrEncodable {
   static const CANNOT_CREATE_FOR_ACC_ID_AND_ACC_TYPE = -4;
   static const INVALID_LIMITS = -5;
   static const ASSET_NOT_FOUND = -6;
-  var value;
-
+  int value;
   ManageLimitsResultCode(this.value);
-}
+  @override toXdr(XdrDataOutputStream stream) {
+    value.toXdr(stream);
+  }
 
+}
 abstract class ManageLimitsResult extends XdrEncodable {
   ManageLimitsResultCode discriminant;
-
   ManageLimitsResult(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class ManageLimitsResultSuccess extends ManageLimitsResult {
-  ManageLimitsResultSuccess(this.success)
-      : super(ManageLimitsResultCode(ManageLimitsResultCode.SUCCESS));
+  ManageLimitsResultSuccess(this.success) : super(ManageLimitsResultCode(ManageLimitsResultCode.SUCCESS));
   late ManageLimitsResultSuccessSuccess success;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     success.toXdr(stream);
   }
@@ -15995,67 +13986,51 @@ class ManageLimitsResultSuccess extends ManageLimitsResult {
 //  }
 
 //  ===========================================================================
-class ManageLimitsResultSuccessSuccess extends XdrEncodable {
+class ManageLimitsResultSuccessSuccess extends XdrEncodable  {
   ManageLimitsResultSuccessDetails details;
   ManageLimitsResultSuccessExt ext;
 
   ManageLimitsResultSuccessSuccess(
-    this.details,
-    this.ext,
-  );
+      this.details,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     details.toXdr(stream);
     ext.toXdr(stream);
   }
 }
-
 abstract class ManageLimitsResultSuccessDetails extends XdrEncodable {
   ManageLimitsAction discriminant;
-
   ManageLimitsResultSuccessDetails(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
-class ManageLimitsResultSuccessDetailsCreate
-    extends ManageLimitsResultSuccessDetails {
-  ManageLimitsResultSuccessDetailsCreate(this.id)
-      : super(ManageLimitsAction(ManageLimitsAction.CREATE));
-  late Uint64 id;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+class ManageLimitsResultSuccessDetailsCreate extends ManageLimitsResultSuccessDetails {
+  ManageLimitsResultSuccessDetailsCreate(this.id) : super(ManageLimitsAction(ManageLimitsAction.CREATE));
+  late UINT64 id;
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     id.toXdr(stream);
   }
 }
 
-class ManageLimitsResultSuccessDetailsRemove
-    extends ManageLimitsResultSuccessDetails {
-  ManageLimitsResultSuccessDetailsRemove()
-      : super(ManageLimitsAction(ManageLimitsAction.REMOVE));
+class ManageLimitsResultSuccessDetailsRemove extends ManageLimitsResultSuccessDetails {
+  ManageLimitsResultSuccessDetailsRemove() : super(ManageLimitsAction(ManageLimitsAction.REMOVE));
 }
 
 abstract class ManageLimitsResultSuccessExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   ManageLimitsResultSuccessExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
-class ManageLimitsResultSuccessExtEmptyVersion
-    extends ManageLimitsResultSuccessExt {
-  ManageLimitsResultSuccessExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+class ManageLimitsResultSuccessExtEmptyVersion extends ManageLimitsResultSuccessExt {
+  ManageLimitsResultSuccessExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
 
 // === xdr source ============================================================
@@ -16097,31 +14072,30 @@ class ManageLimitsResultSuccessExtEmptyVersion
 //  };
 
 //  ===========================================================================
-class ManageOfferOp extends XdrEncodable {
-  BalanceID baseBalance;
-  BalanceID quoteBalance;
+class ManageOfferOp extends XdrEncodable  {
+  BALANCEID baseBalance;
+  BALANCEID quoteBalance;
   bool isBuy;
-  Int64 amount;
-  Int64 price;
-  Int64 fee;
-  Uint64 offerID;
-  Uint64 orderBookID;
+  INT64 amount;
+  INT64 price;
+  INT64 fee;
+  UINT64 offerID;
+  UINT64 orderBookID;
   ManageOfferOpExt ext;
 
   ManageOfferOp(
-    this.baseBalance,
-    this.quoteBalance,
-    this.isBuy,
-    this.amount,
-    this.price,
-    this.fee,
-    this.offerID,
-    this.orderBookID,
-    this.ext,
-  );
+      this.baseBalance,
+      this.quoteBalance,
+      this.isBuy,
+      this.amount,
+      this.price,
+      this.fee,
+      this.offerID,
+      this.orderBookID,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     baseBalance.toXdr(stream);
     quoteBalance.toXdr(stream);
     isBuy.toXdr(stream);
@@ -16133,23 +14107,17 @@ class ManageOfferOp extends XdrEncodable {
     ext.toXdr(stream);
   }
 }
-
 abstract class ManageOfferOpExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   ManageOfferOpExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class ManageOfferOpExtEmptyVersion extends ManageOfferOpExt {
-  ManageOfferOpExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+  ManageOfferOpExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
-
 class ManageOfferResultCode extends XdrEncodable {
   static const SUCCESS = 0;
   static const MALFORMED = -1;
@@ -16182,18 +14150,23 @@ class ManageOfferResultCode extends XdrEncodable {
   static const INCORRECT_AMOUNT_PRECISION = -28;
   static const SPECIFIC_RULE_FORBIDS = -29;
   static const PENDING_ISSUANCE_LESS_THEN_AMOUNT = -30;
-  var value;
-
+  int value;
   ManageOfferResultCode(this.value);
-}
+  @override toXdr(XdrDataOutputStream stream) {
+    value.toXdr(stream);
+  }
 
+}
 class ManageOfferEffect extends XdrEncodable {
   static const CREATED = 0;
   static const UPDATED = 1;
   static const DELETED = 2;
-  var value;
-
+  int value;
   ManageOfferEffect(this.value);
+  @override toXdr(XdrDataOutputStream stream) {
+    value.toXdr(stream);
+  }
+
 }
 // === xdr source ============================================================
 
@@ -16229,33 +14202,32 @@ class ManageOfferEffect extends XdrEncodable {
 //  };
 
 //  ===========================================================================
-class ClaimOfferAtom extends XdrEncodable {
-  AccountID bAccountID;
-  Uint64 offerID;
-  Int64 baseAmount;
-  Int64 quoteAmount;
-  Int64 bFeePaid;
-  Int64 aFeePaid;
-  BalanceID baseBalance;
-  BalanceID quoteBalance;
-  Int64 currentPrice;
+class ClaimOfferAtom extends XdrEncodable  {
+  ACCOUNTID bAccountID;
+  UINT64 offerID;
+  INT64 baseAmount;
+  INT64 quoteAmount;
+  INT64 bFeePaid;
+  INT64 aFeePaid;
+  BALANCEID baseBalance;
+  BALANCEID quoteBalance;
+  INT64 currentPrice;
   ClaimOfferAtomExt ext;
 
   ClaimOfferAtom(
-    this.bAccountID,
-    this.offerID,
-    this.baseAmount,
-    this.quoteAmount,
-    this.bFeePaid,
-    this.aFeePaid,
-    this.baseBalance,
-    this.quoteBalance,
-    this.currentPrice,
-    this.ext,
-  );
+      this.bAccountID,
+      this.offerID,
+      this.baseAmount,
+      this.quoteAmount,
+      this.bFeePaid,
+      this.aFeePaid,
+      this.baseBalance,
+      this.quoteBalance,
+      this.currentPrice,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     bAccountID.toXdr(stream);
     offerID.toXdr(stream);
     baseAmount.toXdr(stream);
@@ -16268,21 +14240,16 @@ class ClaimOfferAtom extends XdrEncodable {
     ext.toXdr(stream);
   }
 }
-
 abstract class ClaimOfferAtomExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   ClaimOfferAtomExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class ClaimOfferAtomExtEmptyVersion extends ClaimOfferAtomExt {
-  ClaimOfferAtomExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+  ClaimOfferAtomExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
 // === xdr source ============================================================
 
@@ -16318,25 +14285,24 @@ class ClaimOfferAtomExtEmptyVersion extends ClaimOfferAtomExt {
 //  };
 
 //  ===========================================================================
-class ManageOfferSuccessResult extends XdrEncodable {
+class ManageOfferSuccessResult extends XdrEncodable  {
   List<ClaimOfferAtom> offersClaimed;
-  AssetCode baseAsset;
-  AssetCode quoteAsset;
+  ASSETCODE baseAsset;
+  ASSETCODE quoteAsset;
   ManageOfferSuccessResultOffer offer;
   ManageOfferSuccessResultExt ext;
 
   ManageOfferSuccessResult(
-    this.offersClaimed,
-    this.baseAsset,
-    this.quoteAsset,
-    this.offer,
-    this.ext,
-  );
+      this.offersClaimed,
+      this.baseAsset,
+      this.quoteAsset,
+      this.offer,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     offersClaimed.length.toXdr(stream);
-    offersClaimed.forEach((element) {
+    offersClaimed.forEach ((element) {
       element.toXdr(stream);
     });
     baseAsset.toXdr(stream);
@@ -16345,39 +14311,27 @@ class ManageOfferSuccessResult extends XdrEncodable {
     ext.toXdr(stream);
   }
 }
-
 abstract class ManageOfferSuccessResultOffer extends XdrEncodable {
   ManageOfferEffect discriminant;
-
   ManageOfferSuccessResultOffer(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
-class ManageOfferSuccessResultOfferCreated
-    extends ManageOfferSuccessResultOffer {
-  ManageOfferSuccessResultOfferCreated(this.offer)
-      : super(ManageOfferEffect(ManageOfferEffect.CREATED));
+class ManageOfferSuccessResultOfferCreated extends ManageOfferSuccessResultOffer {
+  ManageOfferSuccessResultOfferCreated(this.offer) : super(ManageOfferEffect(ManageOfferEffect.CREATED));
   late OfferEntry offer;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     offer.toXdr(stream);
   }
 }
 
-class ManageOfferSuccessResultOfferUpdated
-    extends ManageOfferSuccessResultOffer {
-  ManageOfferSuccessResultOfferUpdated(this.offer)
-      : super(ManageOfferEffect(ManageOfferEffect.UPDATED));
+class ManageOfferSuccessResultOfferUpdated extends ManageOfferSuccessResultOffer {
+  ManageOfferSuccessResultOfferUpdated(this.offer) : super(ManageOfferEffect(ManageOfferEffect.UPDATED));
   late OfferEntry offer;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     offer.toXdr(stream);
   }
@@ -16385,67 +14339,45 @@ class ManageOfferSuccessResultOfferUpdated
 
 abstract class ManageOfferSuccessResultExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   ManageOfferSuccessResultExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
-class ManageOfferSuccessResultExtEmptyVersion
-    extends ManageOfferSuccessResultExt {
-  ManageOfferSuccessResultExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+class ManageOfferSuccessResultExtEmptyVersion extends ManageOfferSuccessResultExt {
+  ManageOfferSuccessResultExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
-
 abstract class ManageOfferResult extends XdrEncodable {
   ManageOfferResultCode discriminant;
-
   ManageOfferResult(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class ManageOfferResultSuccess extends ManageOfferResult {
-  ManageOfferResultSuccess(this.success)
-      : super(ManageOfferResultCode(ManageOfferResultCode.SUCCESS));
+  ManageOfferResultSuccess(this.success) : super(ManageOfferResultCode(ManageOfferResultCode.SUCCESS));
   late ManageOfferSuccessResult success;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     success.toXdr(stream);
   }
 }
 
 class ManageOfferResultPhysicalPriceRestriction extends ManageOfferResult {
-  ManageOfferResultPhysicalPriceRestriction(this.physicalPriceRestriction)
-      : super(ManageOfferResultCode(
-            ManageOfferResultCode.PHYSICAL_PRICE_RESTRICTION));
-  late ManageOfferResultPhysicalPriceRestrictionPhysicalPriceRestriction
-      physicalPriceRestriction;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  ManageOfferResultPhysicalPriceRestriction(this.physicalPriceRestriction) : super(ManageOfferResultCode(ManageOfferResultCode.PHYSICAL_PRICE_RESTRICTION));
+  late ManageOfferResultPhysicalPriceRestrictionPhysicalPriceRestriction physicalPriceRestriction;
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     physicalPriceRestriction.toXdr(stream);
   }
 }
 
 class ManageOfferResultCurrentPriceRestriction extends ManageOfferResult {
-  ManageOfferResultCurrentPriceRestriction(this.currentPriceRestriction)
-      : super(ManageOfferResultCode(
-            ManageOfferResultCode.CURRENT_PRICE_RESTRICTION));
-  late ManageOfferResultCurrentPriceRestrictionCurrentPriceRestriction
-      currentPriceRestriction;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  ManageOfferResultCurrentPriceRestriction(this.currentPriceRestriction) : super(ManageOfferResultCode(ManageOfferResultCode.CURRENT_PRICE_RESTRICTION));
+  late ManageOfferResultCurrentPriceRestrictionCurrentPriceRestriction currentPriceRestriction;
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     currentPriceRestriction.toXdr(stream);
   }
@@ -16465,39 +14397,30 @@ class ManageOfferResultCurrentPriceRestriction extends ManageOfferResult {
 //      }
 
 //  ===========================================================================
-class ManageOfferResultPhysicalPriceRestrictionPhysicalPriceRestriction
-    extends XdrEncodable {
-  Int64 physicalPrice;
+class ManageOfferResultPhysicalPriceRestrictionPhysicalPriceRestriction extends XdrEncodable  {
+  INT64 physicalPrice;
   ManageOfferResultPhysicalPriceRestrictionExt ext;
 
   ManageOfferResultPhysicalPriceRestrictionPhysicalPriceRestriction(
-    this.physicalPrice,
-    this.ext,
-  );
+      this.physicalPrice,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     physicalPrice.toXdr(stream);
     ext.toXdr(stream);
   }
 }
-
-abstract class ManageOfferResultPhysicalPriceRestrictionExt
-    extends XdrEncodable {
+abstract class ManageOfferResultPhysicalPriceRestrictionExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   ManageOfferResultPhysicalPriceRestrictionExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
-class ManageOfferResultPhysicalPriceRestrictionExtEmptyVersion
-    extends ManageOfferResultPhysicalPriceRestrictionExt {
-  ManageOfferResultPhysicalPriceRestrictionExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+class ManageOfferResultPhysicalPriceRestrictionExtEmptyVersion extends ManageOfferResultPhysicalPriceRestrictionExt {
+  ManageOfferResultPhysicalPriceRestrictionExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
 // === xdr source ============================================================
 
@@ -16514,56 +14437,52 @@ class ManageOfferResultPhysicalPriceRestrictionExtEmptyVersion
 //      }
 
 //  ===========================================================================
-class ManageOfferResultCurrentPriceRestrictionCurrentPriceRestriction
-    extends XdrEncodable {
-  Int64 currentPrice;
+class ManageOfferResultCurrentPriceRestrictionCurrentPriceRestriction extends XdrEncodable  {
+  INT64 currentPrice;
   ManageOfferResultCurrentPriceRestrictionExt ext;
 
   ManageOfferResultCurrentPriceRestrictionCurrentPriceRestriction(
-    this.currentPrice,
-    this.ext,
-  );
+      this.currentPrice,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     currentPrice.toXdr(stream);
     ext.toXdr(stream);
   }
 }
-
-abstract class ManageOfferResultCurrentPriceRestrictionExt
-    extends XdrEncodable {
+abstract class ManageOfferResultCurrentPriceRestrictionExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   ManageOfferResultCurrentPriceRestrictionExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
-class ManageOfferResultCurrentPriceRestrictionExtEmptyVersion
-    extends ManageOfferResultCurrentPriceRestrictionExt {
-  ManageOfferResultCurrentPriceRestrictionExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+class ManageOfferResultCurrentPriceRestrictionExtEmptyVersion extends ManageOfferResultCurrentPriceRestrictionExt {
+  ManageOfferResultCurrentPriceRestrictionExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
 
 class ManagePollAction extends XdrEncodable {
   static const CLOSE = 0;
   static const UPDATE_END_TIME = 1;
   static const CANCEL = 2;
-  var value;
-
+  int value;
   ManagePollAction(this.value);
-}
+  @override toXdr(XdrDataOutputStream stream) {
+    value.toXdr(stream);
+  }
 
+}
 class PollResult extends XdrEncodable {
   static const PASSED = 0;
   static const FAILED = 1;
-  var value;
-
+  int value;
   PollResult(this.value);
+  @override toXdr(XdrDataOutputStream stream) {
+    value.toXdr(stream);
+  }
+
 }
 // === xdr source ============================================================
 
@@ -16586,39 +14505,33 @@ class PollResult extends XdrEncodable {
 //  };
 
 //  ===========================================================================
-class ClosePollData extends XdrEncodable {
+class ClosePollData extends XdrEncodable  {
   PollResult result;
-  Longstring details;
+  LONGSTRING details;
   ClosePollDataExt ext;
 
   ClosePollData(
-    this.result,
-    this.details,
-    this.ext,
-  );
+      this.result,
+      this.details,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     result.toXdr(stream);
     details.toXdr(stream);
     ext.toXdr(stream);
   }
 }
-
 abstract class ClosePollDataExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   ClosePollDataExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class ClosePollDataExtEmptyVersion extends ClosePollDataExt {
-  ClosePollDataExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+  ClosePollDataExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
 // === xdr source ============================================================
 
@@ -16636,36 +14549,30 @@ class ClosePollDataExtEmptyVersion extends ClosePollDataExt {
 //  };
 
 //  ===========================================================================
-class UpdatePollEndTimeData extends XdrEncodable {
-  Uint64 newEndTime;
+class UpdatePollEndTimeData extends XdrEncodable  {
+  UINT64 newEndTime;
   UpdatePollEndTimeDataExt ext;
 
   UpdatePollEndTimeData(
-    this.newEndTime,
-    this.ext,
-  );
+      this.newEndTime,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     newEndTime.toXdr(stream);
     ext.toXdr(stream);
   }
 }
-
 abstract class UpdatePollEndTimeDataExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   UpdatePollEndTimeDataExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class UpdatePollEndTimeDataExtEmptyVersion extends UpdatePollEndTimeDataExt {
-  UpdatePollEndTimeDataExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+  UpdatePollEndTimeDataExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
 // === xdr source ============================================================
 
@@ -16697,67 +14604,53 @@ class UpdatePollEndTimeDataExtEmptyVersion extends UpdatePollEndTimeDataExt {
 //  };
 
 //  ===========================================================================
-class ManagePollOp extends XdrEncodable {
-  Uint64 pollID;
+class ManagePollOp extends XdrEncodable  {
+  UINT64 pollID;
   ManagePollOpData data;
   ManagePollOpExt ext;
 
   ManagePollOp(
-    this.pollID,
-    this.data,
-    this.ext,
-  );
+      this.pollID,
+      this.data,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     pollID.toXdr(stream);
     data.toXdr(stream);
     ext.toXdr(stream);
   }
 }
-
 abstract class ManagePollOpData extends XdrEncodable {
   ManagePollAction discriminant;
-
   ManagePollOpData(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class ManagePollOpDataClose extends ManagePollOpData {
-  ManagePollOpDataClose(this.closePollData)
-      : super(ManagePollAction(ManagePollAction.CLOSE));
+  ManagePollOpDataClose(this.closePollData) : super(ManagePollAction(ManagePollAction.CLOSE));
   late ClosePollData closePollData;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     closePollData.toXdr(stream);
   }
 }
 
 class ManagePollOpDataUpdateEndTime extends ManagePollOpData {
-  ManagePollOpDataUpdateEndTime(this.updateTimeData)
-      : super(ManagePollAction(ManagePollAction.UPDATE_END_TIME));
+  ManagePollOpDataUpdateEndTime(this.updateTimeData) : super(ManagePollAction(ManagePollAction.UPDATE_END_TIME));
   late UpdatePollEndTimeData updateTimeData;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     updateTimeData.toXdr(stream);
   }
 }
 
 class ManagePollOpDataCancel extends ManagePollOpData {
-  ManagePollOpDataCancel(this.ext)
-      : super(ManagePollAction(ManagePollAction.CANCEL));
+  ManagePollOpDataCancel(this.ext) : super(ManagePollAction(ManagePollAction.CANCEL));
   late EmptyExt ext;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     ext.toXdr(stream);
   }
@@ -16765,20 +14658,15 @@ class ManagePollOpDataCancel extends ManagePollOpData {
 
 abstract class ManagePollOpExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   ManagePollOpExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class ManagePollOpExtEmptyVersion extends ManagePollOpExt {
-  ManagePollOpExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+  ManagePollOpExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
-
 class ManagePollResultCode extends XdrEncodable {
   static const SUCCESS = 0;
   static const NOT_FOUND = -1;
@@ -16786,29 +14674,25 @@ class ManagePollResultCode extends XdrEncodable {
   static const NOT_AUTHORIZED_TO_CLOSE_POLL = -3;
   static const INVALID_END_TIME = -4;
   static const NOT_AUTHORIZED = -5;
-  var value;
-
+  int value;
   ManagePollResultCode(this.value);
-}
+  @override toXdr(XdrDataOutputStream stream) {
+    value.toXdr(stream);
+  }
 
+}
 abstract class ManagePollResult extends XdrEncodable {
   ManagePollResultCode discriminant;
-
   ManagePollResult(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class ManagePollResultSuccess extends ManagePollResult {
-  ManagePollResultSuccess(this.ext)
-      : super(ManagePollResultCode(ManagePollResultCode.SUCCESS));
+  ManagePollResultSuccess(this.ext) : super(ManagePollResultCode(ManagePollResultCode.SUCCESS));
   late EmptyExt ext;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     ext.toXdr(stream);
   }
@@ -16817,9 +14701,12 @@ class ManagePollResultSuccess extends ManagePollResult {
 class ManageSaleAction extends XdrEncodable {
   static const CREATE_UPDATE_DETAILS_REQUEST = 1;
   static const CANCEL = 2;
-  var value;
-
+  int value;
   ManageSaleAction(this.value);
+  @override toXdr(XdrDataOutputStream stream) {
+    value.toXdr(stream);
+  }
+
 }
 // === xdr source ============================================================
 
@@ -16842,21 +14729,20 @@ class ManageSaleAction extends XdrEncodable {
 //  };
 
 //  ===========================================================================
-class UpdateSaleDetailsData extends XdrEncodable {
-  Uint64 requestID;
-  Longstring creatorDetails;
-  Uint32? allTasks;
+class UpdateSaleDetailsData extends XdrEncodable  {
+  UINT64 requestID;
+  LONGSTRING creatorDetails;
+  UINT32? allTasks;
   UpdateSaleDetailsDataExt ext;
 
   UpdateSaleDetailsData(
-    this.requestID,
-    this.creatorDetails,
-    this.allTasks,
-    this.ext,
-  );
+      this.requestID,
+      this.creatorDetails,
+      this.allTasks,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     requestID.toXdr(stream);
     creatorDetails.toXdr(stream);
     if (allTasks != null) {
@@ -16868,21 +14754,16 @@ class UpdateSaleDetailsData extends XdrEncodable {
     ext.toXdr(stream);
   }
 }
-
 abstract class UpdateSaleDetailsDataExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   UpdateSaleDetailsDataExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class UpdateSaleDetailsDataExtEmptyVersion extends UpdateSaleDetailsDataExt {
-  UpdateSaleDetailsDataExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+  UpdateSaleDetailsDataExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
 // === xdr source ============================================================
 
@@ -16908,43 +14789,35 @@ class UpdateSaleDetailsDataExtEmptyVersion extends UpdateSaleDetailsDataExt {
 //  };
 
 //  ===========================================================================
-class ManageSaleOp extends XdrEncodable {
-  Uint64 saleID;
+class ManageSaleOp extends XdrEncodable  {
+  UINT64 saleID;
   ManageSaleOpData data;
   ManageSaleOpExt ext;
 
   ManageSaleOp(
-    this.saleID,
-    this.data,
-    this.ext,
-  );
+      this.saleID,
+      this.data,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     saleID.toXdr(stream);
     data.toXdr(stream);
     ext.toXdr(stream);
   }
 }
-
 abstract class ManageSaleOpData extends XdrEncodable {
   ManageSaleAction discriminant;
-
   ManageSaleOpData(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class ManageSaleOpDataCreateUpdateDetailsRequest extends ManageSaleOpData {
-  ManageSaleOpDataCreateUpdateDetailsRequest(this.updateSaleDetailsData)
-      : super(ManageSaleAction(ManageSaleAction.CREATE_UPDATE_DETAILS_REQUEST));
+  ManageSaleOpDataCreateUpdateDetailsRequest(this.updateSaleDetailsData) : super(ManageSaleAction(ManageSaleAction.CREATE_UPDATE_DETAILS_REQUEST));
   late UpdateSaleDetailsData updateSaleDetailsData;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     updateSaleDetailsData.toXdr(stream);
   }
@@ -16956,20 +14829,15 @@ class ManageSaleOpDataCancel extends ManageSaleOpData {
 
 abstract class ManageSaleOpExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   ManageSaleOpExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class ManageSaleOpExtEmptyVersion extends ManageSaleOpExt {
-  ManageSaleOpExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+  ManageSaleOpExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
-
 class ManageSaleResultCode extends XdrEncodable {
   static const SUCCESS = 0;
   static const SALE_NOT_FOUND = -1;
@@ -16978,9 +14846,12 @@ class ManageSaleResultCode extends XdrEncodable {
   static const UPDATE_DETAILS_REQUEST_NOT_FOUND = -4;
   static const NOT_ALLOWED_TO_SET_TASKS_ON_UPDATE = -5;
   static const SALE_UPDATE_DETAILS_TASKS_NOT_FOUND = -6;
-  var value;
-
+  int value;
   ManageSaleResultCode(this.value);
+  @override toXdr(XdrDataOutputStream stream) {
+    value.toXdr(stream);
+  }
+
 }
 // === xdr source ============================================================
 
@@ -17008,90 +14879,67 @@ class ManageSaleResultCode extends XdrEncodable {
 //  };
 
 //  ===========================================================================
-class ManageSaleResultSuccess extends XdrEncodable {
+class ManageSaleResultSuccess extends XdrEncodable  {
   bool fulfilled;
   ManageSaleResultSuccessResponse response;
   ManageSaleResultSuccessExt ext;
 
   ManageSaleResultSuccess(
-    this.fulfilled,
-    this.response,
-    this.ext,
-  );
+      this.fulfilled,
+      this.response,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     fulfilled.toXdr(stream);
     response.toXdr(stream);
     ext.toXdr(stream);
   }
 }
-
 abstract class ManageSaleResultSuccessResponse extends XdrEncodable {
   ManageSaleAction discriminant;
-
   ManageSaleResultSuccessResponse(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
-class ManageSaleResultSuccessResponseCreateUpdateDetailsRequest
-    extends ManageSaleResultSuccessResponse {
-  ManageSaleResultSuccessResponseCreateUpdateDetailsRequest(this.requestID)
-      : super(ManageSaleAction(ManageSaleAction.CREATE_UPDATE_DETAILS_REQUEST));
-  late Uint64 requestID;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+class ManageSaleResultSuccessResponseCreateUpdateDetailsRequest extends ManageSaleResultSuccessResponse {
+  ManageSaleResultSuccessResponseCreateUpdateDetailsRequest(this.requestID) : super(ManageSaleAction(ManageSaleAction.CREATE_UPDATE_DETAILS_REQUEST));
+  late UINT64 requestID;
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     requestID.toXdr(stream);
   }
 }
 
-class ManageSaleResultSuccessResponseCancel
-    extends ManageSaleResultSuccessResponse {
-  ManageSaleResultSuccessResponseCancel()
-      : super(ManageSaleAction(ManageSaleAction.CANCEL));
+class ManageSaleResultSuccessResponseCancel extends ManageSaleResultSuccessResponse {
+  ManageSaleResultSuccessResponseCancel() : super(ManageSaleAction(ManageSaleAction.CANCEL));
 }
 
 abstract class ManageSaleResultSuccessExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   ManageSaleResultSuccessExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
-class ManageSaleResultSuccessExtEmptyVersion
-    extends ManageSaleResultSuccessExt {
-  ManageSaleResultSuccessExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+class ManageSaleResultSuccessExtEmptyVersion extends ManageSaleResultSuccessExt {
+  ManageSaleResultSuccessExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
-
 abstract class ManageSaleResult extends XdrEncodable {
   ManageSaleResultCode discriminant;
-
   ManageSaleResult(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class ManageSaleResultSuccessSuccess extends ManageSaleResult {
-  ManageSaleResultSuccessSuccess(this.success)
-      : super(ManageSaleResultCode(ManageSaleResultCode.SUCCESS));
+  ManageSaleResultSuccessSuccess(this.success) : super(ManageSaleResultCode(ManageSaleResultCode.SUCCESS));
   late ManageSaleResultSuccess success;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     success.toXdr(stream);
   }
@@ -17101,9 +14949,12 @@ class ManageSignerRoleAction extends XdrEncodable {
   static const CREATE = 0;
   static const UPDATE = 1;
   static const REMOVE = 2;
-  var value;
-
+  int value;
   ManageSignerRoleAction(this.value);
+  @override toXdr(XdrDataOutputStream stream) {
+    value.toXdr(stream);
+  }
+
 }
 // === xdr source ============================================================
 
@@ -17126,23 +14977,22 @@ class ManageSignerRoleAction extends XdrEncodable {
 //  };
 
 //  ===========================================================================
-class CreateSignerRoleData extends XdrEncodable {
-  List<Uint64> ruleIDs;
+class CreateSignerRoleData extends XdrEncodable  {
+  List<UINT64> ruleIDs;
   bool isReadOnly;
-  Longstring details;
+  LONGSTRING details;
   CreateSignerRoleDataExt ext;
 
   CreateSignerRoleData(
-    this.ruleIDs,
-    this.isReadOnly,
-    this.details,
-    this.ext,
-  );
+      this.ruleIDs,
+      this.isReadOnly,
+      this.details,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     ruleIDs.length.toXdr(stream);
-    ruleIDs.forEach((element) {
+    ruleIDs.forEach ((element) {
       element.toXdr(stream);
     });
     isReadOnly.toXdr(stream);
@@ -17150,21 +15000,16 @@ class CreateSignerRoleData extends XdrEncodable {
     ext.toXdr(stream);
   }
 }
-
 abstract class CreateSignerRoleDataExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   CreateSignerRoleDataExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class CreateSignerRoleDataExtEmptyVersion extends CreateSignerRoleDataExt {
-  CreateSignerRoleDataExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+  CreateSignerRoleDataExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
 // === xdr source ============================================================
 
@@ -17188,45 +15033,39 @@ class CreateSignerRoleDataExtEmptyVersion extends CreateSignerRoleDataExt {
 //  };
 
 //  ===========================================================================
-class UpdateSignerRoleData extends XdrEncodable {
-  Uint64 roleID;
-  List<Uint64> ruleIDs;
-  Longstring details;
+class UpdateSignerRoleData extends XdrEncodable  {
+  UINT64 roleID;
+  List<UINT64> ruleIDs;
+  LONGSTRING details;
   UpdateSignerRoleDataExt ext;
 
   UpdateSignerRoleData(
-    this.roleID,
-    this.ruleIDs,
-    this.details,
-    this.ext,
-  );
+      this.roleID,
+      this.ruleIDs,
+      this.details,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     roleID.toXdr(stream);
     ruleIDs.length.toXdr(stream);
-    ruleIDs.forEach((element) {
+    ruleIDs.forEach ((element) {
       element.toXdr(stream);
     });
     details.toXdr(stream);
     ext.toXdr(stream);
   }
 }
-
 abstract class UpdateSignerRoleDataExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   UpdateSignerRoleDataExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class UpdateSignerRoleDataExtEmptyVersion extends UpdateSignerRoleDataExt {
-  UpdateSignerRoleDataExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+  UpdateSignerRoleDataExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
 // === xdr source ============================================================
 
@@ -17245,36 +15084,30 @@ class UpdateSignerRoleDataExtEmptyVersion extends UpdateSignerRoleDataExt {
 //  };
 
 //  ===========================================================================
-class RemoveSignerRoleData extends XdrEncodable {
-  Uint64 roleID;
+class RemoveSignerRoleData extends XdrEncodable  {
+  UINT64 roleID;
   RemoveSignerRoleDataExt ext;
 
   RemoveSignerRoleData(
-    this.roleID,
-    this.ext,
-  );
+      this.roleID,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     roleID.toXdr(stream);
     ext.toXdr(stream);
   }
 }
-
 abstract class RemoveSignerRoleDataExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   RemoveSignerRoleDataExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class RemoveSignerRoleDataExtEmptyVersion extends RemoveSignerRoleDataExt {
-  RemoveSignerRoleDataExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+  RemoveSignerRoleDataExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
 // === xdr source ============================================================
 
@@ -17302,64 +15135,50 @@ class RemoveSignerRoleDataExtEmptyVersion extends RemoveSignerRoleDataExt {
 //  };
 
 //  ===========================================================================
-class ManageSignerRoleOp extends XdrEncodable {
+class ManageSignerRoleOp extends XdrEncodable  {
   ManageSignerRoleOpData data;
   ManageSignerRoleOpExt ext;
 
   ManageSignerRoleOp(
-    this.data,
-    this.ext,
-  );
+      this.data,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     data.toXdr(stream);
     ext.toXdr(stream);
   }
 }
-
 abstract class ManageSignerRoleOpData extends XdrEncodable {
   ManageSignerRoleAction discriminant;
-
   ManageSignerRoleOpData(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class ManageSignerRoleOpDataCreate extends ManageSignerRoleOpData {
-  ManageSignerRoleOpDataCreate(this.createData)
-      : super(ManageSignerRoleAction(ManageSignerRoleAction.CREATE));
+  ManageSignerRoleOpDataCreate(this.createData) : super(ManageSignerRoleAction(ManageSignerRoleAction.CREATE));
   late CreateSignerRoleData createData;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     createData.toXdr(stream);
   }
 }
 
 class ManageSignerRoleOpDataUpdate extends ManageSignerRoleOpData {
-  ManageSignerRoleOpDataUpdate(this.updateData)
-      : super(ManageSignerRoleAction(ManageSignerRoleAction.UPDATE));
+  ManageSignerRoleOpDataUpdate(this.updateData) : super(ManageSignerRoleAction(ManageSignerRoleAction.UPDATE));
   late UpdateSignerRoleData updateData;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     updateData.toXdr(stream);
   }
 }
 
 class ManageSignerRoleOpDataRemove extends ManageSignerRoleOpData {
-  ManageSignerRoleOpDataRemove(this.removeData)
-      : super(ManageSignerRoleAction(ManageSignerRoleAction.REMOVE));
+  ManageSignerRoleOpDataRemove(this.removeData) : super(ManageSignerRoleAction(ManageSignerRoleAction.REMOVE));
   late RemoveSignerRoleData removeData;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     removeData.toXdr(stream);
   }
@@ -17367,20 +15186,15 @@ class ManageSignerRoleOpDataRemove extends ManageSignerRoleOpData {
 
 abstract class ManageSignerRoleOpExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   ManageSignerRoleOpExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class ManageSignerRoleOpExtEmptyVersion extends ManageSignerRoleOpExt {
-  ManageSignerRoleOpExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+  ManageSignerRoleOpExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
-
 class ManageSignerRoleResultCode extends XdrEncodable {
   static const SUCCESS = 0;
   static const NOT_FOUND = -1;
@@ -17390,82 +15204,61 @@ class ManageSignerRoleResultCode extends XdrEncodable {
   static const RULE_ID_DUPLICATION = -5;
   static const DEFAULT_RULE_ID_DUPLICATION = -6;
   static const TOO_MANY_RULE_IDS = -7;
-  var value;
-
+  int value;
   ManageSignerRoleResultCode(this.value);
-}
+  @override toXdr(XdrDataOutputStream stream) {
+    value.toXdr(stream);
+  }
 
+}
 abstract class ManageSignerRoleResult extends XdrEncodable {
   ManageSignerRoleResultCode discriminant;
-
   ManageSignerRoleResult(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class ManageSignerRoleResultSuccess extends ManageSignerRoleResult {
-  ManageSignerRoleResultSuccess(this.success)
-      : super(ManageSignerRoleResultCode(ManageSignerRoleResultCode.SUCCESS));
+  ManageSignerRoleResultSuccess(this.success) : super(ManageSignerRoleResultCode(ManageSignerRoleResultCode.SUCCESS));
   late ManageSignerRoleResultSuccessSuccess success;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     success.toXdr(stream);
   }
 }
 
 class ManageSignerRoleResultRuleIdDuplication extends ManageSignerRoleResult {
-  ManageSignerRoleResultRuleIdDuplication(this.ruleID)
-      : super(ManageSignerRoleResultCode(
-            ManageSignerRoleResultCode.RULE_ID_DUPLICATION));
-  late Uint64 ruleID;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  ManageSignerRoleResultRuleIdDuplication(this.ruleID) : super(ManageSignerRoleResultCode(ManageSignerRoleResultCode.RULE_ID_DUPLICATION));
+  late UINT64 ruleID;
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     ruleID.toXdr(stream);
   }
 }
 
-class ManageSignerRoleResultDefaultRuleIdDuplication
-    extends ManageSignerRoleResult {
-  ManageSignerRoleResultDefaultRuleIdDuplication(this.ruleID)
-      : super(ManageSignerRoleResultCode(
-            ManageSignerRoleResultCode.DEFAULT_RULE_ID_DUPLICATION));
-  late Uint64 ruleID;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+class ManageSignerRoleResultDefaultRuleIdDuplication extends ManageSignerRoleResult {
+  ManageSignerRoleResultDefaultRuleIdDuplication(this.ruleID) : super(ManageSignerRoleResultCode(ManageSignerRoleResultCode.DEFAULT_RULE_ID_DUPLICATION));
+  late UINT64 ruleID;
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     ruleID.toXdr(stream);
   }
 }
 
 class ManageSignerRoleResultNoSuchRule extends ManageSignerRoleResult {
-  ManageSignerRoleResultNoSuchRule(this.ruleID)
-      : super(ManageSignerRoleResultCode(
-            ManageSignerRoleResultCode.NO_SUCH_RULE));
-  late Uint64 ruleID;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  ManageSignerRoleResultNoSuchRule(this.ruleID) : super(ManageSignerRoleResultCode(ManageSignerRoleResultCode.NO_SUCH_RULE));
+  late UINT64 ruleID;
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     ruleID.toXdr(stream);
   }
 }
 
 class ManageSignerRoleResultTooManyRuleIds extends ManageSignerRoleResult {
-  ManageSignerRoleResultTooManyRuleIds(this.maxRuleIDsCount)
-      : super(ManageSignerRoleResultCode(
-            ManageSignerRoleResultCode.TOO_MANY_RULE_IDS));
-  late Uint64 maxRuleIDsCount;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  ManageSignerRoleResultTooManyRuleIds(this.maxRuleIDsCount) : super(ManageSignerRoleResultCode(ManageSignerRoleResultCode.TOO_MANY_RULE_IDS));
+  late UINT64 maxRuleIDsCount;
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     maxRuleIDsCount.toXdr(stream);
   }
@@ -17487,46 +15280,42 @@ class ManageSignerRoleResultTooManyRuleIds extends ManageSignerRoleResult {
 //          }
 
 //  ===========================================================================
-class ManageSignerRoleResultSuccessSuccess extends XdrEncodable {
-  Uint64 roleID;
+class ManageSignerRoleResultSuccessSuccess extends XdrEncodable  {
+  UINT64 roleID;
   ManageSignerRoleResultSuccessExt ext;
 
   ManageSignerRoleResultSuccessSuccess(
-    this.roleID,
-    this.ext,
-  );
+      this.roleID,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     roleID.toXdr(stream);
     ext.toXdr(stream);
   }
 }
-
 abstract class ManageSignerRoleResultSuccessExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   ManageSignerRoleResultSuccessExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
-class ManageSignerRoleResultSuccessExtEmptyVersion
-    extends ManageSignerRoleResultSuccessExt {
-  ManageSignerRoleResultSuccessExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+class ManageSignerRoleResultSuccessExtEmptyVersion extends ManageSignerRoleResultSuccessExt {
+  ManageSignerRoleResultSuccessExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
 
 class ManageSignerRuleAction extends XdrEncodable {
   static const CREATE = 0;
   static const UPDATE = 1;
   static const REMOVE = 2;
-  var value;
-
+  int value;
   ManageSignerRuleAction(this.value);
+  @override toXdr(XdrDataOutputStream stream) {
+    value.toXdr(stream);
+  }
+
 }
 // === xdr source ============================================================
 
@@ -17555,27 +15344,26 @@ class ManageSignerRuleAction extends XdrEncodable {
 //  };
 
 //  ===========================================================================
-class CreateSignerRuleData extends XdrEncodable {
+class CreateSignerRuleData extends XdrEncodable  {
   SignerRuleResource resource;
   SignerRuleAction action;
   bool forbids;
   bool isDefault;
   bool isReadOnly;
-  Longstring details;
+  LONGSTRING details;
   CreateSignerRuleDataExt ext;
 
   CreateSignerRuleData(
-    this.resource,
-    this.action,
-    this.forbids,
-    this.isDefault,
-    this.isReadOnly,
-    this.details,
-    this.ext,
-  );
+      this.resource,
+      this.action,
+      this.forbids,
+      this.isDefault,
+      this.isReadOnly,
+      this.details,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     resource.toXdr(stream);
     action.toXdr(stream);
     forbids.toXdr(stream);
@@ -17585,21 +15373,16 @@ class CreateSignerRuleData extends XdrEncodable {
     ext.toXdr(stream);
   }
 }
-
 abstract class CreateSignerRuleDataExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   CreateSignerRuleDataExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class CreateSignerRuleDataExtEmptyVersion extends CreateSignerRuleDataExt {
-  CreateSignerRuleDataExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+  CreateSignerRuleDataExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
 // === xdr source ============================================================
 
@@ -17628,27 +15411,26 @@ class CreateSignerRuleDataExtEmptyVersion extends CreateSignerRuleDataExt {
 //  };
 
 //  ===========================================================================
-class UpdateSignerRuleData extends XdrEncodable {
-  Uint64 ruleID;
+class UpdateSignerRuleData extends XdrEncodable  {
+  UINT64 ruleID;
   SignerRuleResource resource;
   SignerRuleAction action;
   bool forbids;
   bool isDefault;
-  Longstring details;
+  LONGSTRING details;
   UpdateSignerRuleDataExt ext;
 
   UpdateSignerRuleData(
-    this.ruleID,
-    this.resource,
-    this.action,
-    this.forbids,
-    this.isDefault,
-    this.details,
-    this.ext,
-  );
+      this.ruleID,
+      this.resource,
+      this.action,
+      this.forbids,
+      this.isDefault,
+      this.details,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     ruleID.toXdr(stream);
     resource.toXdr(stream);
     action.toXdr(stream);
@@ -17658,21 +15440,16 @@ class UpdateSignerRuleData extends XdrEncodable {
     ext.toXdr(stream);
   }
 }
-
 abstract class UpdateSignerRuleDataExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   UpdateSignerRuleDataExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class UpdateSignerRuleDataExtEmptyVersion extends UpdateSignerRuleDataExt {
-  UpdateSignerRuleDataExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+  UpdateSignerRuleDataExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
 // === xdr source ============================================================
 
@@ -17691,36 +15468,30 @@ class UpdateSignerRuleDataExtEmptyVersion extends UpdateSignerRuleDataExt {
 //  };
 
 //  ===========================================================================
-class RemoveSignerRuleData extends XdrEncodable {
-  Uint64 ruleID;
+class RemoveSignerRuleData extends XdrEncodable  {
+  UINT64 ruleID;
   RemoveSignerRuleDataExt ext;
 
   RemoveSignerRuleData(
-    this.ruleID,
-    this.ext,
-  );
+      this.ruleID,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     ruleID.toXdr(stream);
     ext.toXdr(stream);
   }
 }
-
 abstract class RemoveSignerRuleDataExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   RemoveSignerRuleDataExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class RemoveSignerRuleDataExtEmptyVersion extends RemoveSignerRuleDataExt {
-  RemoveSignerRuleDataExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+  RemoveSignerRuleDataExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
 // === xdr source ============================================================
 
@@ -17748,64 +15519,50 @@ class RemoveSignerRuleDataExtEmptyVersion extends RemoveSignerRuleDataExt {
 //  };
 
 //  ===========================================================================
-class ManageSignerRuleOp extends XdrEncodable {
+class ManageSignerRuleOp extends XdrEncodable  {
   ManageSignerRuleOpData data;
   ManageSignerRuleOpExt ext;
 
   ManageSignerRuleOp(
-    this.data,
-    this.ext,
-  );
+      this.data,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     data.toXdr(stream);
     ext.toXdr(stream);
   }
 }
-
 abstract class ManageSignerRuleOpData extends XdrEncodable {
   ManageSignerRuleAction discriminant;
-
   ManageSignerRuleOpData(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class ManageSignerRuleOpDataCreate extends ManageSignerRuleOpData {
-  ManageSignerRuleOpDataCreate(this.createData)
-      : super(ManageSignerRuleAction(ManageSignerRuleAction.CREATE));
+  ManageSignerRuleOpDataCreate(this.createData) : super(ManageSignerRuleAction(ManageSignerRuleAction.CREATE));
   late CreateSignerRuleData createData;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     createData.toXdr(stream);
   }
 }
 
 class ManageSignerRuleOpDataUpdate extends ManageSignerRuleOpData {
-  ManageSignerRuleOpDataUpdate(this.updateData)
-      : super(ManageSignerRuleAction(ManageSignerRuleAction.UPDATE));
+  ManageSignerRuleOpDataUpdate(this.updateData) : super(ManageSignerRuleAction(ManageSignerRuleAction.UPDATE));
   late UpdateSignerRuleData updateData;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     updateData.toXdr(stream);
   }
 }
 
 class ManageSignerRuleOpDataRemove extends ManageSignerRuleOpData {
-  ManageSignerRuleOpDataRemove(this.removeData)
-      : super(ManageSignerRuleAction(ManageSignerRuleAction.REMOVE));
+  ManageSignerRuleOpDataRemove(this.removeData) : super(ManageSignerRuleAction(ManageSignerRuleAction.REMOVE));
   late RemoveSignerRuleData removeData;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     removeData.toXdr(stream);
   }
@@ -17813,65 +15570,52 @@ class ManageSignerRuleOpDataRemove extends ManageSignerRuleOpData {
 
 abstract class ManageSignerRuleOpExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   ManageSignerRuleOpExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class ManageSignerRuleOpExtEmptyVersion extends ManageSignerRuleOpExt {
-  ManageSignerRuleOpExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+  ManageSignerRuleOpExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
-
 class ManageSignerRuleResultCode extends XdrEncodable {
   static const SUCCESS = 0;
   static const NOT_FOUND = -1;
   static const RULE_IS_USED = -2;
   static const INVALID_DETAILS = -3;
   static const INVALID_ACTION = -4;
-  var value;
-
+  int value;
   ManageSignerRuleResultCode(this.value);
-}
+  @override toXdr(XdrDataOutputStream stream) {
+    value.toXdr(stream);
+  }
 
+}
 abstract class ManageSignerRuleResult extends XdrEncodable {
   ManageSignerRuleResultCode discriminant;
-
   ManageSignerRuleResult(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class ManageSignerRuleResultSuccess extends ManageSignerRuleResult {
-  ManageSignerRuleResultSuccess(this.success)
-      : super(ManageSignerRuleResultCode(ManageSignerRuleResultCode.SUCCESS));
+  ManageSignerRuleResultSuccess(this.success) : super(ManageSignerRuleResultCode(ManageSignerRuleResultCode.SUCCESS));
   late ManageSignerRuleResultSuccessSuccess success;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     success.toXdr(stream);
   }
 }
 
 class ManageSignerRuleResultRuleIsUsed extends ManageSignerRuleResult {
-  ManageSignerRuleResultRuleIsUsed(this.roleIDs)
-      : super(ManageSignerRuleResultCode(
-            ManageSignerRuleResultCode.RULE_IS_USED));
-  late List<Uint64> roleIDs;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  ManageSignerRuleResultRuleIsUsed(this.roleIDs) : super(ManageSignerRuleResultCode(ManageSignerRuleResultCode.RULE_IS_USED));
+  late List<UINT64> roleIDs;
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     roleIDs.length.toXdr(stream);
-    roleIDs.forEach((element) {
+    roleIDs.forEach ((element) {
       element.toXdr(stream);
     });
   }
@@ -17892,46 +15636,42 @@ class ManageSignerRuleResultRuleIsUsed extends ManageSignerRuleResult {
 //          }
 
 //  ===========================================================================
-class ManageSignerRuleResultSuccessSuccess extends XdrEncodable {
-  Uint64 ruleID;
+class ManageSignerRuleResultSuccessSuccess extends XdrEncodable  {
+  UINT64 ruleID;
   ManageSignerRuleResultSuccessExt ext;
 
   ManageSignerRuleResultSuccessSuccess(
-    this.ruleID,
-    this.ext,
-  );
+      this.ruleID,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     ruleID.toXdr(stream);
     ext.toXdr(stream);
   }
 }
-
 abstract class ManageSignerRuleResultSuccessExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   ManageSignerRuleResultSuccessExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
-class ManageSignerRuleResultSuccessExtEmptyVersion
-    extends ManageSignerRuleResultSuccessExt {
-  ManageSignerRuleResultSuccessExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+class ManageSignerRuleResultSuccessExtEmptyVersion extends ManageSignerRuleResultSuccessExt {
+  ManageSignerRuleResultSuccessExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
 
 class ManageSignerAction extends XdrEncodable {
   static const CREATE = 0;
   static const UPDATE = 1;
   static const REMOVE = 2;
-  var value;
-
+  int value;
   ManageSignerAction(this.value);
+  @override toXdr(XdrDataOutputStream stream) {
+    value.toXdr(stream);
+  }
+
 }
 // === xdr source ============================================================
 
@@ -17957,25 +15697,24 @@ class ManageSignerAction extends XdrEncodable {
 //  };
 
 //  ===========================================================================
-class UpdateSignerData extends XdrEncodable {
+class UpdateSignerData extends XdrEncodable  {
   PublicKey publicKey;
-  Uint64 roleID;
-  Uint32 weight;
-  Uint32 identity;
-  Longstring details;
+  UINT64 roleID;
+  UINT32 weight;
+  UINT32 identity;
+  LONGSTRING details;
   EmptyExt ext;
 
   UpdateSignerData(
-    this.publicKey,
-    this.roleID,
-    this.weight,
-    this.identity,
-    this.details,
-    this.ext,
-  );
+      this.publicKey,
+      this.roleID,
+      this.weight,
+      this.identity,
+      this.details,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     publicKey.toXdr(stream);
     roleID.toXdr(stream);
     weight.toXdr(stream);
@@ -17997,17 +15736,16 @@ class UpdateSignerData extends XdrEncodable {
 //  };
 
 //  ===========================================================================
-class RemoveSignerData extends XdrEncodable {
+class RemoveSignerData extends XdrEncodable  {
   PublicKey publicKey;
   EmptyExt ext;
 
   RemoveSignerData(
-    this.publicKey,
-    this.ext,
-  );
+      this.publicKey,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     publicKey.toXdr(stream);
     ext.toXdr(stream);
   }
@@ -18034,69 +15772,54 @@ class RemoveSignerData extends XdrEncodable {
 //  };
 
 //  ===========================================================================
-class ManageSignerOp extends XdrEncodable {
+class ManageSignerOp extends XdrEncodable  {
   ManageSignerOpData data;
   EmptyExt ext;
 
   ManageSignerOp(
-    this.data,
-    this.ext,
-  );
+      this.data,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     data.toXdr(stream);
     ext.toXdr(stream);
   }
 }
-
 abstract class ManageSignerOpData extends XdrEncodable {
   ManageSignerAction discriminant;
-
   ManageSignerOpData(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class ManageSignerOpDataCreate extends ManageSignerOpData {
-  ManageSignerOpDataCreate(this.createData)
-      : super(ManageSignerAction(ManageSignerAction.CREATE));
+  ManageSignerOpDataCreate(this.createData) : super(ManageSignerAction(ManageSignerAction.CREATE));
   late UpdateSignerData createData;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     createData.toXdr(stream);
   }
 }
 
 class ManageSignerOpDataUpdate extends ManageSignerOpData {
-  ManageSignerOpDataUpdate(this.updateData)
-      : super(ManageSignerAction(ManageSignerAction.UPDATE));
+  ManageSignerOpDataUpdate(this.updateData) : super(ManageSignerAction(ManageSignerAction.UPDATE));
   late UpdateSignerData updateData;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     updateData.toXdr(stream);
   }
 }
 
 class ManageSignerOpDataRemove extends ManageSignerOpData {
-  ManageSignerOpDataRemove(this.removeData)
-      : super(ManageSignerAction(ManageSignerAction.REMOVE));
+  ManageSignerOpDataRemove(this.removeData) : super(ManageSignerAction(ManageSignerAction.REMOVE));
   late RemoveSignerData removeData;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     removeData.toXdr(stream);
   }
 }
-
 class ManageSignerResultCode extends XdrEncodable {
   static const SUCCESS = 0;
   static const INVALID_DETAILS = -1;
@@ -18105,29 +15828,25 @@ class ManageSignerResultCode extends XdrEncodable {
   static const INVALID_WEIGHT = -4;
   static const NOT_FOUND = -5;
   static const NUMBER_OF_ADMINS_EXCEEDS_LICENSE = -6;
-  var value;
-
+  int value;
   ManageSignerResultCode(this.value);
-}
+  @override toXdr(XdrDataOutputStream stream) {
+    value.toXdr(stream);
+  }
 
+}
 abstract class ManageSignerResult extends XdrEncodable {
   ManageSignerResultCode discriminant;
-
   ManageSignerResult(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class ManageSignerResultSuccess extends ManageSignerResult {
-  ManageSignerResultSuccess(this.ext)
-      : super(ManageSignerResultCode(ManageSignerResultCode.SUCCESS));
+  ManageSignerResultSuccess(this.ext) : super(ManageSignerResultCode(ManageSignerResultCode.SUCCESS));
   late EmptyExt ext;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     ext.toXdr(stream);
   }
@@ -18136,9 +15855,12 @@ class ManageSignerResultSuccess extends ManageSignerResult {
 class ManageVoteAction extends XdrEncodable {
   static const CREATE = 0;
   static const REMOVE = 1;
-  var value;
-
+  int value;
   ManageVoteAction(this.value);
+  @override toXdr(XdrDataOutputStream stream) {
+    value.toXdr(stream);
+  }
+
 }
 // === xdr source ============================================================
 
@@ -18160,39 +15882,33 @@ class ManageVoteAction extends XdrEncodable {
 //  };
 
 //  ===========================================================================
-class CreateVoteData extends XdrEncodable {
-  Uint64 pollID;
+class CreateVoteData extends XdrEncodable  {
+  UINT64 pollID;
   VoteData data;
   CreateVoteDataExt ext;
 
   CreateVoteData(
-    this.pollID,
-    this.data,
-    this.ext,
-  );
+      this.pollID,
+      this.data,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     pollID.toXdr(stream);
     data.toXdr(stream);
     ext.toXdr(stream);
   }
 }
-
 abstract class CreateVoteDataExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   CreateVoteDataExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class CreateVoteDataExtEmptyVersion extends CreateVoteDataExt {
-  CreateVoteDataExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+  CreateVoteDataExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
 // === xdr source ============================================================
 
@@ -18211,36 +15927,30 @@ class CreateVoteDataExtEmptyVersion extends CreateVoteDataExt {
 //  };
 
 //  ===========================================================================
-class RemoveVoteData extends XdrEncodable {
-  Uint64 pollID;
+class RemoveVoteData extends XdrEncodable  {
+  UINT64 pollID;
   RemoveVoteDataExt ext;
 
   RemoveVoteData(
-    this.pollID,
-    this.ext,
-  );
+      this.pollID,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     pollID.toXdr(stream);
     ext.toXdr(stream);
   }
 }
-
 abstract class RemoveVoteDataExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   RemoveVoteDataExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class RemoveVoteDataExtEmptyVersion extends RemoveVoteDataExt {
-  RemoveVoteDataExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+  RemoveVoteDataExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
 // === xdr source ============================================================
 
@@ -18266,52 +15976,41 @@ class RemoveVoteDataExtEmptyVersion extends RemoveVoteDataExt {
 //  };
 
 //  ===========================================================================
-class ManageVoteOp extends XdrEncodable {
+class ManageVoteOp extends XdrEncodable  {
   ManageVoteOpData data;
   ManageVoteOpExt ext;
 
   ManageVoteOp(
-    this.data,
-    this.ext,
-  );
+      this.data,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     data.toXdr(stream);
     ext.toXdr(stream);
   }
 }
-
 abstract class ManageVoteOpData extends XdrEncodable {
   ManageVoteAction discriminant;
-
   ManageVoteOpData(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class ManageVoteOpDataCreate extends ManageVoteOpData {
-  ManageVoteOpDataCreate(this.createData)
-      : super(ManageVoteAction(ManageVoteAction.CREATE));
+  ManageVoteOpDataCreate(this.createData) : super(ManageVoteAction(ManageVoteAction.CREATE));
   late CreateVoteData createData;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     createData.toXdr(stream);
   }
 }
 
 class ManageVoteOpDataRemove extends ManageVoteOpData {
-  ManageVoteOpDataRemove(this.removeData)
-      : super(ManageVoteAction(ManageVoteAction.REMOVE));
+  ManageVoteOpDataRemove(this.removeData) : super(ManageVoteAction(ManageVoteAction.REMOVE));
   late RemoveVoteData removeData;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     removeData.toXdr(stream);
   }
@@ -18319,20 +16018,15 @@ class ManageVoteOpDataRemove extends ManageVoteOpData {
 
 abstract class ManageVoteOpExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   ManageVoteOpExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class ManageVoteOpExtEmptyVersion extends ManageVoteOpExt {
-  ManageVoteOpExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+  ManageVoteOpExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
-
 class ManageVoteResultCode extends XdrEncodable {
   static const SUCCESS = 0;
   static const VOTE_NOT_FOUND = -1;
@@ -18341,29 +16035,25 @@ class ManageVoteResultCode extends XdrEncodable {
   static const POLL_TYPE_MISMATCHED = -4;
   static const POLL_NOT_STARTED = -5;
   static const POLL_ENDED = -6;
-  var value;
-
+  int value;
   ManageVoteResultCode(this.value);
-}
+  @override toXdr(XdrDataOutputStream stream) {
+    value.toXdr(stream);
+  }
 
+}
 abstract class ManageVoteResult extends XdrEncodable {
   ManageVoteResultCode discriminant;
-
   ManageVoteResult(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class ManageVoteResultSuccess extends ManageVoteResult {
-  ManageVoteResultSuccess(this.ext)
-      : super(ManageVoteResultCode(ManageVoteResultCode.SUCCESS));
+  ManageVoteResultSuccess(this.ext) : super(ManageVoteResultCode(ManageVoteResultCode.SUCCESS));
   late EmptyExt ext;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     ext.toXdr(stream);
   }
@@ -18401,29 +16091,28 @@ class ManageVoteResultSuccess extends ManageVoteResult {
 //  };
 
 //  ===========================================================================
-class OpenSwapOp extends XdrEncodable {
-  BalanceID sourceBalance;
-  Uint64 amount;
+class OpenSwapOp extends XdrEncodable  {
+  BALANCEID sourceBalance;
+  UINT64 amount;
   OpenSwapOpDestination destination;
   PaymentFeeData feeData;
-  Longstring details;
-  Hash secretHash;
-  Int64 lockTime;
+  LONGSTRING details;
+  HASH secretHash;
+  INT64 lockTime;
   EmptyExt ext;
 
   OpenSwapOp(
-    this.sourceBalance,
-    this.amount,
-    this.destination,
-    this.feeData,
-    this.details,
-    this.secretHash,
-    this.lockTime,
-    this.ext,
-  );
+      this.sourceBalance,
+      this.amount,
+      this.destination,
+      this.feeData,
+      this.details,
+      this.secretHash,
+      this.lockTime,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     sourceBalance.toXdr(stream);
     amount.toXdr(stream);
     destination.toXdr(stream);
@@ -18434,42 +16123,31 @@ class OpenSwapOp extends XdrEncodable {
     ext.toXdr(stream);
   }
 }
-
 abstract class OpenSwapOpDestination extends XdrEncodable {
   PaymentDestinationType discriminant;
-
   OpenSwapOpDestination(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class OpenSwapOpDestinationAccount extends OpenSwapOpDestination {
-  OpenSwapOpDestinationAccount(this.accountID)
-      : super(PaymentDestinationType(PaymentDestinationType.ACCOUNT));
-  late AccountID accountID;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  OpenSwapOpDestinationAccount(this.accountID) : super(PaymentDestinationType(PaymentDestinationType.ACCOUNT));
+  late ACCOUNTID accountID;
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     accountID.toXdr(stream);
   }
 }
 
 class OpenSwapOpDestinationBalance extends OpenSwapOpDestination {
-  OpenSwapOpDestinationBalance(this.balanceID)
-      : super(PaymentDestinationType(PaymentDestinationType.BALANCE));
-  late BalanceID balanceID;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  OpenSwapOpDestinationBalance(this.balanceID) : super(PaymentDestinationType(PaymentDestinationType.BALANCE));
+  late BALANCEID balanceID;
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     balanceID.toXdr(stream);
   }
 }
-
 class OpenSwapResultCode extends XdrEncodable {
   static const SUCCESS = 0;
   static const MALFORMED = -1;
@@ -18484,9 +16162,12 @@ class OpenSwapResultCode extends XdrEncodable {
   static const INVALID_DETAILS = -10;
   static const INVALID_LOCK_TIME = -11;
   static const INVALID_AMOUNT = -12;
-  var value;
-
+  int value;
   OpenSwapResultCode(this.value);
+  @override toXdr(XdrDataOutputStream stream) {
+    value.toXdr(stream);
+  }
+
 }
 // === xdr source ============================================================
 
@@ -18512,27 +16193,26 @@ class OpenSwapResultCode extends XdrEncodable {
 //  };
 
 //  ===========================================================================
-class OpenSwapSuccess extends XdrEncodable {
-  Uint64 swapID;
-  AccountID destination;
-  BalanceID destinationBalance;
-  AssetCode asset;
+class OpenSwapSuccess extends XdrEncodable  {
+  UINT64 swapID;
+  ACCOUNTID destination;
+  BALANCEID destinationBalance;
+  ASSETCODE asset;
   Fee actualSourceFee;
   Fee actualDestinationFee;
   EmptyExt ext;
 
   OpenSwapSuccess(
-    this.swapID,
-    this.destination,
-    this.destinationBalance,
-    this.asset,
-    this.actualSourceFee,
-    this.actualDestinationFee,
-    this.ext,
-  );
+      this.swapID,
+      this.destination,
+      this.destinationBalance,
+      this.asset,
+      this.actualSourceFee,
+      this.actualDestinationFee,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     swapID.toXdr(stream);
     destination.toXdr(stream);
     destinationBalance.toXdr(stream);
@@ -18542,25 +16222,18 @@ class OpenSwapSuccess extends XdrEncodable {
     ext.toXdr(stream);
   }
 }
-
 abstract class OpenSwapResult extends XdrEncodable {
   OpenSwapResultCode discriminant;
-
   OpenSwapResult(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class OpenSwapResultSuccess extends OpenSwapResult {
-  OpenSwapResultSuccess(this.success)
-      : super(OpenSwapResultCode(OpenSwapResultCode.SUCCESS));
+  OpenSwapResultSuccess(this.success) : super(OpenSwapResultCode(OpenSwapResultCode.SUCCESS));
   late OpenSwapSuccess success;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     success.toXdr(stream);
   }
@@ -18586,50 +16259,46 @@ class OpenSwapResultSuccess extends OpenSwapResult {
 //  };
 
 //  ===========================================================================
-class PaymentFeeData extends XdrEncodable {
+class PaymentFeeData extends XdrEncodable  {
   Fee sourceFee;
   Fee destinationFee;
   bool sourcePaysForDest;
   PaymentFeeDataExt ext;
 
   PaymentFeeData(
-    this.sourceFee,
-    this.destinationFee,
-    this.sourcePaysForDest,
-    this.ext,
-  );
+      this.sourceFee,
+      this.destinationFee,
+      this.sourcePaysForDest,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     sourceFee.toXdr(stream);
     destinationFee.toXdr(stream);
     sourcePaysForDest.toXdr(stream);
     ext.toXdr(stream);
   }
 }
-
 abstract class PaymentFeeDataExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   PaymentFeeDataExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class PaymentFeeDataExtEmptyVersion extends PaymentFeeDataExt {
-  PaymentFeeDataExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+  PaymentFeeDataExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
-
 class PaymentDestinationType extends XdrEncodable {
   static const ACCOUNT = 0;
   static const BALANCE = 1;
-  var value;
-
+  int value;
   PaymentDestinationType(this.value);
+  @override toXdr(XdrDataOutputStream stream) {
+    value.toXdr(stream);
+  }
+
 }
 // === xdr source ============================================================
 
@@ -18668,27 +16337,26 @@ class PaymentDestinationType extends XdrEncodable {
 //  };
 
 //  ===========================================================================
-class PaymentOp extends XdrEncodable {
-  BalanceID sourceBalanceID;
+class PaymentOp extends XdrEncodable  {
+  BALANCEID sourceBalanceID;
   PaymentOpDestination destination;
-  Uint64 amount;
+  UINT64 amount;
   PaymentFeeData feeData;
-  Longstring subject;
-  Longstring reference;
+  LONGSTRING subject;
+  LONGSTRING reference;
   PaymentOpExt ext;
 
   PaymentOp(
-    this.sourceBalanceID,
-    this.destination,
-    this.amount,
-    this.feeData,
-    this.subject,
-    this.reference,
-    this.ext,
-  );
+      this.sourceBalanceID,
+      this.destination,
+      this.amount,
+      this.feeData,
+      this.subject,
+      this.reference,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     sourceBalanceID.toXdr(stream);
     destination.toXdr(stream);
     amount.toXdr(stream);
@@ -18698,37 +16366,27 @@ class PaymentOp extends XdrEncodable {
     ext.toXdr(stream);
   }
 }
-
 abstract class PaymentOpDestination extends XdrEncodable {
   PaymentDestinationType discriminant;
-
   PaymentOpDestination(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class PaymentOpDestinationAccount extends PaymentOpDestination {
-  PaymentOpDestinationAccount(this.accountID)
-      : super(PaymentDestinationType(PaymentDestinationType.ACCOUNT));
-  late AccountID accountID;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  PaymentOpDestinationAccount(this.accountID) : super(PaymentDestinationType(PaymentDestinationType.ACCOUNT));
+  late ACCOUNTID accountID;
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     accountID.toXdr(stream);
   }
 }
 
 class PaymentOpDestinationBalance extends PaymentOpDestination {
-  PaymentOpDestinationBalance(this.balanceID)
-      : super(PaymentDestinationType(PaymentDestinationType.BALANCE));
-  late BalanceID balanceID;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  PaymentOpDestinationBalance(this.balanceID) : super(PaymentDestinationType(PaymentDestinationType.BALANCE));
+  late BALANCEID balanceID;
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     balanceID.toXdr(stream);
   }
@@ -18736,20 +16394,15 @@ class PaymentOpDestinationBalance extends PaymentOpDestination {
 
 abstract class PaymentOpExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   PaymentOpExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class PaymentOpExtEmptyVersion extends PaymentOpExt {
-  PaymentOpExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+  PaymentOpExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
-
 class PaymentResultCode extends XdrEncodable {
   static const SUCCESS = 0;
   static const MALFORMED = -1;
@@ -18768,9 +16421,12 @@ class PaymentResultCode extends XdrEncodable {
   static const DESTINATION_ACCOUNT_NOT_FOUND = -14;
   static const INCORRECT_AMOUNT_PRECISION = -15;
   static const INVALID_SUBJECT = -16;
-  var value;
-
+  int value;
   PaymentResultCode(this.value);
+  @override toXdr(XdrDataOutputStream stream) {
+    value.toXdr(stream);
+  }
+
 }
 // === xdr source ============================================================
 
@@ -18803,29 +16459,28 @@ class PaymentResultCode extends XdrEncodable {
 //  };
 
 //  ===========================================================================
-class PaymentResponse extends XdrEncodable {
-  AccountID destination;
-  BalanceID destinationBalanceID;
-  AssetCode asset;
-  Uint64 sourceSentUniversal;
-  Uint64 paymentID;
+class PaymentResponse extends XdrEncodable  {
+  ACCOUNTID destination;
+  BALANCEID destinationBalanceID;
+  ASSETCODE asset;
+  UINT64 sourceSentUniversal;
+  UINT64 paymentID;
   Fee actualSourcePaymentFee;
   Fee actualDestinationPaymentFee;
   PaymentResponseExt ext;
 
   PaymentResponse(
-    this.destination,
-    this.destinationBalanceID,
-    this.asset,
-    this.sourceSentUniversal,
-    this.paymentID,
-    this.actualSourcePaymentFee,
-    this.actualDestinationPaymentFee,
-    this.ext,
-  );
+      this.destination,
+      this.destinationBalanceID,
+      this.asset,
+      this.sourceSentUniversal,
+      this.paymentID,
+      this.actualSourcePaymentFee,
+      this.actualDestinationPaymentFee,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     destination.toXdr(stream);
     destinationBalanceID.toXdr(stream);
     asset.toXdr(stream);
@@ -18836,41 +16491,29 @@ class PaymentResponse extends XdrEncodable {
     ext.toXdr(stream);
   }
 }
-
 abstract class PaymentResponseExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   PaymentResponseExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class PaymentResponseExtEmptyVersion extends PaymentResponseExt {
-  PaymentResponseExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+  PaymentResponseExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
-
 abstract class PaymentResult extends XdrEncodable {
   PaymentResultCode discriminant;
-
   PaymentResult(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class PaymentResultSuccess extends PaymentResult {
-  PaymentResultSuccess(this.paymentResponse)
-      : super(PaymentResultCode(PaymentResultCode.SUCCESS));
+  PaymentResultSuccess(this.paymentResponse) : super(PaymentResultCode(PaymentResultCode.SUCCESS));
   late PaymentResponse paymentResponse;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     paymentResponse.toXdr(stream);
   }
@@ -18899,27 +16542,26 @@ class PaymentResultSuccess extends PaymentResult {
 //  };
 
 //  ===========================================================================
-class PayoutOp extends XdrEncodable {
-  AssetCode asset;
-  BalanceID sourceBalanceID;
-  Uint64 maxPayoutAmount;
-  Uint64 minPayoutAmount;
-  Uint64 minAssetHolderAmount;
+class PayoutOp extends XdrEncodable  {
+  ASSETCODE asset;
+  BALANCEID sourceBalanceID;
+  UINT64 maxPayoutAmount;
+  UINT64 minPayoutAmount;
+  UINT64 minAssetHolderAmount;
   Fee fee;
   PayoutOpExt ext;
 
   PayoutOp(
-    this.asset,
-    this.sourceBalanceID,
-    this.maxPayoutAmount,
-    this.minPayoutAmount,
-    this.minAssetHolderAmount,
-    this.fee,
-    this.ext,
-  );
+      this.asset,
+      this.sourceBalanceID,
+      this.maxPayoutAmount,
+      this.minPayoutAmount,
+      this.minAssetHolderAmount,
+      this.fee,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     asset.toXdr(stream);
     sourceBalanceID.toXdr(stream);
     maxPayoutAmount.toXdr(stream);
@@ -18929,14 +16571,10 @@ class PayoutOp extends XdrEncodable {
     ext.toXdr(stream);
   }
 }
-
 abstract class PayoutOpExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   PayoutOpExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
@@ -18944,7 +16582,6 @@ abstract class PayoutOpExt extends XdrEncodable {
 class PayoutOpExtEmptyVersion extends PayoutOpExt {
   PayoutOpExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
-
 class PayoutResultCode extends XdrEncodable {
   static const SUCCESS = 0;
   static const INVALID_AMOUNT = -1;
@@ -18962,9 +16599,12 @@ class PayoutResultCode extends XdrEncodable {
   static const STATS_OVERFLOW = -13;
   static const LIMITS_EXCEEDED = -14;
   static const INCORRECT_PRECISION = -15;
-  var value;
-
+  int value;
   PayoutResultCode(this.value);
+  @override toXdr(XdrDataOutputStream stream) {
+    value.toXdr(stream);
+  }
+
 }
 // === xdr source ============================================================
 
@@ -18984,42 +16624,36 @@ class PayoutResultCode extends XdrEncodable {
 //  };
 
 //  ===========================================================================
-class PayoutResponse extends XdrEncodable {
-  AccountID receiverID;
-  BalanceID receiverBalanceID;
-  Uint64 receivedAmount;
+class PayoutResponse extends XdrEncodable  {
+  ACCOUNTID receiverID;
+  BALANCEID receiverBalanceID;
+  UINT64 receivedAmount;
   PayoutResponseExt ext;
 
   PayoutResponse(
-    this.receiverID,
-    this.receiverBalanceID,
-    this.receivedAmount,
-    this.ext,
-  );
+      this.receiverID,
+      this.receiverBalanceID,
+      this.receivedAmount,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     receiverID.toXdr(stream);
     receiverBalanceID.toXdr(stream);
     receivedAmount.toXdr(stream);
     ext.toXdr(stream);
   }
 }
-
 abstract class PayoutResponseExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   PayoutResponseExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class PayoutResponseExtEmptyVersion extends PayoutResponseExt {
-  PayoutResponseExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+  PayoutResponseExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
 // === xdr source ============================================================
 
@@ -19039,23 +16673,22 @@ class PayoutResponseExtEmptyVersion extends PayoutResponseExt {
 //  };
 
 //  ===========================================================================
-class PayoutSuccessResult extends XdrEncodable {
+class PayoutSuccessResult extends XdrEncodable  {
   List<PayoutResponse> payoutResponses;
-  Uint64 actualPayoutAmount;
+  UINT64 actualPayoutAmount;
   Fee actualFee;
   PayoutSuccessResultExt ext;
 
   PayoutSuccessResult(
-    this.payoutResponses,
-    this.actualPayoutAmount,
-    this.actualFee,
-    this.ext,
-  );
+      this.payoutResponses,
+      this.actualPayoutAmount,
+      this.actualFee,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     payoutResponses.length.toXdr(stream);
-    payoutResponses.forEach((element) {
+    payoutResponses.forEach ((element) {
       element.toXdr(stream);
     });
     actualPayoutAmount.toXdr(stream);
@@ -19063,41 +16696,29 @@ class PayoutSuccessResult extends XdrEncodable {
     ext.toXdr(stream);
   }
 }
-
 abstract class PayoutSuccessResultExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   PayoutSuccessResultExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class PayoutSuccessResultExtEmptyVersion extends PayoutSuccessResultExt {
-  PayoutSuccessResultExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+  PayoutSuccessResultExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
-
 abstract class PayoutResult extends XdrEncodable {
   PayoutResultCode discriminant;
-
   PayoutResult(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class PayoutResultSuccess extends PayoutResult {
-  PayoutResultSuccess(this.success)
-      : super(PayoutResultCode(PayoutResultCode.SUCCESS));
+  PayoutResultSuccess(this.success) : super(PayoutResultCode(PayoutResultCode.SUCCESS));
   late PayoutSuccessResult success;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     success.toXdr(stream);
   }
@@ -19123,50 +16744,46 @@ class PayoutResultSuccess extends PayoutResult {
 //  };
 
 //  ===========================================================================
-class RemoveAssetPairOp extends XdrEncodable {
-  AssetCode base;
-  AssetCode quote;
+class RemoveAssetPairOp extends XdrEncodable  {
+  ASSETCODE base;
+  ASSETCODE quote;
   RemoveAssetPairOpExt ext;
 
   RemoveAssetPairOp(
-    this.base,
-    this.quote,
-    this.ext,
-  );
+      this.base,
+      this.quote,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     base.toXdr(stream);
     quote.toXdr(stream);
     ext.toXdr(stream);
   }
 }
-
 abstract class RemoveAssetPairOpExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   RemoveAssetPairOpExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class RemoveAssetPairOpExtEmptyVersion extends RemoveAssetPairOpExt {
-  RemoveAssetPairOpExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+  RemoveAssetPairOpExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
-
 class RemoveAssetPairResultCode extends XdrEncodable {
   static const SUCCESS = 0;
   static const NOT_FOUND = -1;
   static const HAS_ACTIVE_OFFERS = -2;
   static const HAS_ACTIVE_SALES = -3;
   static const INVALID_ASSET_CODE = -4;
-  var value;
-
+  int value;
   RemoveAssetPairResultCode(this.value);
+  @override toXdr(XdrDataOutputStream stream) {
+    value.toXdr(stream);
+  }
+
 }
 // === xdr source ============================================================
 
@@ -19183,53 +16800,40 @@ class RemoveAssetPairResultCode extends XdrEncodable {
 //  };
 
 //  ===========================================================================
-class RemoveAssetPairSuccess extends XdrEncodable {
+class RemoveAssetPairSuccess extends XdrEncodable  {
   RemoveAssetPairSuccessExt ext;
 
   RemoveAssetPairSuccess(
-    this.ext,
-  );
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     ext.toXdr(stream);
   }
 }
-
 abstract class RemoveAssetPairSuccessExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   RemoveAssetPairSuccessExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class RemoveAssetPairSuccessExtEmptyVersion extends RemoveAssetPairSuccessExt {
-  RemoveAssetPairSuccessExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+  RemoveAssetPairSuccessExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
-
 abstract class RemoveAssetPairResult extends XdrEncodable {
   RemoveAssetPairResultCode discriminant;
-
   RemoveAssetPairResult(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class RemoveAssetPairResultSuccess extends RemoveAssetPairResult {
-  RemoveAssetPairResultSuccess(this.success)
-      : super(RemoveAssetPairResultCode(RemoveAssetPairResultCode.SUCCESS));
+  RemoveAssetPairResultSuccess(this.success) : super(RemoveAssetPairResultCode(RemoveAssetPairResultCode.SUCCESS));
   late RemoveAssetPairSuccess success;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     success.toXdr(stream);
   }
@@ -19252,38 +16856,31 @@ class RemoveAssetPairResultSuccess extends RemoveAssetPairResult {
 //  };
 
 //  ===========================================================================
-class RemoveAssetOp extends XdrEncodable {
-  AssetCode code;
+class RemoveAssetOp extends XdrEncodable  {
+  ASSETCODE code;
   RemoveAssetOpExt ext;
 
   RemoveAssetOp(
-    this.code,
-    this.ext,
-  );
+      this.code,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     code.toXdr(stream);
     ext.toXdr(stream);
   }
 }
-
 abstract class RemoveAssetOpExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   RemoveAssetOpExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class RemoveAssetOpExtEmptyVersion extends RemoveAssetOpExt {
-  RemoveAssetOpExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+  RemoveAssetOpExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
-
 class RemoveAssetResultCode extends XdrEncodable {
   static const SUCCESS = 0;
   static const INVALID_ASSET_CODE = -1;
@@ -19294,9 +16891,12 @@ class RemoveAssetResultCode extends XdrEncodable {
   static const HAS_ACTIVE_SWAPS = -6;
   static const CANNOT_REMOVE_STATS_QUOTE_ASSET = -7;
   static const HAS_PENDING_MOVEMENTS = -8;
-  var value;
-
+  int value;
   RemoveAssetResultCode(this.value);
+  @override toXdr(XdrDataOutputStream stream) {
+    value.toXdr(stream);
+  }
+
 }
 // === xdr source ============================================================
 
@@ -19313,53 +16913,40 @@ class RemoveAssetResultCode extends XdrEncodable {
 //  };
 
 //  ===========================================================================
-class RemoveAssetSuccess extends XdrEncodable {
+class RemoveAssetSuccess extends XdrEncodable  {
   RemoveAssetSuccessExt ext;
 
   RemoveAssetSuccess(
-    this.ext,
-  );
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     ext.toXdr(stream);
   }
 }
-
 abstract class RemoveAssetSuccessExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   RemoveAssetSuccessExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class RemoveAssetSuccessExtEmptyVersion extends RemoveAssetSuccessExt {
-  RemoveAssetSuccessExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+  RemoveAssetSuccessExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
-
 abstract class RemoveAssetResult extends XdrEncodable {
   RemoveAssetResultCode discriminant;
-
   RemoveAssetResult(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class RemoveAssetResultSuccess extends RemoveAssetResult {
-  RemoveAssetResultSuccess(this.success)
-      : super(RemoveAssetResultCode(RemoveAssetResultCode.SUCCESS));
+  RemoveAssetResultSuccess(this.success) : super(RemoveAssetResultCode(RemoveAssetResultCode.SUCCESS));
   late RemoveAssetSuccess success;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     success.toXdr(stream);
   }
@@ -19376,49 +16963,43 @@ class RemoveAssetResultSuccess extends RemoveAssetResult {
 //  };
 
 //  ===========================================================================
-class RemoveDataOp extends XdrEncodable {
-  Uint64 dataID;
+class RemoveDataOp extends XdrEncodable  {
+  UINT64 dataID;
   EmptyExt ext;
 
   RemoveDataOp(
-    this.dataID,
-    this.ext,
-  );
+      this.dataID,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     dataID.toXdr(stream);
     ext.toXdr(stream);
   }
 }
-
 class RemoveDataResultCode extends XdrEncodable {
   static const SUCCESS = 0;
   static const NOT_FOUND = -1;
   static const NOT_AUTHORIZED = -2;
-  var value;
-
+  int value;
   RemoveDataResultCode(this.value);
-}
+  @override toXdr(XdrDataOutputStream stream) {
+    value.toXdr(stream);
+  }
 
+}
 abstract class RemoveDataResult extends XdrEncodable {
   RemoveDataResultCode discriminant;
-
   RemoveDataResult(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class RemoveDataResultSuccess extends RemoveDataResult {
-  RemoveDataResultSuccess(this.ext)
-      : super(RemoveDataResultCode(RemoveDataResultCode.SUCCESS));
+  RemoveDataResultSuccess(this.ext) : super(RemoveDataResultCode(RemoveDataResultCode.SUCCESS));
   late EmptyExt ext;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     ext.toXdr(stream);
   }
@@ -19428,9 +17009,12 @@ class ReviewRequestOpAction extends XdrEncodable {
   static const APPROVE = 1;
   static const REJECT = 2;
   static const PERMANENT_REJECT = 3;
-  var value;
-
+  int value;
   ReviewRequestOpAction(this.value);
+  @override toXdr(XdrDataOutputStream stream) {
+    value.toXdr(stream);
+  }
+
 }
 // === xdr source ============================================================
 
@@ -19449,36 +17033,30 @@ class ReviewRequestOpAction extends XdrEncodable {
 //  };
 
 //  ===========================================================================
-class LimitsUpdateDetails extends XdrEncodable {
+class LimitsUpdateDetails extends XdrEncodable  {
   LimitsV2Entry newLimitsV2;
   LimitsUpdateDetailsExt ext;
 
   LimitsUpdateDetails(
-    this.newLimitsV2,
-    this.ext,
-  );
+      this.newLimitsV2,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     newLimitsV2.toXdr(stream);
     ext.toXdr(stream);
   }
 }
-
 abstract class LimitsUpdateDetailsExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   LimitsUpdateDetailsExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class LimitsUpdateDetailsExtEmptyVersion extends LimitsUpdateDetailsExt {
-  LimitsUpdateDetailsExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+  LimitsUpdateDetailsExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
 // === xdr source ============================================================
 
@@ -19496,36 +17074,30 @@ class LimitsUpdateDetailsExtEmptyVersion extends LimitsUpdateDetailsExt {
 //  };
 
 //  ===========================================================================
-class WithdrawalDetails extends XdrEncodable {
+class WithdrawalDetails extends XdrEncodable  {
   String externalDetails;
   WithdrawalDetailsExt ext;
 
   WithdrawalDetails(
-    this.externalDetails,
-    this.ext,
-  );
+      this.externalDetails,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     externalDetails.toXdr(stream);
     ext.toXdr(stream);
   }
 }
-
 abstract class WithdrawalDetailsExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   WithdrawalDetailsExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class WithdrawalDetailsExtEmptyVersion extends WithdrawalDetailsExt {
-  WithdrawalDetailsExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+  WithdrawalDetailsExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
 // === xdr source ============================================================
 
@@ -19543,36 +17115,30 @@ class WithdrawalDetailsExtEmptyVersion extends WithdrawalDetailsExt {
 //  };
 
 //  ===========================================================================
-class AMLAlertDetails extends XdrEncodable {
+class AMLAlertDetails extends XdrEncodable  {
   String comment;
   AMLAlertDetailsExt ext;
 
   AMLAlertDetails(
-    this.comment,
-    this.ext,
-  );
+      this.comment,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     comment.toXdr(stream);
     ext.toXdr(stream);
   }
 }
-
 abstract class AMLAlertDetailsExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   AMLAlertDetailsExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class AMLAlertDetailsExtEmptyVersion extends AMLAlertDetailsExt {
-  AMLAlertDetailsExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+  AMLAlertDetailsExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
 // === xdr source ============================================================
 
@@ -19589,36 +17155,30 @@ class AMLAlertDetailsExtEmptyVersion extends AMLAlertDetailsExt {
 //  };
 
 //  ===========================================================================
-class ContractDetails extends XdrEncodable {
-  Longstring details;
+class ContractDetails extends XdrEncodable  {
+  LONGSTRING details;
   ContractDetailsExt ext;
 
   ContractDetails(
-    this.details,
-    this.ext,
-  );
+      this.details,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     details.toXdr(stream);
     ext.toXdr(stream);
   }
 }
-
 abstract class ContractDetailsExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   ContractDetailsExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class ContractDetailsExtEmptyVersion extends ContractDetailsExt {
-  ContractDetailsExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+  ContractDetailsExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
 // === xdr source ============================================================
 
@@ -19637,36 +17197,30 @@ class ContractDetailsExtEmptyVersion extends ContractDetailsExt {
 //  };
 
 //  ===========================================================================
-class BillPayDetails extends XdrEncodable {
+class BillPayDetails extends XdrEncodable  {
   PaymentOp paymentDetails;
   BillPayDetailsExt ext;
 
   BillPayDetails(
-    this.paymentDetails,
-    this.ext,
-  );
+      this.paymentDetails,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     paymentDetails.toXdr(stream);
     ext.toXdr(stream);
   }
 }
-
 abstract class BillPayDetailsExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   BillPayDetailsExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class BillPayDetailsExtEmptyVersion extends BillPayDetailsExt {
-  BillPayDetailsExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+  BillPayDetailsExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
 // === xdr source ============================================================
 
@@ -19688,42 +17242,36 @@ class BillPayDetailsExtEmptyVersion extends BillPayDetailsExt {
 //  };
 
 //  ===========================================================================
-class ReviewDetails extends XdrEncodable {
-  Uint32 tasksToAdd;
-  Uint32 tasksToRemove;
+class ReviewDetails extends XdrEncodable  {
+  UINT32 tasksToAdd;
+  UINT32 tasksToRemove;
   String externalDetails;
   ReviewDetailsExt ext;
 
   ReviewDetails(
-    this.tasksToAdd,
-    this.tasksToRemove,
-    this.externalDetails,
-    this.ext,
-  );
+      this.tasksToAdd,
+      this.tasksToRemove,
+      this.externalDetails,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     tasksToAdd.toXdr(stream);
     tasksToRemove.toXdr(stream);
     externalDetails.toXdr(stream);
     ext.toXdr(stream);
   }
 }
-
 abstract class ReviewDetailsExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   ReviewDetailsExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class ReviewDetailsExtEmptyVersion extends ReviewDetailsExt {
-  ReviewDetailsExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+  ReviewDetailsExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
 // === xdr source ============================================================
 
@@ -19742,36 +17290,30 @@ class ReviewDetailsExtEmptyVersion extends ReviewDetailsExt {
 //  };
 
 //  ===========================================================================
-class SaleExtended extends XdrEncodable {
-  Uint64 saleID;
+class SaleExtended extends XdrEncodable  {
+  UINT64 saleID;
   SaleExtendedExt ext;
 
   SaleExtended(
-    this.saleID,
-    this.ext,
-  );
+      this.saleID,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     saleID.toXdr(stream);
     ext.toXdr(stream);
   }
 }
-
 abstract class SaleExtendedExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   SaleExtendedExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class SaleExtendedExtEmptyVersion extends SaleExtendedExt {
-  SaleExtendedExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+  SaleExtendedExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
 // === xdr source ============================================================
 
@@ -19791,36 +17333,30 @@ class SaleExtendedExtEmptyVersion extends SaleExtendedExt {
 //  };
 
 //  ===========================================================================
-class AtomicSwapAskExtended extends XdrEncodable {
-  Uint64 askID;
+class AtomicSwapAskExtended extends XdrEncodable  {
+  UINT64 askID;
   AtomicSwapAskExtendedExt ext;
 
   AtomicSwapAskExtended(
-    this.askID,
-    this.ext,
-  );
+      this.askID,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     askID.toXdr(stream);
     ext.toXdr(stream);
   }
 }
-
 abstract class AtomicSwapAskExtendedExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   AtomicSwapAskExtendedExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class AtomicSwapAskExtendedExtEmptyVersion extends AtomicSwapAskExtendedExt {
-  AtomicSwapAskExtendedExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+  AtomicSwapAskExtendedExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
 // === xdr source ============================================================
 
@@ -19840,36 +17376,30 @@ class AtomicSwapAskExtendedExtEmptyVersion extends AtomicSwapAskExtendedExt {
 //  };
 
 //  ===========================================================================
-class CreatePollExtended extends XdrEncodable {
-  Uint64 pollID;
+class CreatePollExtended extends XdrEncodable  {
+  UINT64 pollID;
   CreatePollExtendedExt ext;
 
   CreatePollExtended(
-    this.pollID,
-    this.ext,
-  );
+      this.pollID,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     pollID.toXdr(stream);
     ext.toXdr(stream);
   }
 }
-
 abstract class CreatePollExtendedExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   CreatePollExtendedExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class CreatePollExtendedExtEmptyVersion extends CreatePollExtendedExt {
-  CreatePollExtendedExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+  CreatePollExtendedExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
 // === xdr source ============================================================
 
@@ -19909,37 +17439,36 @@ class CreatePollExtendedExtEmptyVersion extends CreatePollExtendedExt {
 //  };
 
 //  ===========================================================================
-class AtomicSwapBidExtended extends XdrEncodable {
-  Uint64 askID;
-  AccountID askOwnerID;
-  AccountID bidOwnerID;
-  AssetCode baseAsset;
-  AssetCode quoteAsset;
-  Uint64 baseAmount;
-  Uint64 quoteAmount;
-  Uint64 price;
-  BalanceID askOwnerBaseBalanceID;
-  BalanceID bidOwnerBaseBalanceID;
-  Uint64 unlockedAmount;
+class AtomicSwapBidExtended extends XdrEncodable  {
+  UINT64 askID;
+  ACCOUNTID askOwnerID;
+  ACCOUNTID bidOwnerID;
+  ASSETCODE baseAsset;
+  ASSETCODE quoteAsset;
+  UINT64 baseAmount;
+  UINT64 quoteAmount;
+  UINT64 price;
+  BALANCEID askOwnerBaseBalanceID;
+  BALANCEID bidOwnerBaseBalanceID;
+  UINT64 unlockedAmount;
   AtomicSwapBidExtendedExt ext;
 
   AtomicSwapBidExtended(
-    this.askID,
-    this.askOwnerID,
-    this.bidOwnerID,
-    this.baseAsset,
-    this.quoteAsset,
-    this.baseAmount,
-    this.quoteAmount,
-    this.price,
-    this.askOwnerBaseBalanceID,
-    this.bidOwnerBaseBalanceID,
-    this.unlockedAmount,
-    this.ext,
-  );
+      this.askID,
+      this.askOwnerID,
+      this.bidOwnerID,
+      this.baseAsset,
+      this.quoteAsset,
+      this.baseAmount,
+      this.quoteAmount,
+      this.price,
+      this.askOwnerBaseBalanceID,
+      this.bidOwnerBaseBalanceID,
+      this.unlockedAmount,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     askID.toXdr(stream);
     askOwnerID.toXdr(stream);
     bidOwnerID.toXdr(stream);
@@ -19954,21 +17483,16 @@ class AtomicSwapBidExtended extends XdrEncodable {
     ext.toXdr(stream);
   }
 }
-
 abstract class AtomicSwapBidExtendedExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   AtomicSwapBidExtendedExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class AtomicSwapBidExtendedExtEmptyVersion extends AtomicSwapBidExtendedExt {
-  AtomicSwapBidExtendedExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+  AtomicSwapBidExtendedExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
 // === xdr source ============================================================
 
@@ -19982,21 +17506,20 @@ class AtomicSwapBidExtendedExtEmptyVersion extends AtomicSwapBidExtendedExt {
 //  };
 
 //  ===========================================================================
-class CreateDeferredPaymentResult extends XdrEncodable {
-  Uint64 deferredPaymentID;
-  AccountID destination;
-  AccountID source;
+class CreateDeferredPaymentResult extends XdrEncodable  {
+  UINT64 deferredPaymentID;
+  ACCOUNTID destination;
+  ACCOUNTID source;
   EmptyExt ext;
 
   CreateDeferredPaymentResult(
-    this.deferredPaymentID,
-    this.destination,
-    this.source,
-    this.ext,
-  );
+      this.deferredPaymentID,
+      this.destination,
+      this.source,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     deferredPaymentID.toXdr(stream);
     destination.toXdr(stream);
     source.toXdr(stream);
@@ -20015,19 +17538,18 @@ class CreateDeferredPaymentResult extends XdrEncodable {
 //  };
 
 //  ===========================================================================
-class DataCreationExtended extends XdrEncodable {
-  AccountID owner;
-  Uint64 id;
-  Uint64 type;
+class DataCreationExtended extends XdrEncodable  {
+  ACCOUNTID owner;
+  UINT64 id;
+  UINT64 type;
 
   DataCreationExtended(
-    this.owner,
-    this.id,
-    this.type,
-  );
+      this.owner,
+      this.id,
+      this.type,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     owner.toXdr(stream);
     id.toXdr(stream);
     type.toXdr(stream);
@@ -20076,160 +17598,120 @@ class DataCreationExtended extends XdrEncodable {
 //  };
 
 //  ===========================================================================
-class ExtendedResult extends XdrEncodable {
+class ExtendedResult extends XdrEncodable  {
   bool fulfilled;
   ExtendedResultTypeExt typeExt;
   ExtendedResultExt ext;
 
   ExtendedResult(
-    this.fulfilled,
-    this.typeExt,
-    this.ext,
-  );
+      this.fulfilled,
+      this.typeExt,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     fulfilled.toXdr(stream);
     typeExt.toXdr(stream);
     ext.toXdr(stream);
   }
 }
-
 abstract class ExtendedResultTypeExt extends XdrEncodable {
   ReviewableRequestType discriminant;
-
   ExtendedResultTypeExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class ExtendedResultTypeExtCreateSale extends ExtendedResultTypeExt {
-  ExtendedResultTypeExtCreateSale(this.saleExtended)
-      : super(ReviewableRequestType(ReviewableRequestType.CREATE_SALE));
+  ExtendedResultTypeExtCreateSale(this.saleExtended) : super(ReviewableRequestType(ReviewableRequestType.CREATE_SALE));
   late SaleExtended saleExtended;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     saleExtended.toXdr(stream);
   }
 }
 
 class ExtendedResultTypeExtNone extends ExtendedResultTypeExt {
-  ExtendedResultTypeExtNone()
-      : super(ReviewableRequestType(ReviewableRequestType.NONE));
+  ExtendedResultTypeExtNone() : super(ReviewableRequestType(ReviewableRequestType.NONE));
 }
 
 class ExtendedResultTypeExtCreateAtomicSwapBid extends ExtendedResultTypeExt {
-  ExtendedResultTypeExtCreateAtomicSwapBid(this.atomicSwapBidExtended)
-      : super(ReviewableRequestType(
-            ReviewableRequestType.CREATE_ATOMIC_SWAP_BID));
+  ExtendedResultTypeExtCreateAtomicSwapBid(this.atomicSwapBidExtended) : super(ReviewableRequestType(ReviewableRequestType.CREATE_ATOMIC_SWAP_BID));
   late AtomicSwapBidExtended atomicSwapBidExtended;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     atomicSwapBidExtended.toXdr(stream);
   }
 }
 
 class ExtendedResultTypeExtCreateAtomicSwapAsk extends ExtendedResultTypeExt {
-  ExtendedResultTypeExtCreateAtomicSwapAsk(this.atomicSwapAskExtended)
-      : super(ReviewableRequestType(
-            ReviewableRequestType.CREATE_ATOMIC_SWAP_ASK));
+  ExtendedResultTypeExtCreateAtomicSwapAsk(this.atomicSwapAskExtended) : super(ReviewableRequestType(ReviewableRequestType.CREATE_ATOMIC_SWAP_ASK));
   late AtomicSwapAskExtended atomicSwapAskExtended;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     atomicSwapAskExtended.toXdr(stream);
   }
 }
 
 class ExtendedResultTypeExtCreatePoll extends ExtendedResultTypeExt {
-  ExtendedResultTypeExtCreatePoll(this.createPoll)
-      : super(ReviewableRequestType(ReviewableRequestType.CREATE_POLL));
+  ExtendedResultTypeExtCreatePoll(this.createPoll) : super(ReviewableRequestType(ReviewableRequestType.CREATE_POLL));
   late CreatePollExtended createPoll;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     createPoll.toXdr(stream);
   }
 }
 
 class ExtendedResultTypeExtManageOffer extends ExtendedResultTypeExt {
-  ExtendedResultTypeExtManageOffer(this.manageOfferResult)
-      : super(ReviewableRequestType(ReviewableRequestType.MANAGE_OFFER));
+  ExtendedResultTypeExtManageOffer(this.manageOfferResult) : super(ReviewableRequestType(ReviewableRequestType.MANAGE_OFFER));
   late ManageOfferResult manageOfferResult;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     manageOfferResult.toXdr(stream);
   }
 }
 
 class ExtendedResultTypeExtCreatePayment extends ExtendedResultTypeExt {
-  ExtendedResultTypeExtCreatePayment(this.paymentResult)
-      : super(ReviewableRequestType(ReviewableRequestType.CREATE_PAYMENT));
+  ExtendedResultTypeExtCreatePayment(this.paymentResult) : super(ReviewableRequestType(ReviewableRequestType.CREATE_PAYMENT));
   late PaymentResult paymentResult;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     paymentResult.toXdr(stream);
   }
 }
 
 class ExtendedResultTypeExtPerformRedemption extends ExtendedResultTypeExt {
-  ExtendedResultTypeExtPerformRedemption(this.createRedemptionResult)
-      : super(ReviewableRequestType(ReviewableRequestType.PERFORM_REDEMPTION));
+  ExtendedResultTypeExtPerformRedemption(this.createRedemptionResult) : super(ReviewableRequestType(ReviewableRequestType.PERFORM_REDEMPTION));
   late CreateRedemptionRequestResult createRedemptionResult;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     createRedemptionResult.toXdr(stream);
   }
 }
 
 class ExtendedResultTypeExtDataCreation extends ExtendedResultTypeExt {
-  ExtendedResultTypeExtDataCreation(this.dataCreationExtended)
-      : super(ReviewableRequestType(ReviewableRequestType.DATA_CREATION));
+  ExtendedResultTypeExtDataCreation(this.dataCreationExtended) : super(ReviewableRequestType(ReviewableRequestType.DATA_CREATION));
   late DataCreationExtended dataCreationExtended;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     dataCreationExtended.toXdr(stream);
   }
 }
 
 class ExtendedResultTypeExtCreateDeferredPayment extends ExtendedResultTypeExt {
-  ExtendedResultTypeExtCreateDeferredPayment(this.createDeferredPaymentResult)
-      : super(ReviewableRequestType(
-            ReviewableRequestType.CREATE_DEFERRED_PAYMENT));
+  ExtendedResultTypeExtCreateDeferredPayment(this.createDeferredPaymentResult) : super(ReviewableRequestType(ReviewableRequestType.CREATE_DEFERRED_PAYMENT));
   late CreateDeferredPaymentResult createDeferredPaymentResult;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     createDeferredPaymentResult.toXdr(stream);
   }
 }
 
 class ExtendedResultTypeExtCloseDeferredPayment extends ExtendedResultTypeExt {
-  ExtendedResultTypeExtCloseDeferredPayment(this.closeDeferredPaymentResult)
-      : super(ReviewableRequestType(
-            ReviewableRequestType.CLOSE_DEFERRED_PAYMENT));
+  ExtendedResultTypeExtCloseDeferredPayment(this.closeDeferredPaymentResult) : super(ReviewableRequestType(ReviewableRequestType.CLOSE_DEFERRED_PAYMENT));
   late CloseDeferredPaymentResult closeDeferredPaymentResult;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     closeDeferredPaymentResult.toXdr(stream);
   }
@@ -20237,18 +17719,14 @@ class ExtendedResultTypeExtCloseDeferredPayment extends ExtendedResultTypeExt {
 
 abstract class ExtendedResultExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   ExtendedResultExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class ExtendedResultExtEmptyVersion extends ExtendedResultExt {
-  ExtendedResultExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+  ExtendedResultExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
 // === xdr source ============================================================
 
@@ -20291,27 +17769,26 @@ class ExtendedResultExtEmptyVersion extends ExtendedResultExt {
 //  };
 
 //  ===========================================================================
-class ReviewRequestOp extends XdrEncodable {
-  Uint64 requestID;
-  Hash requestHash;
+class ReviewRequestOp extends XdrEncodable  {
+  UINT64 requestID;
+  HASH requestHash;
   ReviewRequestOpRequestDetails requestDetails;
   ReviewRequestOpAction action;
-  Longstring reason;
+  LONGSTRING reason;
   ReviewDetails reviewDetails;
   ReviewRequestOpExt ext;
 
   ReviewRequestOp(
-    this.requestID,
-    this.requestHash,
-    this.requestDetails,
-    this.action,
-    this.reason,
-    this.reviewDetails,
-    this.ext,
-  );
+      this.requestID,
+      this.requestHash,
+      this.requestDetails,
+      this.action,
+      this.reason,
+      this.reviewDetails,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     requestID.toXdr(stream);
     requestHash.toXdr(stream);
     requestDetails.toXdr(stream);
@@ -20321,78 +17798,54 @@ class ReviewRequestOp extends XdrEncodable {
     ext.toXdr(stream);
   }
 }
-
 abstract class ReviewRequestOpRequestDetails extends XdrEncodable {
   ReviewableRequestType discriminant;
-
   ReviewRequestOpRequestDetails(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
-class ReviewRequestOpRequestDetailsCreateWithdraw
-    extends ReviewRequestOpRequestDetails {
-  ReviewRequestOpRequestDetailsCreateWithdraw(this.withdrawal)
-      : super(ReviewableRequestType(ReviewableRequestType.CREATE_WITHDRAW));
+class ReviewRequestOpRequestDetailsCreateWithdraw extends ReviewRequestOpRequestDetails {
+  ReviewRequestOpRequestDetailsCreateWithdraw(this.withdrawal) : super(ReviewableRequestType(ReviewableRequestType.CREATE_WITHDRAW));
   late WithdrawalDetails withdrawal;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     withdrawal.toXdr(stream);
   }
 }
 
-class ReviewRequestOpRequestDetailsUpdateLimits
-    extends ReviewRequestOpRequestDetails {
-  ReviewRequestOpRequestDetailsUpdateLimits(this.limitsUpdate)
-      : super(ReviewableRequestType(ReviewableRequestType.UPDATE_LIMITS));
+class ReviewRequestOpRequestDetailsUpdateLimits extends ReviewRequestOpRequestDetails {
+  ReviewRequestOpRequestDetailsUpdateLimits(this.limitsUpdate) : super(ReviewableRequestType(ReviewableRequestType.UPDATE_LIMITS));
   late LimitsUpdateDetails limitsUpdate;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     limitsUpdate.toXdr(stream);
   }
 }
 
-class ReviewRequestOpRequestDetailsCreateAmlAlert
-    extends ReviewRequestOpRequestDetails {
-  ReviewRequestOpRequestDetailsCreateAmlAlert(this.amlAlertDetails)
-      : super(ReviewableRequestType(ReviewableRequestType.CREATE_AML_ALERT));
+class ReviewRequestOpRequestDetailsCreateAmlAlert extends ReviewRequestOpRequestDetails {
+  ReviewRequestOpRequestDetailsCreateAmlAlert(this.amlAlertDetails) : super(ReviewableRequestType(ReviewableRequestType.CREATE_AML_ALERT));
   late AMLAlertDetails amlAlertDetails;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     amlAlertDetails.toXdr(stream);
   }
 }
 
-class ReviewRequestOpRequestDetailsCreateInvoice
-    extends ReviewRequestOpRequestDetails {
-  ReviewRequestOpRequestDetailsCreateInvoice(this.billPay)
-      : super(ReviewableRequestType(ReviewableRequestType.CREATE_INVOICE));
+class ReviewRequestOpRequestDetailsCreateInvoice extends ReviewRequestOpRequestDetails {
+  ReviewRequestOpRequestDetailsCreateInvoice(this.billPay) : super(ReviewableRequestType(ReviewableRequestType.CREATE_INVOICE));
   late BillPayDetails billPay;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     billPay.toXdr(stream);
   }
 }
 
-class ReviewRequestOpRequestDetailsManageContract
-    extends ReviewRequestOpRequestDetails {
-  ReviewRequestOpRequestDetailsManageContract(this.contract)
-      : super(ReviewableRequestType(ReviewableRequestType.MANAGE_CONTRACT));
+class ReviewRequestOpRequestDetailsManageContract extends ReviewRequestOpRequestDetails {
+  ReviewRequestOpRequestDetailsManageContract(this.contract) : super(ReviewableRequestType(ReviewableRequestType.MANAGE_CONTRACT));
   late ContractDetails contract;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     contract.toXdr(stream);
   }
@@ -20400,20 +17853,15 @@ class ReviewRequestOpRequestDetailsManageContract
 
 abstract class ReviewRequestOpExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   ReviewRequestOpExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class ReviewRequestOpExtEmptyVersion extends ReviewRequestOpExt {
-  ReviewRequestOpExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+  ReviewRequestOpExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
-
 class ReviewRequestResultCode extends XdrEncodable {
   static const SUCCESS = 0;
   static const INVALID_REASON = -1;
@@ -20479,54 +17927,43 @@ class ReviewRequestResultCode extends XdrEncodable {
   static const MANAGE_OFFER_FAILED = -1700;
   static const PAYMENT_FAILED = -1800;
   static const DATA_NOT_FOUND = -1900;
-  var value;
-
+  int value;
   ReviewRequestResultCode(this.value);
-}
+  @override toXdr(XdrDataOutputStream stream) {
+    value.toXdr(stream);
+  }
 
+}
 abstract class ReviewRequestResult extends XdrEncodable {
   ReviewRequestResultCode discriminant;
-
   ReviewRequestResult(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class ReviewRequestResultSuccess extends ReviewRequestResult {
-  ReviewRequestResultSuccess(this.success)
-      : super(ReviewRequestResultCode(ReviewRequestResultCode.SUCCESS));
+  ReviewRequestResultSuccess(this.success) : super(ReviewRequestResultCode(ReviewRequestResultCode.SUCCESS));
   late ExtendedResult success;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     success.toXdr(stream);
   }
 }
 
 class ReviewRequestResultManageOfferFailed extends ReviewRequestResult {
-  ReviewRequestResultManageOfferFailed(this.manageOfferCode)
-      : super(ReviewRequestResultCode(
-            ReviewRequestResultCode.MANAGE_OFFER_FAILED));
+  ReviewRequestResultManageOfferFailed(this.manageOfferCode) : super(ReviewRequestResultCode(ReviewRequestResultCode.MANAGE_OFFER_FAILED));
   late ManageOfferResultCode manageOfferCode;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     manageOfferCode.toXdr(stream);
   }
 }
 
 class ReviewRequestResultPaymentFailed extends ReviewRequestResult {
-  ReviewRequestResultPaymentFailed(this.paymentCode)
-      : super(ReviewRequestResultCode(ReviewRequestResultCode.PAYMENT_FAILED));
+  ReviewRequestResultPaymentFailed(this.paymentCode) : super(ReviewRequestResultCode(ReviewRequestResultCode.PAYMENT_FAILED));
   late PaymentResultCode paymentCode;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     paymentCode.toXdr(stream);
   }
@@ -20551,19 +17988,18 @@ class ReviewRequestResultPaymentFailed extends ReviewRequestResult {
 //      };
 
 //  ===========================================================================
-class SetFeesOp extends XdrEncodable {
+class SetFeesOp extends XdrEncodable  {
   FeeEntry? fee;
   bool isDelete;
   SetFeesOpExt ext;
 
   SetFeesOp(
-    this.fee,
-    this.isDelete,
-    this.ext,
-  );
+      this.fee,
+      this.isDelete,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     if (fee != null) {
       true.toXdr(stream);
       fee?.toXdr(stream);
@@ -20574,23 +18010,17 @@ class SetFeesOp extends XdrEncodable {
     ext.toXdr(stream);
   }
 }
-
 abstract class SetFeesOpExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   SetFeesOpExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class SetFeesOpExtEmptyVersion extends SetFeesOpExt {
-  SetFeesOpExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+  SetFeesOpExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
-
 class SetFeesResultCode extends XdrEncodable {
   static const SUCCESS = 0;
   static const INVALID_AMOUNT = -1;
@@ -20613,29 +18043,25 @@ class SetFeesResultCode extends XdrEncodable {
   static const INVALID_AMOUNT_PRECISION = -18;
   static const ACCOUNT_NOT_FOUND = -19;
   static const ROLE_NOT_FOUND = -20;
-  var value;
-
+  int value;
   SetFeesResultCode(this.value);
-}
+  @override toXdr(XdrDataOutputStream stream) {
+    value.toXdr(stream);
+  }
 
+}
 abstract class SetFeesResult extends XdrEncodable {
   SetFeesResultCode discriminant;
-
   SetFeesResult(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class SetFeesResultSuccess extends SetFeesResult {
-  SetFeesResultSuccess(this.success)
-      : super(SetFeesResultCode(SetFeesResultCode.SUCCESS));
+  SetFeesResultSuccess(this.success) : super(SetFeesResultCode(SetFeesResultCode.SUCCESS));
   late SetFeesResultSuccessSuccess success;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     success.toXdr(stream);
   }
@@ -20653,33 +18079,27 @@ class SetFeesResultSuccess extends SetFeesResult {
 //              }
 
 //  ===========================================================================
-class SetFeesResultSuccessSuccess extends XdrEncodable {
+class SetFeesResultSuccessSuccess extends XdrEncodable  {
   SetFeesResultSuccessExt ext;
 
   SetFeesResultSuccessSuccess(
-    this.ext,
-  );
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     ext.toXdr(stream);
   }
 }
-
 abstract class SetFeesResultSuccessExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   SetFeesResultSuccessExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class SetFeesResultSuccessExtEmptyVersion extends SetFeesResultSuccessExt {
-  SetFeesResultSuccessExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+  SetFeesResultSuccessExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
 
 // === xdr source ============================================================
@@ -20697,26 +18117,21 @@ class SetFeesResultSuccessExtEmptyVersion extends SetFeesResultSuccessExt {
 //  };
 
 //  ===========================================================================
-class StampOp extends XdrEncodable {
+class StampOp extends XdrEncodable  {
   StampOpExt ext;
 
   StampOp(
-    this.ext,
-  );
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     ext.toXdr(stream);
   }
 }
-
 abstract class StampOpExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   StampOpExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
@@ -20724,12 +18139,14 @@ abstract class StampOpExt extends XdrEncodable {
 class StampOpExtEmptyVersion extends StampOpExt {
   StampOpExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
-
 class StampResultCode extends XdrEncodable {
   static const SUCCESS = 0;
-  var value;
-
+  int value;
   StampResultCode(this.value);
+  @override toXdr(XdrDataOutputStream stream) {
+    value.toXdr(stream);
+  }
+
 }
 // === xdr source ============================================================
 
@@ -20751,59 +18168,46 @@ class StampResultCode extends XdrEncodable {
 //  };
 
 //  ===========================================================================
-class StampSuccess extends XdrEncodable {
-  Hash ledgerHash;
-  Hash licenseHash;
+class StampSuccess extends XdrEncodable  {
+  HASH ledgerHash;
+  HASH licenseHash;
   StampSuccessExt ext;
 
   StampSuccess(
-    this.ledgerHash,
-    this.licenseHash,
-    this.ext,
-  );
+      this.ledgerHash,
+      this.licenseHash,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     ledgerHash.toXdr(stream);
     licenseHash.toXdr(stream);
     ext.toXdr(stream);
   }
 }
-
 abstract class StampSuccessExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   StampSuccessExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class StampSuccessExtEmptyVersion extends StampSuccessExt {
-  StampSuccessExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+  StampSuccessExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
-
 abstract class StampResult extends XdrEncodable {
   StampResultCode discriminant;
-
   StampResult(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class StampResultSuccess extends StampResult {
-  StampResultSuccess(this.success)
-      : super(StampResultCode(StampResultCode.SUCCESS));
+  StampResultSuccess(this.success) : super(StampResultCode(StampResultCode.SUCCESS));
   late StampSuccess success;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     success.toXdr(stream);
   }
@@ -20822,53 +18226,47 @@ class StampResultSuccess extends StampResult {
 //  };
 
 //  ===========================================================================
-class UpdateDataOp extends XdrEncodable {
-  Uint64 dataID;
-  Longstring value;
+class UpdateDataOp extends XdrEncodable  {
+  UINT64 dataID;
+  LONGSTRING value;
   EmptyExt ext;
 
   UpdateDataOp(
-    this.dataID,
-    this.value,
-    this.ext,
-  );
+      this.dataID,
+      this.value,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     dataID.toXdr(stream);
     value.toXdr(stream);
     ext.toXdr(stream);
   }
 }
-
 class UpdateDataResultCode extends XdrEncodable {
   static const SUCCESS = 0;
   static const INVALID_DATA = -1;
   static const NOT_FOUND = -2;
   static const NOT_AUTHORIZED = -3;
-  var value;
-
+  int value;
   UpdateDataResultCode(this.value);
-}
+  @override toXdr(XdrDataOutputStream stream) {
+    value.toXdr(stream);
+  }
 
+}
 abstract class UpdateDataResult extends XdrEncodable {
   UpdateDataResultCode discriminant;
-
   UpdateDataResult(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class UpdateDataResultSuccess extends UpdateDataResult {
-  UpdateDataResultSuccess(this.ext)
-      : super(UpdateDataResultCode(UpdateDataResultCode.SUCCESS));
+  UpdateDataResultSuccess(this.ext) : super(UpdateDataResultCode(UpdateDataResultCode.SUCCESS));
   late EmptyExt ext;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     ext.toXdr(stream);
   }
@@ -20880,9 +18278,12 @@ class ErrorCode extends XdrEncodable {
   static const CONF = 2;
   static const AUTH = 3;
   static const LOAD = 4;
-  var value;
-
+  int value;
   ErrorCode(this.value);
+  @override toXdr(XdrDataOutputStream stream) {
+    value.toXdr(stream);
+  }
+
 }
 // === xdr source ============================================================
 
@@ -20893,17 +18294,16 @@ class ErrorCode extends XdrEncodable {
 //  };
 
 //  ===========================================================================
-class Error extends XdrEncodable {
+class Error extends XdrEncodable  {
   ErrorCode code;
   String msg;
 
   Error(
-    this.code,
-    this.msg,
-  );
+      this.code,
+      this.msg,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     code.toXdr(stream);
     msg.toXdr(stream);
   }
@@ -20918,19 +18318,18 @@ class Error extends XdrEncodable {
 //  };
 
 //  ===========================================================================
-class AuthCert extends XdrEncodable {
+class AuthCert extends XdrEncodable  {
   Curve25519Public pubkey;
-  Uint64 expiration;
-  Signature sig;
+  UINT64 expiration;
+  SIGNATURE sig;
 
   AuthCert(
-    this.pubkey,
-    this.expiration,
-    this.sig,
-  );
+      this.pubkey,
+      this.expiration,
+      this.sig,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     pubkey.toXdr(stream);
     expiration.toXdr(stream);
     sig.toXdr(stream);
@@ -20952,31 +18351,30 @@ class AuthCert extends XdrEncodable {
 //  };
 
 //  ===========================================================================
-class Hello extends XdrEncodable {
-  Uint32 ledgerVersion;
-  Uint32 overlayVersion;
-  Uint32 overlayMinVersion;
-  Hash networkID;
+class Hello extends XdrEncodable  {
+  UINT32 ledgerVersion;
+  UINT32 overlayVersion;
+  UINT32 overlayMinVersion;
+  HASH networkID;
   String versionStr;
   int listeningPort;
-  NodeID peerID;
+  NODEID peerID;
   AuthCert cert;
-  Uint256 nonce;
+  UINT256 nonce;
 
   Hello(
-    this.ledgerVersion,
-    this.overlayVersion,
-    this.overlayMinVersion,
-    this.networkID,
-    this.versionStr,
-    this.listeningPort,
-    this.peerID,
-    this.cert,
-    this.nonce,
-  );
+      this.ledgerVersion,
+      this.overlayVersion,
+      this.overlayMinVersion,
+      this.networkID,
+      this.versionStr,
+      this.listeningPort,
+      this.peerID,
+      this.cert,
+      this.nonce,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     ledgerVersion.toXdr(stream);
     overlayVersion.toXdr(stream);
     overlayMinVersion.toXdr(stream);
@@ -20998,25 +18396,26 @@ class Hello extends XdrEncodable {
 //  };
 
 //  ===========================================================================
-class Auth extends XdrEncodable {
+class Auth extends XdrEncodable  {
   int unused;
 
   Auth(
-    this.unused,
-  );
+      this.unused,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     unused.toXdr(stream);
   }
 }
-
 class IPAddrType extends XdrEncodable {
   static const IPv4 = 0;
   static const IPv6 = 1;
-  var value;
-
+  int value;
   IPAddrType(this.value);
+  @override toXdr(XdrDataOutputStream stream) {
+    value.toXdr(stream);
+  }
+
 }
 // === xdr source ============================================================
 
@@ -21035,32 +18434,27 @@ class IPAddrType extends XdrEncodable {
 //  };
 
 //  ===========================================================================
-class PeerAddress extends XdrEncodable {
+class PeerAddress extends XdrEncodable  {
   PeerAddressIp ip;
-  Uint32 port;
-  Uint32 numFailures;
+  UINT32 port;
+  UINT32 numFailures;
 
   PeerAddress(
-    this.ip,
-    this.port,
-    this.numFailures,
-  );
+      this.ip,
+      this.port,
+      this.numFailures,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     ip.toXdr(stream);
     port.toXdr(stream);
     numFailures.toXdr(stream);
   }
 }
-
 abstract class PeerAddressIp extends XdrEncodable {
   IPAddrType discriminant;
-
   PeerAddressIp(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
@@ -21068,9 +18462,7 @@ abstract class PeerAddressIp extends XdrEncodable {
 class PeerAddressIpIpv4 extends PeerAddressIp {
   PeerAddressIpIpv4(this.ipv4) : super(IPAddrType(IPAddrType.IPv4));
   late XdrByteArrayFixed4 ipv4;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     ipv4.toXdr(stream);
   }
@@ -21079,14 +18471,11 @@ class PeerAddressIpIpv4 extends PeerAddressIp {
 class PeerAddressIpIpv6 extends PeerAddressIp {
   PeerAddressIpIpv6(this.ipv6) : super(IPAddrType(IPAddrType.IPv6));
   late XdrByteArrayFixed16 ipv6;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     ipv6.toXdr(stream);
   }
 }
-
 class MessageType extends XdrEncodable {
   static const ERROR_MSG = 0;
   static const AUTH = 2;
@@ -21101,9 +18490,12 @@ class MessageType extends XdrEncodable {
   static const SCP_MESSAGE = 11;
   static const GET_SCP_STATE = 12;
   static const HELLO = 13;
-  var value;
-
+  int value;
   MessageType(this.value);
+  @override toXdr(XdrDataOutputStream stream) {
+    value.toXdr(stream);
+  }
+
 }
 // === xdr source ============================================================
 
@@ -21114,40 +18506,32 @@ class MessageType extends XdrEncodable {
 //  };
 
 //  ===========================================================================
-class DontHave extends XdrEncodable {
+class DontHave extends XdrEncodable  {
   MessageType type;
-  Uint256 reqHash;
+  UINT256 reqHash;
 
   DontHave(
-    this.type,
-    this.reqHash,
-  );
+      this.type,
+      this.reqHash,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     type.toXdr(stream);
     reqHash.toXdr(stream);
   }
 }
-
 abstract class StellarMessage extends XdrEncodable {
   MessageType discriminant;
-
   StellarMessage(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class StellarMessageErrorMsg extends StellarMessage {
-  StellarMessageErrorMsg(this.error)
-      : super(MessageType(MessageType.ERROR_MSG));
+  StellarMessageErrorMsg(this.error) : super(MessageType(MessageType.ERROR_MSG));
   late Error error;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     error.toXdr(stream);
   }
@@ -21156,9 +18540,7 @@ class StellarMessageErrorMsg extends StellarMessage {
 class StellarMessageHello extends StellarMessage {
   StellarMessageHello(this.hello) : super(MessageType(MessageType.HELLO));
   late Hello hello;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     hello.toXdr(stream);
   }
@@ -21167,21 +18549,16 @@ class StellarMessageHello extends StellarMessage {
 class StellarMessageAuth extends StellarMessage {
   StellarMessageAuth(this.auth) : super(MessageType(MessageType.AUTH));
   late Auth auth;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     auth.toXdr(stream);
   }
 }
 
 class StellarMessageDontHave extends StellarMessage {
-  StellarMessageDontHave(this.dontHave)
-      : super(MessageType(MessageType.DONT_HAVE));
+  StellarMessageDontHave(this.dontHave) : super(MessageType(MessageType.DONT_HAVE));
   late DontHave dontHave;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     dontHave.toXdr(stream);
   }
@@ -21194,24 +18571,19 @@ class StellarMessageGetPeers extends StellarMessage {
 class StellarMessagePeers extends StellarMessage {
   StellarMessagePeers(this.peers) : super(MessageType(MessageType.PEERS));
   late List<PeerAddress> peers;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     peers.length.toXdr(stream);
-    peers.forEach((element) {
+    peers.forEach ((element) {
       element.toXdr(stream);
     });
   }
 }
 
 class StellarMessageGetTxSet extends StellarMessage {
-  StellarMessageGetTxSet(this.txSetHash)
-      : super(MessageType(MessageType.GET_TX_SET));
-  late Uint256 txSetHash;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  StellarMessageGetTxSet(this.txSetHash) : super(MessageType(MessageType.GET_TX_SET));
+  late UINT256 txSetHash;
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     txSetHash.toXdr(stream);
   }
@@ -21220,69 +18592,52 @@ class StellarMessageGetTxSet extends StellarMessage {
 class StellarMessageTxSet extends StellarMessage {
   StellarMessageTxSet(this.txSet) : super(MessageType(MessageType.TX_SET));
   late TransactionSet txSet;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     txSet.toXdr(stream);
   }
 }
 
 class StellarMessageTransaction extends StellarMessage {
-  StellarMessageTransaction(this.transaction)
-      : super(MessageType(MessageType.TRANSACTION));
+  StellarMessageTransaction(this.transaction) : super(MessageType(MessageType.TRANSACTION));
   late TransactionEnvelope transaction;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     transaction.toXdr(stream);
   }
 }
 
 class StellarMessageGetScpQuorumset extends StellarMessage {
-  StellarMessageGetScpQuorumset(this.qSetHash)
-      : super(MessageType(MessageType.GET_SCP_QUORUMSET));
-  late Uint256 qSetHash;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  StellarMessageGetScpQuorumset(this.qSetHash) : super(MessageType(MessageType.GET_SCP_QUORUMSET));
+  late UINT256 qSetHash;
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     qSetHash.toXdr(stream);
   }
 }
 
 class StellarMessageScpQuorumset extends StellarMessage {
-  StellarMessageScpQuorumset(this.qSet)
-      : super(MessageType(MessageType.SCP_QUORUMSET));
+  StellarMessageScpQuorumset(this.qSet) : super(MessageType(MessageType.SCP_QUORUMSET));
   late SCPQuorumSet qSet;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     qSet.toXdr(stream);
   }
 }
 
 class StellarMessageScpMessage extends StellarMessage {
-  StellarMessageScpMessage(this.envelope)
-      : super(MessageType(MessageType.SCP_MESSAGE));
+  StellarMessageScpMessage(this.envelope) : super(MessageType(MessageType.SCP_MESSAGE));
   late SCPEnvelope envelope;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     envelope.toXdr(stream);
   }
 }
 
 class StellarMessageGetScpState extends StellarMessage {
-  StellarMessageGetScpState(this.getSCPLedgerSeq)
-      : super(MessageType(MessageType.GET_SCP_STATE));
-  late Uint32 getSCPLedgerSeq;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  StellarMessageGetScpState(this.getSCPLedgerSeq) : super(MessageType(MessageType.GET_SCP_STATE));
+  late UINT32 getSCPLedgerSeq;
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     getSCPLedgerSeq.toXdr(stream);
   }
@@ -21290,22 +18645,16 @@ class StellarMessageGetScpState extends StellarMessage {
 
 abstract class AuthenticatedMessage extends XdrEncodable {
   LedgerVersion discriminant;
-
   AuthenticatedMessage(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class AuthenticatedMessageEmptyVersion extends AuthenticatedMessage {
-  AuthenticatedMessageEmptyVersion(this.v0)
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+  AuthenticatedMessageEmptyVersion(this.v0) : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
   late AuthenticatedMessageV0V0 v0;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     v0.toXdr(stream);
   }
@@ -21320,19 +18669,18 @@ class AuthenticatedMessageEmptyVersion extends AuthenticatedMessage {
 //      }
 
 //  ===========================================================================
-class AuthenticatedMessageV0V0 extends XdrEncodable {
-  Uint64 sequence;
+class AuthenticatedMessageV0V0 extends XdrEncodable  {
+  UINT64 sequence;
   StellarMessage message;
   HmacSha256Mac mac;
 
   AuthenticatedMessageV0V0(
-    this.sequence,
-    this.message,
-    this.mac,
-  );
+      this.sequence,
+      this.message,
+      this.mac,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     sequence.toXdr(stream);
     message.toXdr(stream);
     mac.toXdr(stream);
@@ -21341,192 +18689,133 @@ class AuthenticatedMessageV0V0 extends XdrEncodable {
 
 abstract class ReviewableRequestResource extends XdrEncodable {
   ReviewableRequestType discriminant;
-
   ReviewableRequestResource(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class ReviewableRequestResourceCreateSale extends ReviewableRequestResource {
-  ReviewableRequestResourceCreateSale(this.createSale)
-      : super(ReviewableRequestType(ReviewableRequestType.CREATE_SALE));
+  ReviewableRequestResourceCreateSale(this.createSale) : super(ReviewableRequestType(ReviewableRequestType.CREATE_SALE));
   late ReviewableRequestResourceCreateSaleCreateSale createSale;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     createSale.toXdr(stream);
   }
 }
 
-class ReviewableRequestResourceCreateIssuance
-    extends ReviewableRequestResource {
-  ReviewableRequestResourceCreateIssuance(this.createIssuance)
-      : super(ReviewableRequestType(ReviewableRequestType.CREATE_ISSUANCE));
+class ReviewableRequestResourceCreateIssuance extends ReviewableRequestResource {
+  ReviewableRequestResourceCreateIssuance(this.createIssuance) : super(ReviewableRequestType(ReviewableRequestType.CREATE_ISSUANCE));
   late ReviewableRequestResourceCreateIssuanceCreateIssuance createIssuance;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     createIssuance.toXdr(stream);
   }
 }
 
-class ReviewableRequestResourceCreateWithdraw
-    extends ReviewableRequestResource {
-  ReviewableRequestResourceCreateWithdraw(this.createWithdraw)
-      : super(ReviewableRequestType(ReviewableRequestType.CREATE_WITHDRAW));
+class ReviewableRequestResourceCreateWithdraw extends ReviewableRequestResource {
+  ReviewableRequestResourceCreateWithdraw(this.createWithdraw) : super(ReviewableRequestType(ReviewableRequestType.CREATE_WITHDRAW));
   late ReviewableRequestResourceCreateWithdrawCreateWithdraw createWithdraw;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     createWithdraw.toXdr(stream);
   }
 }
 
-class ReviewableRequestResourceCreateAtomicSwapAsk
-    extends ReviewableRequestResource {
-  ReviewableRequestResourceCreateAtomicSwapAsk(this.createAtomicSwapAskExt)
-      : super(ReviewableRequestType(
-            ReviewableRequestType.CREATE_ATOMIC_SWAP_ASK));
+class ReviewableRequestResourceCreateAtomicSwapAsk extends ReviewableRequestResource {
+  ReviewableRequestResourceCreateAtomicSwapAsk(this.createAtomicSwapAskExt) : super(ReviewableRequestType(ReviewableRequestType.CREATE_ATOMIC_SWAP_ASK));
   late ReviewableRequestResourceCreateAtomicSwapAskExt createAtomicSwapAskExt;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     createAtomicSwapAskExt.toXdr(stream);
   }
 }
 
-class ReviewableRequestResourceCreateAtomicSwapBid
-    extends ReviewableRequestResource {
-  ReviewableRequestResourceCreateAtomicSwapBid(this.createAtomicSwapBidExt)
-      : super(ReviewableRequestType(
-            ReviewableRequestType.CREATE_ATOMIC_SWAP_BID));
+class ReviewableRequestResourceCreateAtomicSwapBid extends ReviewableRequestResource {
+  ReviewableRequestResourceCreateAtomicSwapBid(this.createAtomicSwapBidExt) : super(ReviewableRequestType(ReviewableRequestType.CREATE_ATOMIC_SWAP_BID));
   late ReviewableRequestResourceCreateAtomicSwapBidExt createAtomicSwapBidExt;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     createAtomicSwapBidExt.toXdr(stream);
   }
 }
 
 class ReviewableRequestResourceCreatePoll extends ReviewableRequestResource {
-  ReviewableRequestResourceCreatePoll(this.createPoll)
-      : super(ReviewableRequestType(ReviewableRequestType.CREATE_POLL));
+  ReviewableRequestResourceCreatePoll(this.createPoll) : super(ReviewableRequestType(ReviewableRequestType.CREATE_POLL));
   late ReviewableRequestResourceCreatePollCreatePoll createPoll;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     createPoll.toXdr(stream);
   }
 }
 
 class ReviewableRequestResourceManageOffer extends ReviewableRequestResource {
-  ReviewableRequestResourceManageOffer(this.manageOffer)
-      : super(ReviewableRequestType(ReviewableRequestType.MANAGE_OFFER));
+  ReviewableRequestResourceManageOffer(this.manageOffer) : super(ReviewableRequestType(ReviewableRequestType.MANAGE_OFFER));
   late ReviewableRequestResourceManageOfferManageOffer manageOffer;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     manageOffer.toXdr(stream);
   }
 }
 
 class ReviewableRequestResourceCreatePayment extends ReviewableRequestResource {
-  ReviewableRequestResourceCreatePayment(this.createPayment)
-      : super(ReviewableRequestType(ReviewableRequestType.CREATE_PAYMENT));
+  ReviewableRequestResourceCreatePayment(this.createPayment) : super(ReviewableRequestType(ReviewableRequestType.CREATE_PAYMENT));
   late ReviewableRequestResourceCreatePaymentCreatePayment createPayment;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     createPayment.toXdr(stream);
   }
 }
 
-class ReviewableRequestResourcePerformRedemption
-    extends ReviewableRequestResource {
-  ReviewableRequestResourcePerformRedemption(this.performRedemption)
-      : super(ReviewableRequestType(ReviewableRequestType.PERFORM_REDEMPTION));
-  late ReviewableRequestResourcePerformRedemptionPerformRedemption
-      performRedemption;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+class ReviewableRequestResourcePerformRedemption extends ReviewableRequestResource {
+  ReviewableRequestResourcePerformRedemption(this.performRedemption) : super(ReviewableRequestType(ReviewableRequestType.PERFORM_REDEMPTION));
+  late ReviewableRequestResourcePerformRedemptionPerformRedemption performRedemption;
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     performRedemption.toXdr(stream);
   }
 }
 
 class ReviewableRequestResourceDataCreation extends ReviewableRequestResource {
-  ReviewableRequestResourceDataCreation(this.dataCreation)
-      : super(ReviewableRequestType(ReviewableRequestType.DATA_CREATION));
+  ReviewableRequestResourceDataCreation(this.dataCreation) : super(ReviewableRequestType(ReviewableRequestType.DATA_CREATION));
   late ReviewableRequestResourceDataCreationDataCreation dataCreation;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     dataCreation.toXdr(stream);
   }
 }
 
 class ReviewableRequestResourceDataUpdate extends ReviewableRequestResource {
-  ReviewableRequestResourceDataUpdate(this.dataUpdate)
-      : super(ReviewableRequestType(ReviewableRequestType.DATA_UPDATE));
+  ReviewableRequestResourceDataUpdate(this.dataUpdate) : super(ReviewableRequestType(ReviewableRequestType.DATA_UPDATE));
   late ReviewableRequestResourceDataUpdateDataUpdate dataUpdate;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     dataUpdate.toXdr(stream);
   }
 }
 
 class ReviewableRequestResourceDataRemove extends ReviewableRequestResource {
-  ReviewableRequestResourceDataRemove(this.dataRemove)
-      : super(ReviewableRequestType(ReviewableRequestType.DATA_REMOVE));
+  ReviewableRequestResourceDataRemove(this.dataRemove) : super(ReviewableRequestType(ReviewableRequestType.DATA_REMOVE));
   late ReviewableRequestResourceDataRemoveDataRemove dataRemove;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     dataRemove.toXdr(stream);
   }
 }
 
-class ReviewableRequestResourceCreateDeferredPayment
-    extends ReviewableRequestResource {
-  ReviewableRequestResourceCreateDeferredPayment(this.createDeferredPayment)
-      : super(ReviewableRequestType(
-            ReviewableRequestType.CREATE_DEFERRED_PAYMENT));
-  late ReviewableRequestResourceCreateDeferredPaymentCreateDeferredPayment
-      createDeferredPayment;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+class ReviewableRequestResourceCreateDeferredPayment extends ReviewableRequestResource {
+  ReviewableRequestResourceCreateDeferredPayment(this.createDeferredPayment) : super(ReviewableRequestType(ReviewableRequestType.CREATE_DEFERRED_PAYMENT));
+  late ReviewableRequestResourceCreateDeferredPaymentCreateDeferredPayment createDeferredPayment;
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     createDeferredPayment.toXdr(stream);
   }
 }
 
-class ReviewableRequestResourceCloseDeferredPayment
-    extends ReviewableRequestResource {
-  ReviewableRequestResourceCloseDeferredPayment(this.closeDeferredPayment)
-      : super(ReviewableRequestType(
-            ReviewableRequestType.CLOSE_DEFERRED_PAYMENT));
-  late ReviewableRequestResourceCloseDeferredPaymentCloseDeferredPayment
-      closeDeferredPayment;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+class ReviewableRequestResourceCloseDeferredPayment extends ReviewableRequestResource {
+  ReviewableRequestResourceCloseDeferredPayment(this.closeDeferredPayment) : super(ReviewableRequestType(ReviewableRequestType.CLOSE_DEFERRED_PAYMENT));
+  late ReviewableRequestResourceCloseDeferredPaymentCloseDeferredPayment closeDeferredPayment;
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     closeDeferredPayment.toXdr(stream);
   }
@@ -21543,17 +18832,16 @@ class ReviewableRequestResourceCloseDeferredPayment
 //      }
 
 //  ===========================================================================
-class ReviewableRequestResourceCreateSaleCreateSale extends XdrEncodable {
-  Uint64 type;
+class ReviewableRequestResourceCreateSaleCreateSale extends XdrEncodable  {
+  UINT64 type;
   EmptyExt ext;
 
   ReviewableRequestResourceCreateSaleCreateSale(
-    this.type,
-    this.ext,
-  );
+      this.type,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     type.toXdr(stream);
     ext.toXdr(stream);
   }
@@ -21572,20 +18860,18 @@ class ReviewableRequestResourceCreateSaleCreateSale extends XdrEncodable {
 //      }
 
 //  ===========================================================================
-class ReviewableRequestResourceCreateIssuanceCreateIssuance
-    extends XdrEncodable {
-  AssetCode assetCode;
-  Uint64 assetType;
+class ReviewableRequestResourceCreateIssuanceCreateIssuance extends XdrEncodable  {
+  ASSETCODE assetCode;
+  UINT64 assetType;
   EmptyExt ext;
 
   ReviewableRequestResourceCreateIssuanceCreateIssuance(
-    this.assetCode,
-    this.assetType,
-    this.ext,
-  );
+      this.assetCode,
+      this.assetType,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     assetCode.toXdr(stream);
     assetType.toXdr(stream);
     ext.toXdr(stream);
@@ -21605,54 +18891,39 @@ class ReviewableRequestResourceCreateIssuanceCreateIssuance
 //      }
 
 //  ===========================================================================
-class ReviewableRequestResourceCreateWithdrawCreateWithdraw
-    extends XdrEncodable {
-  AssetCode assetCode;
-  Uint64 assetType;
+class ReviewableRequestResourceCreateWithdrawCreateWithdraw extends XdrEncodable  {
+  ASSETCODE assetCode;
+  UINT64 assetType;
   EmptyExt ext;
 
   ReviewableRequestResourceCreateWithdrawCreateWithdraw(
-    this.assetCode,
-    this.assetType,
-    this.ext,
-  );
+      this.assetCode,
+      this.assetType,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     assetCode.toXdr(stream);
     assetType.toXdr(stream);
     ext.toXdr(stream);
   }
 }
-
-abstract class ReviewableRequestResourceCreateAtomicSwapAskExt
-    extends XdrEncodable {
+abstract class ReviewableRequestResourceCreateAtomicSwapAskExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   ReviewableRequestResourceCreateAtomicSwapAskExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
-class ReviewableRequestResourceCreateAtomicSwapAskExtEmptyVersion
-    extends ReviewableRequestResourceCreateAtomicSwapAskExt {
-  ReviewableRequestResourceCreateAtomicSwapAskExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+class ReviewableRequestResourceCreateAtomicSwapAskExtEmptyVersion extends ReviewableRequestResourceCreateAtomicSwapAskExt {
+  ReviewableRequestResourceCreateAtomicSwapAskExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
 
-class ReviewableRequestResourceCreateAtomicSwapAskExtAtomicSwapReturning
-    extends ReviewableRequestResourceCreateAtomicSwapAskExt {
-  ReviewableRequestResourceCreateAtomicSwapAskExtAtomicSwapReturning(
-      this.createAtomicSwapAsk)
-      : super(LedgerVersion(LedgerVersion.ATOMIC_SWAP_RETURNING));
-  late ReviewableRequestResourceCreateAtomicSwapAskExtCreateAtomicSwapAskCreateAtomicSwapAsk
-      createAtomicSwapAsk;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+class ReviewableRequestResourceCreateAtomicSwapAskExtAtomicSwapReturning extends ReviewableRequestResourceCreateAtomicSwapAskExt {
+  ReviewableRequestResourceCreateAtomicSwapAskExtAtomicSwapReturning(this.createAtomicSwapAsk) : super(LedgerVersion(LedgerVersion.ATOMIC_SWAP_RETURNING));
+  late ReviewableRequestResourceCreateAtomicSwapAskExtCreateAtomicSwapAskCreateAtomicSwapAsk createAtomicSwapAsk;
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     createAtomicSwapAsk.toXdr(stream);
   }
@@ -21671,54 +18942,40 @@ class ReviewableRequestResourceCreateAtomicSwapAskExtAtomicSwapReturning
 //          }
 
 //  ===========================================================================
-class ReviewableRequestResourceCreateAtomicSwapAskExtCreateAtomicSwapAskCreateAtomicSwapAsk
-    extends XdrEncodable {
-  AssetCode assetCode;
-  Uint64 assetType;
+class ReviewableRequestResourceCreateAtomicSwapAskExtCreateAtomicSwapAskCreateAtomicSwapAsk extends XdrEncodable  {
+  ASSETCODE assetCode;
+  UINT64 assetType;
   EmptyExt ext;
 
   ReviewableRequestResourceCreateAtomicSwapAskExtCreateAtomicSwapAskCreateAtomicSwapAsk(
-    this.assetCode,
-    this.assetType,
-    this.ext,
-  );
+      this.assetCode,
+      this.assetType,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     assetCode.toXdr(stream);
     assetType.toXdr(stream);
     ext.toXdr(stream);
   }
 }
 
-abstract class ReviewableRequestResourceCreateAtomicSwapBidExt
-    extends XdrEncodable {
+abstract class ReviewableRequestResourceCreateAtomicSwapBidExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   ReviewableRequestResourceCreateAtomicSwapBidExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
-class ReviewableRequestResourceCreateAtomicSwapBidExtEmptyVersion
-    extends ReviewableRequestResourceCreateAtomicSwapBidExt {
-  ReviewableRequestResourceCreateAtomicSwapBidExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+class ReviewableRequestResourceCreateAtomicSwapBidExtEmptyVersion extends ReviewableRequestResourceCreateAtomicSwapBidExt {
+  ReviewableRequestResourceCreateAtomicSwapBidExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
 
-class ReviewableRequestResourceCreateAtomicSwapBidExtAtomicSwapReturning
-    extends ReviewableRequestResourceCreateAtomicSwapBidExt {
-  ReviewableRequestResourceCreateAtomicSwapBidExtAtomicSwapReturning(
-      this.createAtomicSwapBid)
-      : super(LedgerVersion(LedgerVersion.ATOMIC_SWAP_RETURNING));
-  late ReviewableRequestResourceCreateAtomicSwapBidExtCreateAtomicSwapBidCreateAtomicSwapBid
-      createAtomicSwapBid;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+class ReviewableRequestResourceCreateAtomicSwapBidExtAtomicSwapReturning extends ReviewableRequestResourceCreateAtomicSwapBidExt {
+  ReviewableRequestResourceCreateAtomicSwapBidExtAtomicSwapReturning(this.createAtomicSwapBid) : super(LedgerVersion(LedgerVersion.ATOMIC_SWAP_RETURNING));
+  late ReviewableRequestResourceCreateAtomicSwapBidExtCreateAtomicSwapBidCreateAtomicSwapBid createAtomicSwapBid;
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     createAtomicSwapBid.toXdr(stream);
   }
@@ -21737,20 +18994,18 @@ class ReviewableRequestResourceCreateAtomicSwapBidExtAtomicSwapReturning
 //          }
 
 //  ===========================================================================
-class ReviewableRequestResourceCreateAtomicSwapBidExtCreateAtomicSwapBidCreateAtomicSwapBid
-    extends XdrEncodable {
-  AssetCode assetCode;
-  Uint64 assetType;
+class ReviewableRequestResourceCreateAtomicSwapBidExtCreateAtomicSwapBidCreateAtomicSwapBid extends XdrEncodable  {
+  ASSETCODE assetCode;
+  UINT64 assetType;
   EmptyExt ext;
 
   ReviewableRequestResourceCreateAtomicSwapBidExtCreateAtomicSwapBidCreateAtomicSwapBid(
-    this.assetCode,
-    this.assetType,
-    this.ext,
-  );
+      this.assetCode,
+      this.assetType,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     assetCode.toXdr(stream);
     assetType.toXdr(stream);
     ext.toXdr(stream);
@@ -21769,17 +19024,16 @@ class ReviewableRequestResourceCreateAtomicSwapBidExtCreateAtomicSwapBidCreateAt
 //      }
 
 //  ===========================================================================
-class ReviewableRequestResourceCreatePollCreatePoll extends XdrEncodable {
-  Uint32 permissionType;
+class ReviewableRequestResourceCreatePollCreatePoll extends XdrEncodable  {
+  UINT32 permissionType;
   EmptyExt ext;
 
   ReviewableRequestResourceCreatePollCreatePoll(
-    this.permissionType,
-    this.ext,
-  );
+      this.permissionType,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     permissionType.toXdr(stream);
     ext.toXdr(stream);
   }
@@ -21814,29 +19068,28 @@ class ReviewableRequestResourceCreatePollCreatePoll extends XdrEncodable {
 //      }
 
 //  ===========================================================================
-class ReviewableRequestResourceManageOfferManageOffer extends XdrEncodable {
-  Uint64 baseAssetType;
-  Uint64 quoteAssetType;
-  AssetCode baseAssetCode;
-  AssetCode quoteAssetCode;
+class ReviewableRequestResourceManageOfferManageOffer extends XdrEncodable  {
+  UINT64 baseAssetType;
+  UINT64 quoteAssetType;
+  ASSETCODE baseAssetCode;
+  ASSETCODE quoteAssetCode;
   bool isBuy;
-  Uint32 manageAction;
-  Uint64 orderBookID;
+  UINT32 manageAction;
+  UINT64 orderBookID;
   EmptyExt ext;
 
   ReviewableRequestResourceManageOfferManageOffer(
-    this.baseAssetType,
-    this.quoteAssetType,
-    this.baseAssetCode,
-    this.quoteAssetCode,
-    this.isBuy,
-    this.manageAction,
-    this.orderBookID,
-    this.ext,
-  );
+      this.baseAssetType,
+      this.quoteAssetType,
+      this.baseAssetCode,
+      this.quoteAssetCode,
+      this.isBuy,
+      this.manageAction,
+      this.orderBookID,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     baseAssetType.toXdr(stream);
     quoteAssetType.toXdr(stream);
     baseAssetCode.toXdr(stream);
@@ -21861,19 +19114,18 @@ class ReviewableRequestResourceManageOfferManageOffer extends XdrEncodable {
 //      }
 
 //  ===========================================================================
-class ReviewableRequestResourceCreatePaymentCreatePayment extends XdrEncodable {
-  AssetCode assetCode;
-  Uint64 assetType;
+class ReviewableRequestResourceCreatePaymentCreatePayment extends XdrEncodable  {
+  ASSETCODE assetCode;
+  UINT64 assetType;
   EmptyExt ext;
 
   ReviewableRequestResourceCreatePaymentCreatePayment(
-    this.assetCode,
-    this.assetType,
-    this.ext,
-  );
+      this.assetCode,
+      this.assetType,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     assetCode.toXdr(stream);
     assetType.toXdr(stream);
     ext.toXdr(stream);
@@ -21893,20 +19145,18 @@ class ReviewableRequestResourceCreatePaymentCreatePayment extends XdrEncodable {
 //      }
 
 //  ===========================================================================
-class ReviewableRequestResourcePerformRedemptionPerformRedemption
-    extends XdrEncodable {
-  AssetCode assetCode;
-  Uint64 assetType;
+class ReviewableRequestResourcePerformRedemptionPerformRedemption extends XdrEncodable  {
+  ASSETCODE assetCode;
+  UINT64 assetType;
   EmptyExt ext;
 
   ReviewableRequestResourcePerformRedemptionPerformRedemption(
-    this.assetCode,
-    this.assetType,
-    this.ext,
-  );
+      this.assetCode,
+      this.assetType,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     assetCode.toXdr(stream);
     assetType.toXdr(stream);
     ext.toXdr(stream);
@@ -21923,17 +19173,16 @@ class ReviewableRequestResourcePerformRedemptionPerformRedemption
 //      }
 
 //  ===========================================================================
-class ReviewableRequestResourceDataCreationDataCreation extends XdrEncodable {
-  Uint64 type;
+class ReviewableRequestResourceDataCreationDataCreation extends XdrEncodable  {
+  UINT64 type;
   EmptyExt ext;
 
   ReviewableRequestResourceDataCreationDataCreation(
-    this.type,
-    this.ext,
-  );
+      this.type,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     type.toXdr(stream);
     ext.toXdr(stream);
   }
@@ -21949,17 +19198,16 @@ class ReviewableRequestResourceDataCreationDataCreation extends XdrEncodable {
 //      }
 
 //  ===========================================================================
-class ReviewableRequestResourceDataUpdateDataUpdate extends XdrEncodable {
-  Uint64 type;
+class ReviewableRequestResourceDataUpdateDataUpdate extends XdrEncodable  {
+  UINT64 type;
   EmptyExt ext;
 
   ReviewableRequestResourceDataUpdateDataUpdate(
-    this.type,
-    this.ext,
-  );
+      this.type,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     type.toXdr(stream);
     ext.toXdr(stream);
   }
@@ -21975,17 +19223,16 @@ class ReviewableRequestResourceDataUpdateDataUpdate extends XdrEncodable {
 //      }
 
 //  ===========================================================================
-class ReviewableRequestResourceDataRemoveDataRemove extends XdrEncodable {
-  Uint64 type;
+class ReviewableRequestResourceDataRemoveDataRemove extends XdrEncodable  {
+  UINT64 type;
   EmptyExt ext;
 
   ReviewableRequestResourceDataRemoveDataRemove(
-    this.type,
-    this.ext,
-  );
+      this.type,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     type.toXdr(stream);
     ext.toXdr(stream);
   }
@@ -22001,20 +19248,18 @@ class ReviewableRequestResourceDataRemoveDataRemove extends XdrEncodable {
 //      }
 
 //  ===========================================================================
-class ReviewableRequestResourceCreateDeferredPaymentCreateDeferredPayment
-    extends XdrEncodable {
-  AssetCode assetCode;
-  Uint64 assetType;
+class ReviewableRequestResourceCreateDeferredPaymentCreateDeferredPayment extends XdrEncodable  {
+  ASSETCODE assetCode;
+  UINT64 assetType;
   EmptyExt ext;
 
   ReviewableRequestResourceCreateDeferredPaymentCreateDeferredPayment(
-    this.assetCode,
-    this.assetType,
-    this.ext,
-  );
+      this.assetCode,
+      this.assetType,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     assetCode.toXdr(stream);
     assetType.toXdr(stream);
     ext.toXdr(stream);
@@ -22031,20 +19276,18 @@ class ReviewableRequestResourceCreateDeferredPaymentCreateDeferredPayment
 //      }
 
 //  ===========================================================================
-class ReviewableRequestResourceCloseDeferredPaymentCloseDeferredPayment
-    extends XdrEncodable {
-  AssetCode assetCode;
-  Uint64 assetType;
+class ReviewableRequestResourceCloseDeferredPaymentCloseDeferredPayment extends XdrEncodable  {
+  ASSETCODE assetCode;
+  UINT64 assetType;
   EmptyExt ext;
 
   ReviewableRequestResourceCloseDeferredPaymentCloseDeferredPayment(
-    this.assetCode,
-    this.assetType,
-    this.ext,
-  );
+      this.assetCode,
+      this.assetType,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     assetCode.toXdr(stream);
     assetType.toXdr(stream);
     ext.toXdr(stream);
@@ -22064,19 +19307,18 @@ class ReviewableRequestResourceCloseDeferredPaymentCloseDeferredPayment
 //  };
 
 //  ===========================================================================
-class CustomRuleResource extends XdrEncodable {
-  Longstring? action;
-  Longstring resource;
+class CustomRuleResource extends XdrEncodable  {
+  LONGSTRING? action;
+  LONGSTRING resource;
   EmptyExt ext;
 
   CustomRuleResource(
-    this.action,
-    this.resource,
-    this.ext,
-  );
+      this.action,
+      this.resource,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     if (action != null) {
       true.toXdr(stream);
       action?.toXdr(stream);
@@ -22087,37 +19329,27 @@ class CustomRuleResource extends XdrEncodable {
     ext.toXdr(stream);
   }
 }
-
 abstract class AccountRuleResource extends XdrEncodable {
   LedgerEntryType discriminant;
-
   AccountRuleResource(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class AccountRuleResourceAsset extends AccountRuleResource {
-  AccountRuleResourceAsset(this.asset)
-      : super(LedgerEntryType(LedgerEntryType.ASSET));
+  AccountRuleResourceAsset(this.asset) : super(LedgerEntryType(LedgerEntryType.ASSET));
   late AccountRuleResourceAssetAsset asset;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     asset.toXdr(stream);
   }
 }
 
 class AccountRuleResourceReviewableRequest extends AccountRuleResource {
-  AccountRuleResourceReviewableRequest(this.reviewableRequest)
-      : super(LedgerEntryType(LedgerEntryType.REVIEWABLE_REQUEST));
+  AccountRuleResourceReviewableRequest(this.reviewableRequest) : super(LedgerEntryType(LedgerEntryType.REVIEWABLE_REQUEST));
   late AccountRuleResourceReviewableRequestReviewableRequest reviewableRequest;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     reviewableRequest.toXdr(stream);
   }
@@ -22128,133 +19360,99 @@ class AccountRuleResourceAny extends AccountRuleResource {
 }
 
 class AccountRuleResourceOfferEntry extends AccountRuleResource {
-  AccountRuleResourceOfferEntry(this.offer)
-      : super(LedgerEntryType(LedgerEntryType.OFFER_ENTRY));
+  AccountRuleResourceOfferEntry(this.offer) : super(LedgerEntryType(LedgerEntryType.OFFER_ENTRY));
   late AccountRuleResourceOfferOffer offer;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     offer.toXdr(stream);
   }
 }
 
 class AccountRuleResourceSale extends AccountRuleResource {
-  AccountRuleResourceSale(this.sale)
-      : super(LedgerEntryType(LedgerEntryType.SALE));
+  AccountRuleResourceSale(this.sale) : super(LedgerEntryType(LedgerEntryType.SALE));
   late AccountRuleResourceSaleSale sale;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     sale.toXdr(stream);
   }
 }
 
 class AccountRuleResourceAtomicSwapAsk extends AccountRuleResource {
-  AccountRuleResourceAtomicSwapAsk(this.atomicSwapAsk)
-      : super(LedgerEntryType(LedgerEntryType.ATOMIC_SWAP_ASK));
+  AccountRuleResourceAtomicSwapAsk(this.atomicSwapAsk) : super(LedgerEntryType(LedgerEntryType.ATOMIC_SWAP_ASK));
   late AccountRuleResourceAtomicSwapAskAtomicSwapAsk atomicSwapAsk;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     atomicSwapAsk.toXdr(stream);
   }
 }
 
 class AccountRuleResourceKeyValue extends AccountRuleResource {
-  AccountRuleResourceKeyValue(this.keyValue)
-      : super(LedgerEntryType(LedgerEntryType.KEY_VALUE));
+  AccountRuleResourceKeyValue(this.keyValue) : super(LedgerEntryType(LedgerEntryType.KEY_VALUE));
   late AccountRuleResourceKeyValueKeyValue keyValue;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     keyValue.toXdr(stream);
   }
 }
 
 class AccountRuleResourcePoll extends AccountRuleResource {
-  AccountRuleResourcePoll(this.poll)
-      : super(LedgerEntryType(LedgerEntryType.POLL));
+  AccountRuleResourcePoll(this.poll) : super(LedgerEntryType(LedgerEntryType.POLL));
   late AccountRuleResourcePollPoll poll;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     poll.toXdr(stream);
   }
 }
 
 class AccountRuleResourceVote extends AccountRuleResource {
-  AccountRuleResourceVote(this.vote)
-      : super(LedgerEntryType(LedgerEntryType.VOTE));
+  AccountRuleResourceVote(this.vote) : super(LedgerEntryType(LedgerEntryType.VOTE));
   late AccountRuleResourceVoteVote vote;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     vote.toXdr(stream);
   }
 }
 
 class AccountRuleResourceInitiateKycRecovery extends AccountRuleResource {
-  AccountRuleResourceInitiateKycRecovery(this.initiateKYCRecovery)
-      : super(LedgerEntryType(LedgerEntryType.INITIATE_KYC_RECOVERY));
-  late AccountRuleResourceInitiateKYCRecoveryInitiateKYCRecovery
-      initiateKYCRecovery;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  AccountRuleResourceInitiateKycRecovery(this.initiateKYCRecovery) : super(LedgerEntryType(LedgerEntryType.INITIATE_KYC_RECOVERY));
+  late AccountRuleResourceInitiateKYCRecoveryInitiateKYCRecovery initiateKYCRecovery;
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     initiateKYCRecovery.toXdr(stream);
   }
 }
 
 class AccountRuleResourceAccountSpecificRule extends AccountRuleResource {
-  AccountRuleResourceAccountSpecificRule(this.accountSpecificRuleExt)
-      : super(LedgerEntryType(LedgerEntryType.ACCOUNT_SPECIFIC_RULE));
+  AccountRuleResourceAccountSpecificRule(this.accountSpecificRuleExt) : super(LedgerEntryType(LedgerEntryType.ACCOUNT_SPECIFIC_RULE));
   late AccountRuleResourceAccountSpecificRuleExt accountSpecificRuleExt;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     accountSpecificRuleExt.toXdr(stream);
   }
 }
 
 class AccountRuleResourceSwap extends AccountRuleResource {
-  AccountRuleResourceSwap(this.swap)
-      : super(LedgerEntryType(LedgerEntryType.SWAP));
+  AccountRuleResourceSwap(this.swap) : super(LedgerEntryType(LedgerEntryType.SWAP));
   late AccountRuleResourceSwapSwap swap;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     swap.toXdr(stream);
   }
 }
 
 class AccountRuleResourceData extends AccountRuleResource {
-  AccountRuleResourceData(this.data)
-      : super(LedgerEntryType(LedgerEntryType.DATA));
+  AccountRuleResourceData(this.data) : super(LedgerEntryType(LedgerEntryType.DATA));
   late AccountRuleResourceDataData data;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     data.toXdr(stream);
   }
 }
 
 class AccountRuleResourceCustom extends AccountRuleResource {
-  AccountRuleResourceCustom(this.custom)
-      : super(LedgerEntryType(LedgerEntryType.CUSTOM));
+  AccountRuleResourceCustom(this.custom) : super(LedgerEntryType(LedgerEntryType.CUSTOM));
   late CustomRuleResource custom;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     custom.toXdr(stream);
   }
@@ -22270,19 +19468,18 @@ class AccountRuleResourceCustom extends AccountRuleResource {
 //      }
 
 //  ===========================================================================
-class AccountRuleResourceAssetAsset extends XdrEncodable {
-  AssetCode assetCode;
-  Uint64 assetType;
+class AccountRuleResourceAssetAsset extends XdrEncodable  {
+  ASSETCODE assetCode;
+  UINT64 assetType;
   EmptyExt ext;
 
   AccountRuleResourceAssetAsset(
-    this.assetCode,
-    this.assetType,
-    this.ext,
-  );
+      this.assetCode,
+      this.assetType,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     assetCode.toXdr(stream);
     assetType.toXdr(stream);
     ext.toXdr(stream);
@@ -22301,18 +19498,16 @@ class AccountRuleResourceAssetAsset extends XdrEncodable {
 //      }
 
 //  ===========================================================================
-class AccountRuleResourceReviewableRequestReviewableRequest
-    extends XdrEncodable {
+class AccountRuleResourceReviewableRequestReviewableRequest extends XdrEncodable  {
   ReviewableRequestResource details;
   EmptyExt ext;
 
   AccountRuleResourceReviewableRequestReviewableRequest(
-    this.details,
-    this.ext,
-  );
+      this.details,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     details.toXdr(stream);
     ext.toXdr(stream);
   }
@@ -22338,25 +19533,24 @@ class AccountRuleResourceReviewableRequestReviewableRequest
 //      }
 
 //  ===========================================================================
-class AccountRuleResourceOfferOffer extends XdrEncodable {
-  Uint64 baseAssetType;
-  Uint64 quoteAssetType;
-  AssetCode baseAssetCode;
-  AssetCode quoteAssetCode;
+class AccountRuleResourceOfferOffer extends XdrEncodable  {
+  UINT64 baseAssetType;
+  UINT64 quoteAssetType;
+  ASSETCODE baseAssetCode;
+  ASSETCODE quoteAssetCode;
   bool isBuy;
   EmptyExt ext;
 
   AccountRuleResourceOfferOffer(
-    this.baseAssetType,
-    this.quoteAssetType,
-    this.baseAssetCode,
-    this.quoteAssetCode,
-    this.isBuy,
-    this.ext,
-  );
+      this.baseAssetType,
+      this.quoteAssetType,
+      this.baseAssetCode,
+      this.quoteAssetCode,
+      this.isBuy,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     baseAssetType.toXdr(stream);
     quoteAssetType.toXdr(stream);
     baseAssetCode.toXdr(stream);
@@ -22377,19 +19571,18 @@ class AccountRuleResourceOfferOffer extends XdrEncodable {
 //      }
 
 //  ===========================================================================
-class AccountRuleResourceSaleSale extends XdrEncodable {
-  Uint64 saleID;
-  Uint64 saleType;
+class AccountRuleResourceSaleSale extends XdrEncodable  {
+  UINT64 saleID;
+  UINT64 saleType;
   EmptyExt ext;
 
   AccountRuleResourceSaleSale(
-    this.saleID,
-    this.saleType,
-    this.ext,
-  );
+      this.saleID,
+      this.saleType,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     saleID.toXdr(stream);
     saleType.toXdr(stream);
     ext.toXdr(stream);
@@ -22406,19 +19599,18 @@ class AccountRuleResourceSaleSale extends XdrEncodable {
 //      }
 
 //  ===========================================================================
-class AccountRuleResourceAtomicSwapAskAtomicSwapAsk extends XdrEncodable {
-  Uint64 assetType;
-  AssetCode assetCode;
+class AccountRuleResourceAtomicSwapAskAtomicSwapAsk extends XdrEncodable  {
+  UINT64 assetType;
+  ASSETCODE assetCode;
   EmptyExt ext;
 
   AccountRuleResourceAtomicSwapAskAtomicSwapAsk(
-    this.assetType,
-    this.assetCode,
-    this.ext,
-  );
+      this.assetType,
+      this.assetCode,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     assetType.toXdr(stream);
     assetCode.toXdr(stream);
     ext.toXdr(stream);
@@ -22436,17 +19628,16 @@ class AccountRuleResourceAtomicSwapAskAtomicSwapAsk extends XdrEncodable {
 //      }
 
 //  ===========================================================================
-class AccountRuleResourceKeyValueKeyValue extends XdrEncodable {
-  Longstring keyPrefix;
+class AccountRuleResourceKeyValueKeyValue extends XdrEncodable  {
+  LONGSTRING keyPrefix;
   EmptyExt ext;
 
   AccountRuleResourceKeyValueKeyValue(
-    this.keyPrefix,
-    this.ext,
-  );
+      this.keyPrefix,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     keyPrefix.toXdr(stream);
     ext.toXdr(stream);
   }
@@ -22466,19 +19657,18 @@ class AccountRuleResourceKeyValueKeyValue extends XdrEncodable {
 //      }
 
 //  ===========================================================================
-class AccountRuleResourcePollPoll extends XdrEncodable {
-  Uint64 pollID;
-  Uint32 permissionType;
+class AccountRuleResourcePollPoll extends XdrEncodable  {
+  UINT64 pollID;
+  UINT32 permissionType;
   EmptyExt ext;
 
   AccountRuleResourcePollPoll(
-    this.pollID,
-    this.permissionType,
-    this.ext,
-  );
+      this.pollID,
+      this.permissionType,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     pollID.toXdr(stream);
     permissionType.toXdr(stream);
     ext.toXdr(stream);
@@ -22499,19 +19689,18 @@ class AccountRuleResourcePollPoll extends XdrEncodable {
 //      }
 
 //  ===========================================================================
-class AccountRuleResourceVoteVote extends XdrEncodable {
-  Uint64 pollID;
-  Uint32 permissionType;
+class AccountRuleResourceVoteVote extends XdrEncodable  {
+  UINT64 pollID;
+  UINT32 permissionType;
   EmptyExt ext;
 
   AccountRuleResourceVoteVote(
-    this.pollID,
-    this.permissionType,
-    this.ext,
-  );
+      this.pollID,
+      this.permissionType,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     pollID.toXdr(stream);
     permissionType.toXdr(stream);
     ext.toXdr(stream);
@@ -22529,50 +19718,36 @@ class AccountRuleResourceVoteVote extends XdrEncodable {
 //      }
 
 //  ===========================================================================
-class AccountRuleResourceInitiateKYCRecoveryInitiateKYCRecovery
-    extends XdrEncodable {
-  Uint64 roleID;
+class AccountRuleResourceInitiateKYCRecoveryInitiateKYCRecovery extends XdrEncodable  {
+  UINT64 roleID;
   EmptyExt ext;
 
   AccountRuleResourceInitiateKYCRecoveryInitiateKYCRecovery(
-    this.roleID,
-    this.ext,
-  );
+      this.roleID,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     roleID.toXdr(stream);
     ext.toXdr(stream);
   }
 }
-
 abstract class AccountRuleResourceAccountSpecificRuleExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   AccountRuleResourceAccountSpecificRuleExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
-class AccountRuleResourceAccountSpecificRuleExtEmptyVersion
-    extends AccountRuleResourceAccountSpecificRuleExt {
-  AccountRuleResourceAccountSpecificRuleExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+class AccountRuleResourceAccountSpecificRuleExtEmptyVersion extends AccountRuleResourceAccountSpecificRuleExt {
+  AccountRuleResourceAccountSpecificRuleExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
 
-class AccountRuleResourceAccountSpecificRuleExtAddAccSpecificRuleResource
-    extends AccountRuleResourceAccountSpecificRuleExt {
-  AccountRuleResourceAccountSpecificRuleExtAddAccSpecificRuleResource(
-      this.accountSpecificRule)
-      : super(LedgerVersion(LedgerVersion.ADD_ACC_SPECIFIC_RULE_RESOURCE));
-  late AccountRuleResourceAccountSpecificRuleExtAccountSpecificRuleAccountSpecificRule
-      accountSpecificRule;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+class AccountRuleResourceAccountSpecificRuleExtAddAccSpecificRuleResource extends AccountRuleResourceAccountSpecificRuleExt {
+  AccountRuleResourceAccountSpecificRuleExtAddAccSpecificRuleResource(this.accountSpecificRule) : super(LedgerVersion(LedgerVersion.ADD_ACC_SPECIFIC_RULE_RESOURCE));
+  late AccountRuleResourceAccountSpecificRuleExtAccountSpecificRuleAccountSpecificRule accountSpecificRule;
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     accountSpecificRule.toXdr(stream);
   }
@@ -22590,18 +19765,16 @@ class AccountRuleResourceAccountSpecificRuleExtAddAccSpecificRuleResource
 //          }
 
 //  ===========================================================================
-class AccountRuleResourceAccountSpecificRuleExtAccountSpecificRuleAccountSpecificRule
-    extends XdrEncodable {
+class AccountRuleResourceAccountSpecificRuleExtAccountSpecificRuleAccountSpecificRule extends XdrEncodable  {
   LedgerKey ledgerKey;
   EmptyExt ext;
 
   AccountRuleResourceAccountSpecificRuleExtAccountSpecificRuleAccountSpecificRule(
-    this.ledgerKey,
-    this.ext,
-  );
+      this.ledgerKey,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     ledgerKey.toXdr(stream);
     ext.toXdr(stream);
   }
@@ -22621,19 +19794,18 @@ class AccountRuleResourceAccountSpecificRuleExtAccountSpecificRuleAccountSpecifi
 //      }
 
 //  ===========================================================================
-class AccountRuleResourceSwapSwap extends XdrEncodable {
-  AssetCode assetCode;
-  Uint64 assetType;
+class AccountRuleResourceSwapSwap extends XdrEncodable  {
+  ASSETCODE assetCode;
+  UINT64 assetType;
   EmptyExt ext;
 
   AccountRuleResourceSwapSwap(
-    this.assetCode,
-    this.assetType,
-    this.ext,
-  );
+      this.assetCode,
+      this.assetType,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     assetCode.toXdr(stream);
     assetType.toXdr(stream);
     ext.toXdr(stream);
@@ -22650,17 +19822,16 @@ class AccountRuleResourceSwapSwap extends XdrEncodable {
 //      }
 
 //  ===========================================================================
-class AccountRuleResourceDataData extends XdrEncodable {
-  Uint64 type;
+class AccountRuleResourceDataData extends XdrEncodable  {
+  UINT64 type;
   EmptyExt ext;
 
   AccountRuleResourceDataData(
-    this.type,
-    this.ext,
-  );
+      this.type,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     type.toXdr(stream);
     ext.toXdr(stream);
   }
@@ -22692,41 +19863,34 @@ class AccountRuleAction extends XdrEncodable {
   static const UPDATE = 23;
   static const UPDATE_FOR_OTHER = 24;
   static const CUSTOM = 25;
-  var value;
-
+  int value;
   AccountRuleAction(this.value);
-}
+  @override toXdr(XdrDataOutputStream stream) {
+    value.toXdr(stream);
+  }
 
+}
 abstract class SignerRuleResource extends XdrEncodable {
   LedgerEntryType discriminant;
-
   SignerRuleResource(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class SignerRuleResourceReviewableRequest extends SignerRuleResource {
-  SignerRuleResourceReviewableRequest(this.reviewableRequest)
-      : super(LedgerEntryType(LedgerEntryType.REVIEWABLE_REQUEST));
+  SignerRuleResourceReviewableRequest(this.reviewableRequest) : super(LedgerEntryType(LedgerEntryType.REVIEWABLE_REQUEST));
   late SignerRuleResourceReviewableRequestReviewableRequest reviewableRequest;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     reviewableRequest.toXdr(stream);
   }
 }
 
 class SignerRuleResourceAsset extends SignerRuleResource {
-  SignerRuleResourceAsset(this.asset)
-      : super(LedgerEntryType(LedgerEntryType.ASSET));
+  SignerRuleResourceAsset(this.asset) : super(LedgerEntryType(LedgerEntryType.ASSET));
   late SignerRuleResourceAssetAsset asset;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     asset.toXdr(stream);
   }
@@ -22737,169 +19901,126 @@ class SignerRuleResourceAny extends SignerRuleResource {
 }
 
 class SignerRuleResourceOfferEntry extends SignerRuleResource {
-  SignerRuleResourceOfferEntry(this.offer)
-      : super(LedgerEntryType(LedgerEntryType.OFFER_ENTRY));
+  SignerRuleResourceOfferEntry(this.offer) : super(LedgerEntryType(LedgerEntryType.OFFER_ENTRY));
   late SignerRuleResourceOfferOffer offer;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     offer.toXdr(stream);
   }
 }
 
 class SignerRuleResourceSale extends SignerRuleResource {
-  SignerRuleResourceSale(this.sale)
-      : super(LedgerEntryType(LedgerEntryType.SALE));
+  SignerRuleResourceSale(this.sale) : super(LedgerEntryType(LedgerEntryType.SALE));
   late SignerRuleResourceSaleSale sale;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     sale.toXdr(stream);
   }
 }
 
 class SignerRuleResourceAtomicSwapAsk extends SignerRuleResource {
-  SignerRuleResourceAtomicSwapAsk(this.atomicSwapAsk)
-      : super(LedgerEntryType(LedgerEntryType.ATOMIC_SWAP_ASK));
+  SignerRuleResourceAtomicSwapAsk(this.atomicSwapAsk) : super(LedgerEntryType(LedgerEntryType.ATOMIC_SWAP_ASK));
   late SignerRuleResourceAtomicSwapAskAtomicSwapAsk atomicSwapAsk;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     atomicSwapAsk.toXdr(stream);
   }
 }
 
 class SignerRuleResourceSignerRule extends SignerRuleResource {
-  SignerRuleResourceSignerRule(this.signerRule)
-      : super(LedgerEntryType(LedgerEntryType.SIGNER_RULE));
+  SignerRuleResourceSignerRule(this.signerRule) : super(LedgerEntryType(LedgerEntryType.SIGNER_RULE));
   late SignerRuleResourceSignerRuleSignerRule signerRule;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     signerRule.toXdr(stream);
   }
 }
 
 class SignerRuleResourceSignerRole extends SignerRuleResource {
-  SignerRuleResourceSignerRole(this.signerRole)
-      : super(LedgerEntryType(LedgerEntryType.SIGNER_ROLE));
+  SignerRuleResourceSignerRole(this.signerRole) : super(LedgerEntryType(LedgerEntryType.SIGNER_ROLE));
   late SignerRuleResourceSignerRoleSignerRole signerRole;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     signerRole.toXdr(stream);
   }
 }
 
 class SignerRuleResourceSigner extends SignerRuleResource {
-  SignerRuleResourceSigner(this.signer)
-      : super(LedgerEntryType(LedgerEntryType.SIGNER));
+  SignerRuleResourceSigner(this.signer) : super(LedgerEntryType(LedgerEntryType.SIGNER));
   late SignerRuleResourceSignerSigner signer;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     signer.toXdr(stream);
   }
 }
 
 class SignerRuleResourceKeyValue extends SignerRuleResource {
-  SignerRuleResourceKeyValue(this.keyValue)
-      : super(LedgerEntryType(LedgerEntryType.KEY_VALUE));
+  SignerRuleResourceKeyValue(this.keyValue) : super(LedgerEntryType(LedgerEntryType.KEY_VALUE));
   late SignerRuleResourceKeyValueKeyValue keyValue;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     keyValue.toXdr(stream);
   }
 }
 
 class SignerRuleResourcePoll extends SignerRuleResource {
-  SignerRuleResourcePoll(this.poll)
-      : super(LedgerEntryType(LedgerEntryType.POLL));
+  SignerRuleResourcePoll(this.poll) : super(LedgerEntryType(LedgerEntryType.POLL));
   late SignerRuleResourcePollPoll poll;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     poll.toXdr(stream);
   }
 }
 
 class SignerRuleResourceVote extends SignerRuleResource {
-  SignerRuleResourceVote(this.vote)
-      : super(LedgerEntryType(LedgerEntryType.VOTE));
+  SignerRuleResourceVote(this.vote) : super(LedgerEntryType(LedgerEntryType.VOTE));
   late SignerRuleResourceVoteVote vote;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     vote.toXdr(stream);
   }
 }
 
 class SignerRuleResourceInitiateKycRecovery extends SignerRuleResource {
-  SignerRuleResourceInitiateKycRecovery(this.initiateKYCRecovery)
-      : super(LedgerEntryType(LedgerEntryType.INITIATE_KYC_RECOVERY));
-  late SignerRuleResourceInitiateKYCRecoveryInitiateKYCRecovery
-      initiateKYCRecovery;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  SignerRuleResourceInitiateKycRecovery(this.initiateKYCRecovery) : super(LedgerEntryType(LedgerEntryType.INITIATE_KYC_RECOVERY));
+  late SignerRuleResourceInitiateKYCRecoveryInitiateKYCRecovery initiateKYCRecovery;
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     initiateKYCRecovery.toXdr(stream);
   }
 }
 
 class SignerRuleResourceAccountSpecificRule extends SignerRuleResource {
-  SignerRuleResourceAccountSpecificRule(this.accountSpecificRuleExt)
-      : super(LedgerEntryType(LedgerEntryType.ACCOUNT_SPECIFIC_RULE));
+  SignerRuleResourceAccountSpecificRule(this.accountSpecificRuleExt) : super(LedgerEntryType(LedgerEntryType.ACCOUNT_SPECIFIC_RULE));
   late SignerRuleResourceAccountSpecificRuleExt accountSpecificRuleExt;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     accountSpecificRuleExt.toXdr(stream);
   }
 }
 
 class SignerRuleResourceSwap extends SignerRuleResource {
-  SignerRuleResourceSwap(this.swap)
-      : super(LedgerEntryType(LedgerEntryType.SWAP));
+  SignerRuleResourceSwap(this.swap) : super(LedgerEntryType(LedgerEntryType.SWAP));
   late SignerRuleResourceSwapSwap swap;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     swap.toXdr(stream);
   }
 }
 
 class SignerRuleResourceData extends SignerRuleResource {
-  SignerRuleResourceData(this.data)
-      : super(LedgerEntryType(LedgerEntryType.DATA));
+  SignerRuleResourceData(this.data) : super(LedgerEntryType(LedgerEntryType.DATA));
   late SignerRuleResourceDataData data;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     data.toXdr(stream);
   }
 }
 
 class SignerRuleResourceCustom extends SignerRuleResource {
-  SignerRuleResourceCustom(this.custom)
-      : super(LedgerEntryType(LedgerEntryType.CUSTOM));
+  SignerRuleResourceCustom(this.custom) : super(LedgerEntryType(LedgerEntryType.CUSTOM));
   late CustomRuleResource custom;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     custom.toXdr(stream);
   }
@@ -22923,24 +20044,22 @@ class SignerRuleResourceCustom extends SignerRuleResource {
 //      }
 
 //  ===========================================================================
-class SignerRuleResourceReviewableRequestReviewableRequest
-    extends XdrEncodable {
+class SignerRuleResourceReviewableRequestReviewableRequest extends XdrEncodable  {
   ReviewableRequestResource details;
-  Uint64 tasksToAdd;
-  Uint64 tasksToRemove;
-  Uint64 allTasks;
+  UINT64 tasksToAdd;
+  UINT64 tasksToRemove;
+  UINT64 allTasks;
   EmptyExt ext;
 
   SignerRuleResourceReviewableRequestReviewableRequest(
-    this.details,
-    this.tasksToAdd,
-    this.tasksToRemove,
-    this.allTasks,
-    this.ext,
-  );
+      this.details,
+      this.tasksToAdd,
+      this.tasksToRemove,
+      this.allTasks,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     details.toXdr(stream);
     tasksToAdd.toXdr(stream);
     tasksToRemove.toXdr(stream);
@@ -22959,19 +20078,18 @@ class SignerRuleResourceReviewableRequestReviewableRequest
 //      }
 
 //  ===========================================================================
-class SignerRuleResourceAssetAsset extends XdrEncodable {
-  AssetCode assetCode;
-  Uint64 assetType;
+class SignerRuleResourceAssetAsset extends XdrEncodable  {
+  ASSETCODE assetCode;
+  UINT64 assetType;
   EmptyExt ext;
 
   SignerRuleResourceAssetAsset(
-    this.assetCode,
-    this.assetType,
-    this.ext,
-  );
+      this.assetCode,
+      this.assetType,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     assetCode.toXdr(stream);
     assetType.toXdr(stream);
     ext.toXdr(stream);
@@ -22997,25 +20115,24 @@ class SignerRuleResourceAssetAsset extends XdrEncodable {
 //      }
 
 //  ===========================================================================
-class SignerRuleResourceOfferOffer extends XdrEncodable {
-  Uint64 baseAssetType;
-  Uint64 quoteAssetType;
-  AssetCode baseAssetCode;
-  AssetCode quoteAssetCode;
+class SignerRuleResourceOfferOffer extends XdrEncodable  {
+  UINT64 baseAssetType;
+  UINT64 quoteAssetType;
+  ASSETCODE baseAssetCode;
+  ASSETCODE quoteAssetCode;
   bool isBuy;
   EmptyExt ext;
 
   SignerRuleResourceOfferOffer(
-    this.baseAssetType,
-    this.quoteAssetType,
-    this.baseAssetCode,
-    this.quoteAssetCode,
-    this.isBuy,
-    this.ext,
-  );
+      this.baseAssetType,
+      this.quoteAssetType,
+      this.baseAssetCode,
+      this.quoteAssetCode,
+      this.isBuy,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     baseAssetType.toXdr(stream);
     quoteAssetType.toXdr(stream);
     baseAssetCode.toXdr(stream);
@@ -23035,19 +20152,18 @@ class SignerRuleResourceOfferOffer extends XdrEncodable {
 //      }
 
 //  ===========================================================================
-class SignerRuleResourceSaleSale extends XdrEncodable {
-  Uint64 saleID;
-  Uint64 saleType;
+class SignerRuleResourceSaleSale extends XdrEncodable  {
+  UINT64 saleID;
+  UINT64 saleType;
   EmptyExt ext;
 
   SignerRuleResourceSaleSale(
-    this.saleID,
-    this.saleType,
-    this.ext,
-  );
+      this.saleID,
+      this.saleType,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     saleID.toXdr(stream);
     saleType.toXdr(stream);
     ext.toXdr(stream);
@@ -23064,19 +20180,18 @@ class SignerRuleResourceSaleSale extends XdrEncodable {
 //      }
 
 //  ===========================================================================
-class SignerRuleResourceAtomicSwapAskAtomicSwapAsk extends XdrEncodable {
-  Uint64 assetType;
-  AssetCode assetCode;
+class SignerRuleResourceAtomicSwapAskAtomicSwapAsk extends XdrEncodable  {
+  UINT64 assetType;
+  ASSETCODE assetCode;
   EmptyExt ext;
 
   SignerRuleResourceAtomicSwapAskAtomicSwapAsk(
-    this.assetType,
-    this.assetCode,
-    this.ext,
-  );
+      this.assetType,
+      this.assetCode,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     assetType.toXdr(stream);
     assetCode.toXdr(stream);
     ext.toXdr(stream);
@@ -23092,17 +20207,16 @@ class SignerRuleResourceAtomicSwapAskAtomicSwapAsk extends XdrEncodable {
 //      }
 
 //  ===========================================================================
-class SignerRuleResourceSignerRuleSignerRule extends XdrEncodable {
+class SignerRuleResourceSignerRuleSignerRule extends XdrEncodable  {
   bool isDefault;
   EmptyExt ext;
 
   SignerRuleResourceSignerRuleSignerRule(
-    this.isDefault,
-    this.ext,
-  );
+      this.isDefault,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     isDefault.toXdr(stream);
     ext.toXdr(stream);
   }
@@ -23118,17 +20232,16 @@ class SignerRuleResourceSignerRuleSignerRule extends XdrEncodable {
 //      }
 
 //  ===========================================================================
-class SignerRuleResourceSignerRoleSignerRole extends XdrEncodable {
-  Uint64 roleID;
+class SignerRuleResourceSignerRoleSignerRole extends XdrEncodable  {
+  UINT64 roleID;
   EmptyExt ext;
 
   SignerRuleResourceSignerRoleSignerRole(
-    this.roleID,
-    this.ext,
-  );
+      this.roleID,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     roleID.toXdr(stream);
     ext.toXdr(stream);
   }
@@ -23143,17 +20256,16 @@ class SignerRuleResourceSignerRoleSignerRole extends XdrEncodable {
 //      }
 
 //  ===========================================================================
-class SignerRuleResourceSignerSigner extends XdrEncodable {
-  Uint64 roleID;
+class SignerRuleResourceSignerSigner extends XdrEncodable  {
+  UINT64 roleID;
   EmptyExt ext;
 
   SignerRuleResourceSignerSigner(
-    this.roleID,
-    this.ext,
-  );
+      this.roleID,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     roleID.toXdr(stream);
     ext.toXdr(stream);
   }
@@ -23170,17 +20282,16 @@ class SignerRuleResourceSignerSigner extends XdrEncodable {
 //      }
 
 //  ===========================================================================
-class SignerRuleResourceKeyValueKeyValue extends XdrEncodable {
-  Longstring keyPrefix;
+class SignerRuleResourceKeyValueKeyValue extends XdrEncodable  {
+  LONGSTRING keyPrefix;
   EmptyExt ext;
 
   SignerRuleResourceKeyValueKeyValue(
-    this.keyPrefix,
-    this.ext,
-  );
+      this.keyPrefix,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     keyPrefix.toXdr(stream);
     ext.toXdr(stream);
   }
@@ -23200,19 +20311,18 @@ class SignerRuleResourceKeyValueKeyValue extends XdrEncodable {
 //      }
 
 //  ===========================================================================
-class SignerRuleResourcePollPoll extends XdrEncodable {
-  Uint64 pollID;
-  Uint32 permissionType;
+class SignerRuleResourcePollPoll extends XdrEncodable  {
+  UINT64 pollID;
+  UINT32 permissionType;
   EmptyExt ext;
 
   SignerRuleResourcePollPoll(
-    this.pollID,
-    this.permissionType,
-    this.ext,
-  );
+      this.pollID,
+      this.permissionType,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     pollID.toXdr(stream);
     permissionType.toXdr(stream);
     ext.toXdr(stream);
@@ -23233,19 +20343,18 @@ class SignerRuleResourcePollPoll extends XdrEncodable {
 //      }
 
 //  ===========================================================================
-class SignerRuleResourceVoteVote extends XdrEncodable {
-  Uint64 pollID;
-  Uint32 permissionType;
+class SignerRuleResourceVoteVote extends XdrEncodable  {
+  UINT64 pollID;
+  UINT32 permissionType;
   EmptyExt ext;
 
   SignerRuleResourceVoteVote(
-    this.pollID,
-    this.permissionType,
-    this.ext,
-  );
+      this.pollID,
+      this.permissionType,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     pollID.toXdr(stream);
     permissionType.toXdr(stream);
     ext.toXdr(stream);
@@ -23263,50 +20372,36 @@ class SignerRuleResourceVoteVote extends XdrEncodable {
 //      }
 
 //  ===========================================================================
-class SignerRuleResourceInitiateKYCRecoveryInitiateKYCRecovery
-    extends XdrEncodable {
-  Uint64 roleID;
+class SignerRuleResourceInitiateKYCRecoveryInitiateKYCRecovery extends XdrEncodable  {
+  UINT64 roleID;
   EmptyExt ext;
 
   SignerRuleResourceInitiateKYCRecoveryInitiateKYCRecovery(
-    this.roleID,
-    this.ext,
-  );
+      this.roleID,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     roleID.toXdr(stream);
     ext.toXdr(stream);
   }
 }
-
 abstract class SignerRuleResourceAccountSpecificRuleExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   SignerRuleResourceAccountSpecificRuleExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
-class SignerRuleResourceAccountSpecificRuleExtEmptyVersion
-    extends SignerRuleResourceAccountSpecificRuleExt {
-  SignerRuleResourceAccountSpecificRuleExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+class SignerRuleResourceAccountSpecificRuleExtEmptyVersion extends SignerRuleResourceAccountSpecificRuleExt {
+  SignerRuleResourceAccountSpecificRuleExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
 
-class SignerRuleResourceAccountSpecificRuleExtAddAccSpecificRuleResource
-    extends SignerRuleResourceAccountSpecificRuleExt {
-  SignerRuleResourceAccountSpecificRuleExtAddAccSpecificRuleResource(
-      this.accountSpecificRule)
-      : super(LedgerVersion(LedgerVersion.ADD_ACC_SPECIFIC_RULE_RESOURCE));
-  late SignerRuleResourceAccountSpecificRuleExtAccountSpecificRuleAccountSpecificRule
-      accountSpecificRule;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+class SignerRuleResourceAccountSpecificRuleExtAddAccSpecificRuleResource extends SignerRuleResourceAccountSpecificRuleExt {
+  SignerRuleResourceAccountSpecificRuleExtAddAccSpecificRuleResource(this.accountSpecificRule) : super(LedgerVersion(LedgerVersion.ADD_ACC_SPECIFIC_RULE_RESOURCE));
+  late SignerRuleResourceAccountSpecificRuleExtAccountSpecificRuleAccountSpecificRule accountSpecificRule;
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     accountSpecificRule.toXdr(stream);
   }
@@ -23324,18 +20419,16 @@ class SignerRuleResourceAccountSpecificRuleExtAddAccSpecificRuleResource
 //          }
 
 //  ===========================================================================
-class SignerRuleResourceAccountSpecificRuleExtAccountSpecificRuleAccountSpecificRule
-    extends XdrEncodable {
+class SignerRuleResourceAccountSpecificRuleExtAccountSpecificRuleAccountSpecificRule extends XdrEncodable  {
   LedgerKey ledgerKey;
   EmptyExt ext;
 
   SignerRuleResourceAccountSpecificRuleExtAccountSpecificRuleAccountSpecificRule(
-    this.ledgerKey,
-    this.ext,
-  );
+      this.ledgerKey,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     ledgerKey.toXdr(stream);
     ext.toXdr(stream);
   }
@@ -23355,19 +20448,18 @@ class SignerRuleResourceAccountSpecificRuleExtAccountSpecificRuleAccountSpecific
 //      }
 
 //  ===========================================================================
-class SignerRuleResourceSwapSwap extends XdrEncodable {
-  AssetCode assetCode;
-  Uint64 assetType;
+class SignerRuleResourceSwapSwap extends XdrEncodable  {
+  ASSETCODE assetCode;
+  UINT64 assetType;
   EmptyExt ext;
 
   SignerRuleResourceSwapSwap(
-    this.assetCode,
-    this.assetType,
-    this.ext,
-  );
+      this.assetCode,
+      this.assetType,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     assetCode.toXdr(stream);
     assetType.toXdr(stream);
     ext.toXdr(stream);
@@ -23384,17 +20476,16 @@ class SignerRuleResourceSwapSwap extends XdrEncodable {
 //      }
 
 //  ===========================================================================
-class SignerRuleResourceDataData extends XdrEncodable {
-  Uint64 type;
+class SignerRuleResourceDataData extends XdrEncodable  {
+  UINT64 type;
   EmptyExt ext;
 
   SignerRuleResourceDataData(
-    this.type,
-    this.ext,
-  );
+      this.type,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     type.toXdr(stream);
     ext.toXdr(stream);
   }
@@ -23423,9 +20514,12 @@ class SignerRuleAction extends XdrEncodable {
   static const EXCHANGE = 20;
   static const UPDATE_FOR_OTHER = 21;
   static const CUSTOM = 22;
-  var value;
-
+  int value;
   SignerRuleAction(this.value);
+  @override toXdr(XdrDataOutputStream stream) {
+    value.toXdr(stream);
+  }
+
 }
 // === xdr source ============================================================
 
@@ -23450,42 +20544,36 @@ class SignerRuleAction extends XdrEncodable {
 //  };
 
 //  ===========================================================================
-class AMLAlertRequest extends XdrEncodable {
-  BalanceID balanceID;
-  Uint64 amount;
-  Longstring creatorDetails;
+class AMLAlertRequest extends XdrEncodable  {
+  BALANCEID balanceID;
+  UINT64 amount;
+  LONGSTRING creatorDetails;
   AMLAlertRequestExt ext;
 
   AMLAlertRequest(
-    this.balanceID,
-    this.amount,
-    this.creatorDetails,
-    this.ext,
-  );
+      this.balanceID,
+      this.amount,
+      this.creatorDetails,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     balanceID.toXdr(stream);
     amount.toXdr(stream);
     creatorDetails.toXdr(stream);
     ext.toXdr(stream);
   }
 }
-
 abstract class AMLAlertRequestExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   AMLAlertRequestExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class AMLAlertRequestExtEmptyVersion extends AMLAlertRequestExt {
-  AMLAlertRequestExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+  AMLAlertRequestExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
 // === xdr source ============================================================
 
@@ -23520,33 +20608,32 @@ class AMLAlertRequestExtEmptyVersion extends AMLAlertRequestExt {
 //  };
 
 //  ===========================================================================
-class AssetCreationRequest extends XdrEncodable {
-  AssetCode code;
-  AccountID preissuedAssetSigner;
-  Uint64 maxIssuanceAmount;
-  Uint64 initialPreissuedAmount;
-  Uint32 policies;
-  Longstring creatorDetails;
-  Uint64 type;
-  Uint32 sequenceNumber;
-  Uint32 trailingDigitsCount;
+class AssetCreationRequest extends XdrEncodable  {
+  ASSETCODE code;
+  ACCOUNTID preissuedAssetSigner;
+  UINT64 maxIssuanceAmount;
+  UINT64 initialPreissuedAmount;
+  UINT32 policies;
+  LONGSTRING creatorDetails;
+  UINT64 type;
+  UINT32 sequenceNumber;
+  UINT32 trailingDigitsCount;
   AssetCreationRequestExt ext;
 
   AssetCreationRequest(
-    this.code,
-    this.preissuedAssetSigner,
-    this.maxIssuanceAmount,
-    this.initialPreissuedAmount,
-    this.policies,
-    this.creatorDetails,
-    this.type,
-    this.sequenceNumber,
-    this.trailingDigitsCount,
-    this.ext,
-  );
+      this.code,
+      this.preissuedAssetSigner,
+      this.maxIssuanceAmount,
+      this.initialPreissuedAmount,
+      this.policies,
+      this.creatorDetails,
+      this.type,
+      this.sequenceNumber,
+      this.trailingDigitsCount,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     code.toXdr(stream);
     preissuedAssetSigner.toXdr(stream);
     maxIssuanceAmount.toXdr(stream);
@@ -23559,21 +20646,16 @@ class AssetCreationRequest extends XdrEncodable {
     ext.toXdr(stream);
   }
 }
-
 abstract class AssetCreationRequestExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   AssetCreationRequestExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class AssetCreationRequestExtEmptyVersion extends AssetCreationRequestExt {
-  AssetCreationRequestExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+  AssetCreationRequestExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
 // === xdr source ============================================================
 
@@ -23598,23 +20680,22 @@ class AssetCreationRequestExtEmptyVersion extends AssetCreationRequestExt {
 //  };
 
 //  ===========================================================================
-class AssetUpdateRequest extends XdrEncodable {
-  AssetCode code;
-  Longstring creatorDetails;
-  Uint32 policies;
-  Uint32 sequenceNumber;
+class AssetUpdateRequest extends XdrEncodable  {
+  ASSETCODE code;
+  LONGSTRING creatorDetails;
+  UINT32 policies;
+  UINT32 sequenceNumber;
   AssetUpdateRequestExt ext;
 
   AssetUpdateRequest(
-    this.code,
-    this.creatorDetails,
-    this.policies,
-    this.sequenceNumber,
-    this.ext,
-  );
+      this.code,
+      this.creatorDetails,
+      this.policies,
+      this.sequenceNumber,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     code.toXdr(stream);
     creatorDetails.toXdr(stream);
     policies.toXdr(stream);
@@ -23622,21 +20703,16 @@ class AssetUpdateRequest extends XdrEncodable {
     ext.toXdr(stream);
   }
 }
-
 abstract class AssetUpdateRequestExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   AssetUpdateRequestExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class AssetUpdateRequestExtEmptyVersion extends AssetUpdateRequestExt {
-  AssetUpdateRequestExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+  AssetUpdateRequestExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
 // === xdr source ============================================================
 
@@ -23661,43 +20737,36 @@ class AssetUpdateRequestExtEmptyVersion extends AssetUpdateRequestExt {
 //  };
 
 //  ===========================================================================
-class AssetChangePreissuedSigner extends XdrEncodable {
-  AssetCode code;
-  AccountID accountID;
+class AssetChangePreissuedSigner extends XdrEncodable  {
+  ASSETCODE code;
+  ACCOUNTID accountID;
   DecoratedSignature signature;
   AssetChangePreissuedSignerExt ext;
 
   AssetChangePreissuedSigner(
-    this.code,
-    this.accountID,
-    this.signature,
-    this.ext,
-  );
+      this.code,
+      this.accountID,
+      this.signature,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     code.toXdr(stream);
     accountID.toXdr(stream);
     signature.toXdr(stream);
     ext.toXdr(stream);
   }
 }
-
 abstract class AssetChangePreissuedSignerExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   AssetChangePreissuedSignerExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
-class AssetChangePreissuedSignerExtEmptyVersion
-    extends AssetChangePreissuedSignerExt {
-  AssetChangePreissuedSignerExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+class AssetChangePreissuedSignerExtEmptyVersion extends AssetChangePreissuedSignerExt {
+  AssetChangePreissuedSignerExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
 // === xdr source ============================================================
 
@@ -23722,49 +20791,42 @@ class AssetChangePreissuedSignerExtEmptyVersion
 //  };
 
 //  ===========================================================================
-class CreateAtomicSwapAskRequest extends XdrEncodable {
-  BalanceID baseBalance;
-  Uint64 amount;
-  Longstring creatorDetails;
+class CreateAtomicSwapAskRequest extends XdrEncodable  {
+  BALANCEID baseBalance;
+  UINT64 amount;
+  LONGSTRING creatorDetails;
   List<AtomicSwapAskQuoteAsset> quoteAssets;
   CreateAtomicSwapAskRequestExt ext;
 
   CreateAtomicSwapAskRequest(
-    this.baseBalance,
-    this.amount,
-    this.creatorDetails,
-    this.quoteAssets,
-    this.ext,
-  );
+      this.baseBalance,
+      this.amount,
+      this.creatorDetails,
+      this.quoteAssets,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     baseBalance.toXdr(stream);
     amount.toXdr(stream);
     creatorDetails.toXdr(stream);
     quoteAssets.length.toXdr(stream);
-    quoteAssets.forEach((element) {
+    quoteAssets.forEach ((element) {
       element.toXdr(stream);
     });
     ext.toXdr(stream);
   }
 }
-
 abstract class CreateAtomicSwapAskRequestExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   CreateAtomicSwapAskRequestExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
-class CreateAtomicSwapAskRequestExtEmptyVersion
-    extends CreateAtomicSwapAskRequestExt {
-  CreateAtomicSwapAskRequestExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+class CreateAtomicSwapAskRequestExtEmptyVersion extends CreateAtomicSwapAskRequestExt {
+  CreateAtomicSwapAskRequestExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
 // === xdr source ============================================================
 
@@ -23789,23 +20851,22 @@ class CreateAtomicSwapAskRequestExtEmptyVersion
 //  };
 
 //  ===========================================================================
-class CreateAtomicSwapBidRequest extends XdrEncodable {
-  Uint64 askID;
-  Uint64 baseAmount;
-  AssetCode quoteAsset;
-  Longstring creatorDetails;
+class CreateAtomicSwapBidRequest extends XdrEncodable  {
+  UINT64 askID;
+  UINT64 baseAmount;
+  ASSETCODE quoteAsset;
+  LONGSTRING creatorDetails;
   CreateAtomicSwapBidRequestExt ext;
 
   CreateAtomicSwapBidRequest(
-    this.askID,
-    this.baseAmount,
-    this.quoteAsset,
-    this.creatorDetails,
-    this.ext,
-  );
+      this.askID,
+      this.baseAmount,
+      this.quoteAsset,
+      this.creatorDetails,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     askID.toXdr(stream);
     baseAmount.toXdr(stream);
     quoteAsset.toXdr(stream);
@@ -23813,22 +20874,16 @@ class CreateAtomicSwapBidRequest extends XdrEncodable {
     ext.toXdr(stream);
   }
 }
-
 abstract class CreateAtomicSwapBidRequestExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   CreateAtomicSwapBidRequestExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
-class CreateAtomicSwapBidRequestExtEmptyVersion
-    extends CreateAtomicSwapBidRequestExt {
-  CreateAtomicSwapBidRequestExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+class CreateAtomicSwapBidRequestExtEmptyVersion extends CreateAtomicSwapBidRequestExt {
+  CreateAtomicSwapBidRequestExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
 // === xdr source ============================================================
 
@@ -23852,23 +20907,22 @@ class CreateAtomicSwapBidRequestExtEmptyVersion
 //  };
 
 //  ===========================================================================
-class ChangeRoleRequest extends XdrEncodable {
-  AccountID destinationAccount;
-  Uint64 accountRoleToSet;
-  Uint32 sequenceNumber;
-  Longstring creatorDetails;
+class ChangeRoleRequest extends XdrEncodable  {
+  ACCOUNTID destinationAccount;
+  UINT64 accountRoleToSet;
+  UINT32 sequenceNumber;
+  LONGSTRING creatorDetails;
   ChangeRoleRequestExt ext;
 
   ChangeRoleRequest(
-    this.destinationAccount,
-    this.accountRoleToSet,
-    this.sequenceNumber,
-    this.creatorDetails,
-    this.ext,
-  );
+      this.destinationAccount,
+      this.accountRoleToSet,
+      this.sequenceNumber,
+      this.creatorDetails,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     destinationAccount.toXdr(stream);
     accountRoleToSet.toXdr(stream);
     sequenceNumber.toXdr(stream);
@@ -23876,29 +20930,26 @@ class ChangeRoleRequest extends XdrEncodable {
     ext.toXdr(stream);
   }
 }
-
 abstract class ChangeRoleRequestExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   ChangeRoleRequestExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class ChangeRoleRequestExtEmptyVersion extends ChangeRoleRequestExt {
-  ChangeRoleRequestExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+  ChangeRoleRequestExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
-
 class CloseDeferredPaymentDestinationType extends XdrEncodable {
   static const ACCOUNT = 0;
   static const BALANCE = 1;
-  var value;
-
+  int value;
   CloseDeferredPaymentDestinationType(this.value);
+  @override toXdr(XdrDataOutputStream stream) {
+    value.toXdr(stream);
+  }
+
 }
 // === xdr source ============================================================
 
@@ -23924,25 +20975,24 @@ class CloseDeferredPaymentDestinationType extends XdrEncodable {
 //  };
 
 //  ===========================================================================
-class CloseDeferredPaymentRequest extends XdrEncodable {
-  Uint64 deferredPaymentID;
+class CloseDeferredPaymentRequest extends XdrEncodable  {
+  UINT64 deferredPaymentID;
   CloseDeferredPaymentRequestDestination destination;
-  Longstring creatorDetails;
-  Uint64 amount;
-  Uint32 sequenceNumber;
+  LONGSTRING creatorDetails;
+  UINT64 amount;
+  UINT32 sequenceNumber;
   EmptyExt ext;
 
   CloseDeferredPaymentRequest(
-    this.deferredPaymentID,
-    this.destination,
-    this.creatorDetails,
-    this.amount,
-    this.sequenceNumber,
-    this.ext,
-  );
+      this.deferredPaymentID,
+      this.destination,
+      this.creatorDetails,
+      this.amount,
+      this.sequenceNumber,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     deferredPaymentID.toXdr(stream);
     destination.toXdr(stream);
     creatorDetails.toXdr(stream);
@@ -23951,41 +21001,27 @@ class CloseDeferredPaymentRequest extends XdrEncodable {
     ext.toXdr(stream);
   }
 }
-
 abstract class CloseDeferredPaymentRequestDestination extends XdrEncodable {
   CloseDeferredPaymentDestinationType discriminant;
-
   CloseDeferredPaymentRequestDestination(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
-class CloseDeferredPaymentRequestDestinationAccount
-    extends CloseDeferredPaymentRequestDestination {
-  CloseDeferredPaymentRequestDestinationAccount(this.accountID)
-      : super(CloseDeferredPaymentDestinationType(
-            CloseDeferredPaymentDestinationType.ACCOUNT));
-  late AccountID accountID;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+class CloseDeferredPaymentRequestDestinationAccount extends CloseDeferredPaymentRequestDestination {
+  CloseDeferredPaymentRequestDestinationAccount(this.accountID) : super(CloseDeferredPaymentDestinationType(CloseDeferredPaymentDestinationType.ACCOUNT));
+  late ACCOUNTID accountID;
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     accountID.toXdr(stream);
   }
 }
 
-class CloseDeferredPaymentRequestDestinationBalance
-    extends CloseDeferredPaymentRequestDestination {
-  CloseDeferredPaymentRequestDestinationBalance(this.balanceID)
-      : super(CloseDeferredPaymentDestinationType(
-            CloseDeferredPaymentDestinationType.BALANCE));
-  late BalanceID balanceID;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+class CloseDeferredPaymentRequestDestinationBalance extends CloseDeferredPaymentRequestDestination {
+  CloseDeferredPaymentRequestDestinationBalance(this.balanceID) : super(CloseDeferredPaymentDestinationType(CloseDeferredPaymentDestinationType.BALANCE));
+  late BALANCEID balanceID;
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     balanceID.toXdr(stream);
   }
@@ -24011,25 +21047,24 @@ class CloseDeferredPaymentRequestDestinationBalance
 //  };
 
 //  ===========================================================================
-class ContractRequest extends XdrEncodable {
-  AccountID customer;
-  AccountID escrow;
-  Longstring creatorDetails;
-  Uint64 startTime;
-  Uint64 endTime;
+class ContractRequest extends XdrEncodable  {
+  ACCOUNTID customer;
+  ACCOUNTID escrow;
+  LONGSTRING creatorDetails;
+  UINT64 startTime;
+  UINT64 endTime;
   ContractRequestExt ext;
 
   ContractRequest(
-    this.customer,
-    this.escrow,
-    this.creatorDetails,
-    this.startTime,
-    this.endTime,
-    this.ext,
-  );
+      this.customer,
+      this.escrow,
+      this.creatorDetails,
+      this.startTime,
+      this.endTime,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     customer.toXdr(stream);
     escrow.toXdr(stream);
     creatorDetails.toXdr(stream);
@@ -24038,21 +21073,16 @@ class ContractRequest extends XdrEncodable {
     ext.toXdr(stream);
   }
 }
-
 abstract class ContractRequestExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   ContractRequestExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class ContractRequestExtEmptyVersion extends ContractRequestExt {
-  ContractRequestExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+  ContractRequestExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
 // === xdr source ============================================================
 
@@ -24082,25 +21112,24 @@ class ContractRequestExtEmptyVersion extends ContractRequestExt {
 //  };
 
 //  ===========================================================================
-class DataCreationRequest extends XdrEncodable {
-  Uint64 type;
-  Uint32 sequenceNumber;
-  AccountID owner;
-  Longstring value;
-  Longstring creatorDetails;
+class DataCreationRequest extends XdrEncodable  {
+  UINT64 type;
+  UINT32 sequenceNumber;
+  ACCOUNTID owner;
+  LONGSTRING value;
+  LONGSTRING creatorDetails;
   DataCreationRequestExt ext;
 
   DataCreationRequest(
-    this.type,
-    this.sequenceNumber,
-    this.owner,
-    this.value,
-    this.creatorDetails,
-    this.ext,
-  );
+      this.type,
+      this.sequenceNumber,
+      this.owner,
+      this.value,
+      this.creatorDetails,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     type.toXdr(stream);
     sequenceNumber.toXdr(stream);
     owner.toXdr(stream);
@@ -24109,21 +21138,16 @@ class DataCreationRequest extends XdrEncodable {
     ext.toXdr(stream);
   }
 }
-
 abstract class DataCreationRequestExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   DataCreationRequestExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class DataCreationRequestExtEmptyVersion extends DataCreationRequestExt {
-  DataCreationRequestExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+  DataCreationRequestExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
 // === xdr source ============================================================
 
@@ -24140,25 +21164,24 @@ class DataCreationRequestExtEmptyVersion extends DataCreationRequestExt {
 //  };
 
 //  ===========================================================================
-class CreateDeferredPaymentRequest extends XdrEncodable {
-  BalanceID sourceBalance;
-  AccountID destination;
-  Uint64 amount;
-  Uint32 sequenceNumber;
-  Longstring creatorDetails;
+class CreateDeferredPaymentRequest extends XdrEncodable  {
+  BALANCEID sourceBalance;
+  ACCOUNTID destination;
+  UINT64 amount;
+  UINT32 sequenceNumber;
+  LONGSTRING creatorDetails;
   EmptyExt ext;
 
   CreateDeferredPaymentRequest(
-    this.sourceBalance,
-    this.destination,
-    this.amount,
-    this.sequenceNumber,
-    this.creatorDetails,
-    this.ext,
-  );
+      this.sourceBalance,
+      this.destination,
+      this.amount,
+      this.sequenceNumber,
+      this.creatorDetails,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     sourceBalance.toXdr(stream);
     destination.toXdr(stream);
     amount.toXdr(stream);
@@ -24206,31 +21229,30 @@ class CreateDeferredPaymentRequest extends XdrEncodable {
 //  };
 
 //  ===========================================================================
-class CreatePollRequest extends XdrEncodable {
-  Uint32 permissionType;
-  Uint32 numberOfChoices;
+class CreatePollRequest extends XdrEncodable  {
+  UINT32 permissionType;
+  UINT32 numberOfChoices;
   PollData data;
-  Longstring creatorDetails;
-  Uint64 startTime;
-  Uint64 endTime;
-  AccountID resultProviderID;
+  LONGSTRING creatorDetails;
+  UINT64 startTime;
+  UINT64 endTime;
+  ACCOUNTID resultProviderID;
   bool voteConfirmationRequired;
   CreatePollRequestExt ext;
 
   CreatePollRequest(
-    this.permissionType,
-    this.numberOfChoices,
-    this.data,
-    this.creatorDetails,
-    this.startTime,
-    this.endTime,
-    this.resultProviderID,
-    this.voteConfirmationRequired,
-    this.ext,
-  );
+      this.permissionType,
+      this.numberOfChoices,
+      this.data,
+      this.creatorDetails,
+      this.startTime,
+      this.endTime,
+      this.resultProviderID,
+      this.voteConfirmationRequired,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     permissionType.toXdr(stream);
     numberOfChoices.toXdr(stream);
     data.toXdr(stream);
@@ -24242,21 +21264,16 @@ class CreatePollRequest extends XdrEncodable {
     ext.toXdr(stream);
   }
 }
-
 abstract class CreatePollRequestExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   CreatePollRequestExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class CreatePollRequestExtEmptyVersion extends CreatePollRequestExt {
-  CreatePollRequestExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+  CreatePollRequestExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
 // === xdr source ============================================================
 
@@ -24281,29 +21298,28 @@ class CreatePollRequestExtEmptyVersion extends CreatePollRequestExt {
 //  };
 
 //  ===========================================================================
-class InvoiceRequest extends XdrEncodable {
-  AssetCode asset;
-  Uint64 amount;
-  BalanceID senderBalance;
-  BalanceID receiverBalance;
-  Uint64? contractID;
+class InvoiceRequest extends XdrEncodable  {
+  ASSETCODE asset;
+  UINT64 amount;
+  BALANCEID senderBalance;
+  BALANCEID receiverBalance;
+  UINT64? contractID;
   bool isApproved;
-  Longstring creatorDetails;
+  LONGSTRING creatorDetails;
   InvoiceRequestExt ext;
 
   InvoiceRequest(
-    this.asset,
-    this.amount,
-    this.senderBalance,
-    this.receiverBalance,
-    this.contractID,
-    this.isApproved,
-    this.creatorDetails,
-    this.ext,
-  );
+      this.asset,
+      this.amount,
+      this.senderBalance,
+      this.receiverBalance,
+      this.contractID,
+      this.isApproved,
+      this.creatorDetails,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     asset.toXdr(stream);
     amount.toXdr(stream);
     senderBalance.toXdr(stream);
@@ -24319,21 +21335,16 @@ class InvoiceRequest extends XdrEncodable {
     ext.toXdr(stream);
   }
 }
-
 abstract class InvoiceRequestExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   InvoiceRequestExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class InvoiceRequestExtEmptyVersion extends InvoiceRequestExt {
-  InvoiceRequestExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+  InvoiceRequestExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
 // === xdr source ============================================================
 
@@ -24361,25 +21372,24 @@ class InvoiceRequestExtEmptyVersion extends InvoiceRequestExt {
 //  };
 
 //  ===========================================================================
-class PreIssuanceRequest extends XdrEncodable {
-  AssetCode asset;
-  Uint64 amount;
+class PreIssuanceRequest extends XdrEncodable  {
+  ASSETCODE asset;
+  UINT64 amount;
   DecoratedSignature signature;
-  String64 reference;
-  Longstring creatorDetails;
+  STRING64 reference;
+  LONGSTRING creatorDetails;
   PreIssuanceRequestExt ext;
 
   PreIssuanceRequest(
-    this.asset,
-    this.amount,
-    this.signature,
-    this.reference,
-    this.creatorDetails,
-    this.ext,
-  );
+      this.asset,
+      this.amount,
+      this.signature,
+      this.reference,
+      this.creatorDetails,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     asset.toXdr(stream);
     amount.toXdr(stream);
     signature.toXdr(stream);
@@ -24388,21 +21398,16 @@ class PreIssuanceRequest extends XdrEncodable {
     ext.toXdr(stream);
   }
 }
-
 abstract class PreIssuanceRequestExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   PreIssuanceRequestExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class PreIssuanceRequestExtEmptyVersion extends PreIssuanceRequestExt {
-  PreIssuanceRequestExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+  PreIssuanceRequestExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
 // === xdr source ============================================================
 
@@ -24428,25 +21433,24 @@ class PreIssuanceRequestExtEmptyVersion extends PreIssuanceRequestExt {
 //  };
 
 //  ===========================================================================
-class IssuanceRequest extends XdrEncodable {
-  AssetCode asset;
-  Uint64 amount;
-  BalanceID receiver;
-  Longstring creatorDetails;
+class IssuanceRequest extends XdrEncodable  {
+  ASSETCODE asset;
+  UINT64 amount;
+  BALANCEID receiver;
+  LONGSTRING creatorDetails;
   Fee fee;
   IssuanceRequestExt ext;
 
   IssuanceRequest(
-    this.asset,
-    this.amount,
-    this.receiver,
-    this.creatorDetails,
-    this.fee,
-    this.ext,
-  );
+      this.asset,
+      this.amount,
+      this.receiver,
+      this.creatorDetails,
+      this.fee,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     asset.toXdr(stream);
     amount.toXdr(stream);
     receiver.toXdr(stream);
@@ -24455,21 +21459,16 @@ class IssuanceRequest extends XdrEncodable {
     ext.toXdr(stream);
   }
 }
-
 abstract class IssuanceRequestExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   IssuanceRequestExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class IssuanceRequestExtEmptyVersion extends IssuanceRequestExt {
-  IssuanceRequestExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+  IssuanceRequestExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
 // === xdr source ============================================================
 
@@ -24495,26 +21494,25 @@ class IssuanceRequestExtEmptyVersion extends IssuanceRequestExt {
 //  };
 
 //  ===========================================================================
-class KYCRecoveryRequest extends XdrEncodable {
-  AccountID targetAccount;
+class KYCRecoveryRequest extends XdrEncodable  {
+  ACCOUNTID targetAccount;
   List<UpdateSignerData> signersData;
-  Longstring creatorDetails;
-  Uint32 sequenceNumber;
+  LONGSTRING creatorDetails;
+  UINT32 sequenceNumber;
   KYCRecoveryRequestExt ext;
 
   KYCRecoveryRequest(
-    this.targetAccount,
-    this.signersData,
-    this.creatorDetails,
-    this.sequenceNumber,
-    this.ext,
-  );
+      this.targetAccount,
+      this.signersData,
+      this.creatorDetails,
+      this.sequenceNumber,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     targetAccount.toXdr(stream);
     signersData.length.toXdr(stream);
-    signersData.forEach((element) {
+    signersData.forEach ((element) {
       element.toXdr(stream);
     });
     creatorDetails.toXdr(stream);
@@ -24522,21 +21520,16 @@ class KYCRecoveryRequest extends XdrEncodable {
     ext.toXdr(stream);
   }
 }
-
 abstract class KYCRecoveryRequestExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   KYCRecoveryRequestExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class KYCRecoveryRequestExtEmptyVersion extends KYCRecoveryRequestExt {
-  KYCRecoveryRequestExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+  KYCRecoveryRequestExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
 // === xdr source ============================================================
 
@@ -24556,36 +21549,30 @@ class KYCRecoveryRequestExtEmptyVersion extends KYCRecoveryRequestExt {
 //  };
 
 //  ===========================================================================
-class LimitsUpdateRequest extends XdrEncodable {
-  Longstring creatorDetails;
+class LimitsUpdateRequest extends XdrEncodable  {
+  LONGSTRING creatorDetails;
   LimitsUpdateRequestExt ext;
 
   LimitsUpdateRequest(
-    this.creatorDetails,
-    this.ext,
-  );
+      this.creatorDetails,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     creatorDetails.toXdr(stream);
     ext.toXdr(stream);
   }
 }
-
 abstract class LimitsUpdateRequestExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   LimitsUpdateRequestExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class LimitsUpdateRequestExtEmptyVersion extends LimitsUpdateRequestExt {
-  LimitsUpdateRequestExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+  LimitsUpdateRequestExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
 // === xdr source ============================================================
 
@@ -24603,46 +21590,36 @@ class LimitsUpdateRequestExtEmptyVersion extends LimitsUpdateRequestExt {
 //  };
 
 //  ===========================================================================
-class ManageOfferRequest extends XdrEncodable {
+class ManageOfferRequest extends XdrEncodable  {
   ManageOfferOp op;
   ManageOfferRequestExt ext;
 
   ManageOfferRequest(
-    this.op,
-    this.ext,
-  );
+      this.op,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     op.toXdr(stream);
     ext.toXdr(stream);
   }
 }
-
 abstract class ManageOfferRequestExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   ManageOfferRequestExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class ManageOfferRequestExtEmptyVersion extends ManageOfferRequestExt {
-  ManageOfferRequestExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+  ManageOfferRequestExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
 
-class ManageOfferRequestExtMovementRequestsDetails
-    extends ManageOfferRequestExt {
-  ManageOfferRequestExtMovementRequestsDetails(this.creatorDetails)
-      : super(LedgerVersion(LedgerVersion.MOVEMENT_REQUESTS_DETAILS));
-  late Longstring creatorDetails;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+class ManageOfferRequestExtMovementRequestsDetails extends ManageOfferRequestExt {
+  ManageOfferRequestExtMovementRequestsDetails(this.creatorDetails) : super(LedgerVersion(LedgerVersion.MOVEMENT_REQUESTS_DETAILS));
+  late LONGSTRING creatorDetails;
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     creatorDetails.toXdr(stream);
   }
@@ -24663,46 +21640,36 @@ class ManageOfferRequestExtMovementRequestsDetails
 //  };
 
 //  ===========================================================================
-class CreatePaymentRequest extends XdrEncodable {
+class CreatePaymentRequest extends XdrEncodable  {
   PaymentOp paymentOp;
   CreatePaymentRequestExt ext;
 
   CreatePaymentRequest(
-    this.paymentOp,
-    this.ext,
-  );
+      this.paymentOp,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     paymentOp.toXdr(stream);
     ext.toXdr(stream);
   }
 }
-
 abstract class CreatePaymentRequestExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   CreatePaymentRequestExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class CreatePaymentRequestExtEmptyVersion extends CreatePaymentRequestExt {
-  CreatePaymentRequestExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+  CreatePaymentRequestExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
 
-class CreatePaymentRequestExtMovementRequestsDetails
-    extends CreatePaymentRequestExt {
-  CreatePaymentRequestExtMovementRequestsDetails(this.creatorDetails)
-      : super(LedgerVersion(LedgerVersion.MOVEMENT_REQUESTS_DETAILS));
-  late Longstring creatorDetails;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+class CreatePaymentRequestExtMovementRequestsDetails extends CreatePaymentRequestExt {
+  CreatePaymentRequestExtMovementRequestsDetails(this.creatorDetails) : super(LedgerVersion(LedgerVersion.MOVEMENT_REQUESTS_DETAILS));
+  late LONGSTRING creatorDetails;
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     creatorDetails.toXdr(stream);
   }
@@ -24732,23 +21699,22 @@ class CreatePaymentRequestExtMovementRequestsDetails
 //  };
 
 //  ===========================================================================
-class RedemptionRequest extends XdrEncodable {
-  BalanceID sourceBalanceID;
-  AccountID destination;
-  Uint64 amount;
-  Longstring creatorDetails;
+class RedemptionRequest extends XdrEncodable  {
+  BALANCEID sourceBalanceID;
+  ACCOUNTID destination;
+  UINT64 amount;
+  LONGSTRING creatorDetails;
   RedemptionRequestExt ext;
 
   RedemptionRequest(
-    this.sourceBalanceID,
-    this.destination,
-    this.amount,
-    this.creatorDetails,
-    this.ext,
-  );
+      this.sourceBalanceID,
+      this.destination,
+      this.amount,
+      this.creatorDetails,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     sourceBalanceID.toXdr(stream);
     destination.toXdr(stream);
     amount.toXdr(stream);
@@ -24756,21 +21722,16 @@ class RedemptionRequest extends XdrEncodable {
     ext.toXdr(stream);
   }
 }
-
 abstract class RedemptionRequestExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   RedemptionRequestExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class RedemptionRequestExtEmptyVersion extends RedemptionRequestExt {
-  RedemptionRequestExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+  RedemptionRequestExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
 // === xdr source ============================================================
 
@@ -24794,42 +21755,36 @@ class RedemptionRequestExtEmptyVersion extends RedemptionRequestExt {
 //  };
 
 //  ===========================================================================
-class DataRemoveRequest extends XdrEncodable {
-  Uint64 id;
-  Uint32 sequenceNumber;
-  Longstring creatorDetails;
+class DataRemoveRequest extends XdrEncodable  {
+  UINT64 id;
+  UINT32 sequenceNumber;
+  LONGSTRING creatorDetails;
   DataRemoveRequestExt ext;
 
   DataRemoveRequest(
-    this.id,
-    this.sequenceNumber,
-    this.creatorDetails,
-    this.ext,
-  );
+      this.id,
+      this.sequenceNumber,
+      this.creatorDetails,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     id.toXdr(stream);
     sequenceNumber.toXdr(stream);
     creatorDetails.toXdr(stream);
     ext.toXdr(stream);
   }
 }
-
 abstract class DataRemoveRequestExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   DataRemoveRequestExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class DataRemoveRequestExtEmptyVersion extends DataRemoveRequestExt {
-  DataRemoveRequestExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+  DataRemoveRequestExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
 // === xdr source ============================================================
 
@@ -24849,40 +21804,33 @@ class DataRemoveRequestExtEmptyVersion extends DataRemoveRequestExt {
 //  };
 
 //  ===========================================================================
-class SaleCreationRequestQuoteAsset extends XdrEncodable {
-  AssetCode quoteAsset;
-  Uint64 price;
+class SaleCreationRequestQuoteAsset extends XdrEncodable  {
+  ASSETCODE quoteAsset;
+  UINT64 price;
   SaleCreationRequestQuoteAssetExt ext;
 
   SaleCreationRequestQuoteAsset(
-    this.quoteAsset,
-    this.price,
-    this.ext,
-  );
+      this.quoteAsset,
+      this.price,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     quoteAsset.toXdr(stream);
     price.toXdr(stream);
     ext.toXdr(stream);
   }
 }
-
 abstract class SaleCreationRequestQuoteAssetExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   SaleCreationRequestQuoteAssetExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
-class SaleCreationRequestQuoteAssetExtEmptyVersion
-    extends SaleCreationRequestQuoteAssetExt {
-  SaleCreationRequestQuoteAssetExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+class SaleCreationRequestQuoteAssetExtEmptyVersion extends SaleCreationRequestQuoteAssetExt {
+  SaleCreationRequestQuoteAssetExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
 // === xdr source ============================================================
 
@@ -24903,19 +21851,18 @@ class SaleCreationRequestQuoteAssetExtEmptyVersion
 //  };
 
 //  ===========================================================================
-class CreateAccountSaleRuleData extends XdrEncodable {
-  AccountID? accountID;
+class CreateAccountSaleRuleData extends XdrEncodable  {
+  ACCOUNTID? accountID;
   bool forbids;
   CreateAccountSaleRuleDataExt ext;
 
   CreateAccountSaleRuleData(
-    this.accountID,
-    this.forbids,
-    this.ext,
-  );
+      this.accountID,
+      this.forbids,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     if (accountID != null) {
       true.toXdr(stream);
       accountID?.toXdr(stream);
@@ -24926,22 +21873,16 @@ class CreateAccountSaleRuleData extends XdrEncodable {
     ext.toXdr(stream);
   }
 }
-
 abstract class CreateAccountSaleRuleDataExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   CreateAccountSaleRuleDataExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
-class CreateAccountSaleRuleDataExtEmptyVersion
-    extends CreateAccountSaleRuleDataExt {
-  CreateAccountSaleRuleDataExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+class CreateAccountSaleRuleDataExtEmptyVersion extends CreateAccountSaleRuleDataExt {
+  CreateAccountSaleRuleDataExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
 // === xdr source ============================================================
 
@@ -24986,39 +21927,38 @@ class CreateAccountSaleRuleDataExtEmptyVersion
 //  };
 
 //  ===========================================================================
-class SaleCreationRequest extends XdrEncodable {
-  Uint64 saleType;
-  AssetCode baseAsset;
-  AssetCode defaultQuoteAsset;
-  Uint64 startTime;
-  Uint64 endTime;
-  Uint64 softCap;
-  Uint64 hardCap;
-  Longstring creatorDetails;
+class SaleCreationRequest extends XdrEncodable  {
+  UINT64 saleType;
+  ASSETCODE baseAsset;
+  ASSETCODE defaultQuoteAsset;
+  UINT64 startTime;
+  UINT64 endTime;
+  UINT64 softCap;
+  UINT64 hardCap;
+  LONGSTRING creatorDetails;
   SaleTypeExt saleTypeExt;
-  Uint64 requiredBaseAssetForHardCap;
-  Uint32 sequenceNumber;
+  UINT64 requiredBaseAssetForHardCap;
+  UINT32 sequenceNumber;
   List<SaleCreationRequestQuoteAsset> quoteAssets;
   SaleCreationRequestExt ext;
 
   SaleCreationRequest(
-    this.saleType,
-    this.baseAsset,
-    this.defaultQuoteAsset,
-    this.startTime,
-    this.endTime,
-    this.softCap,
-    this.hardCap,
-    this.creatorDetails,
-    this.saleTypeExt,
-    this.requiredBaseAssetForHardCap,
-    this.sequenceNumber,
-    this.quoteAssets,
-    this.ext,
-  );
+      this.saleType,
+      this.baseAsset,
+      this.defaultQuoteAsset,
+      this.startTime,
+      this.endTime,
+      this.softCap,
+      this.hardCap,
+      this.creatorDetails,
+      this.saleTypeExt,
+      this.requiredBaseAssetForHardCap,
+      this.sequenceNumber,
+      this.quoteAssets,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     saleType.toXdr(stream);
     baseAsset.toXdr(stream);
     defaultQuoteAsset.toXdr(stream);
@@ -25031,39 +21971,31 @@ class SaleCreationRequest extends XdrEncodable {
     requiredBaseAssetForHardCap.toXdr(stream);
     sequenceNumber.toXdr(stream);
     quoteAssets.length.toXdr(stream);
-    quoteAssets.forEach((element) {
+    quoteAssets.forEach ((element) {
       element.toXdr(stream);
     });
     ext.toXdr(stream);
   }
 }
-
 abstract class SaleCreationRequestExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   SaleCreationRequestExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class SaleCreationRequestExtEmptyVersion extends SaleCreationRequestExt {
-  SaleCreationRequestExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+  SaleCreationRequestExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
 
 class SaleCreationRequestExtAddSaleWhitelists extends SaleCreationRequestExt {
-  SaleCreationRequestExtAddSaleWhitelists(this.saleRules)
-      : super(LedgerVersion(LedgerVersion.ADD_SALE_WHITELISTS));
+  SaleCreationRequestExtAddSaleWhitelists(this.saleRules) : super(LedgerVersion(LedgerVersion.ADD_SALE_WHITELISTS));
   late List<CreateAccountSaleRuleData> saleRules;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     saleRules.length.toXdr(stream);
-    saleRules.forEach((element) {
+    saleRules.forEach ((element) {
       element.toXdr(stream);
     });
   }
@@ -25093,23 +22025,22 @@ class SaleCreationRequestExtAddSaleWhitelists extends SaleCreationRequestExt {
 //  };
 
 //  ===========================================================================
-class DataUpdateRequest extends XdrEncodable {
-  Uint64 id;
-  Uint32 sequenceNumber;
-  Longstring value;
-  Longstring creatorDetails;
+class DataUpdateRequest extends XdrEncodable  {
+  UINT64 id;
+  UINT32 sequenceNumber;
+  LONGSTRING value;
+  LONGSTRING creatorDetails;
   DataUpdateRequestExt ext;
 
   DataUpdateRequest(
-    this.id,
-    this.sequenceNumber,
-    this.value,
-    this.creatorDetails,
-    this.ext,
-  );
+      this.id,
+      this.sequenceNumber,
+      this.value,
+      this.creatorDetails,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     id.toXdr(stream);
     sequenceNumber.toXdr(stream);
     value.toXdr(stream);
@@ -25117,21 +22048,16 @@ class DataUpdateRequest extends XdrEncodable {
     ext.toXdr(stream);
   }
 }
-
 abstract class DataUpdateRequestExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   DataUpdateRequestExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class DataUpdateRequestExtEmptyVersion extends DataUpdateRequestExt {
-  DataUpdateRequestExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+  DataUpdateRequestExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
 // === xdr source ============================================================
 
@@ -25153,43 +22079,36 @@ class DataUpdateRequestExtEmptyVersion extends DataUpdateRequestExt {
 //  };
 
 //  ===========================================================================
-class UpdateSaleDetailsRequest extends XdrEncodable {
-  Uint64 saleID;
-  Longstring creatorDetails;
-  Uint32 sequenceNumber;
+class UpdateSaleDetailsRequest extends XdrEncodable  {
+  UINT64 saleID;
+  LONGSTRING creatorDetails;
+  UINT32 sequenceNumber;
   UpdateSaleDetailsRequestExt ext;
 
   UpdateSaleDetailsRequest(
-    this.saleID,
-    this.creatorDetails,
-    this.sequenceNumber,
-    this.ext,
-  );
+      this.saleID,
+      this.creatorDetails,
+      this.sequenceNumber,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     saleID.toXdr(stream);
     creatorDetails.toXdr(stream);
     sequenceNumber.toXdr(stream);
     ext.toXdr(stream);
   }
 }
-
 abstract class UpdateSaleDetailsRequestExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   UpdateSaleDetailsRequestExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
-class UpdateSaleDetailsRequestExtEmptyVersion
-    extends UpdateSaleDetailsRequestExt {
-  UpdateSaleDetailsRequestExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+class UpdateSaleDetailsRequestExtEmptyVersion extends UpdateSaleDetailsRequestExt {
+  UpdateSaleDetailsRequestExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
 // === xdr source ============================================================
 
@@ -25216,25 +22135,24 @@ class UpdateSaleDetailsRequestExtEmptyVersion
 //  };
 
 //  ===========================================================================
-class WithdrawalRequest extends XdrEncodable {
-  BalanceID balance;
-  Uint64 amount;
-  Uint64 universalAmount;
+class WithdrawalRequest extends XdrEncodable  {
+  BALANCEID balance;
+  UINT64 amount;
+  UINT64 universalAmount;
   Fee fee;
-  Longstring creatorDetails;
+  LONGSTRING creatorDetails;
   WithdrawalRequestExt ext;
 
   WithdrawalRequest(
-    this.balance,
-    this.amount,
-    this.universalAmount,
-    this.fee,
-    this.creatorDetails,
-    this.ext,
-  );
+      this.balance,
+      this.amount,
+      this.universalAmount,
+      this.fee,
+      this.creatorDetails,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     balance.toXdr(stream);
     amount.toXdr(stream);
     universalAmount.toXdr(stream);
@@ -25243,21 +22161,16 @@ class WithdrawalRequest extends XdrEncodable {
     ext.toXdr(stream);
   }
 }
-
 abstract class WithdrawalRequestExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   WithdrawalRequestExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class WithdrawalRequestExtEmptyVersion extends WithdrawalRequestExt {
-  WithdrawalRequestExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+  WithdrawalRequestExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
 // === xdr source ============================================================
 
@@ -25404,17 +22317,16 @@ class WithdrawalRequestExtEmptyVersion extends WithdrawalRequestExt {
 //  };
 
 //  ===========================================================================
-class Operation extends XdrEncodable {
-  AccountID? sourceAccount;
+class Operation extends XdrEncodable  {
+  ACCOUNTID? sourceAccount;
   OperationBody body;
 
   Operation(
-    this.sourceAccount,
-    this.body,
-  );
+      this.sourceAccount,
+      this.body,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     if (sourceAccount != null) {
       true.toXdr(stream);
       sourceAccount?.toXdr(stream);
@@ -25424,425 +22336,315 @@ class Operation extends XdrEncodable {
     body.toXdr(stream);
   }
 }
-
 abstract class OperationBody extends XdrEncodable {
   OperationType discriminant;
-
   OperationBody(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class OperationBodyCreateAccount extends OperationBody {
-  OperationBodyCreateAccount(this.createAccountOp)
-      : super(OperationType(OperationType.CREATE_ACCOUNT));
+  OperationBodyCreateAccount(this.createAccountOp) : super(OperationType(OperationType.CREATE_ACCOUNT));
   late CreateAccountOp createAccountOp;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     createAccountOp.toXdr(stream);
   }
 }
 
 class OperationBodyCreateIssuanceRequest extends OperationBody {
-  OperationBodyCreateIssuanceRequest(this.createIssuanceRequestOp)
-      : super(OperationType(OperationType.CREATE_ISSUANCE_REQUEST));
+  OperationBodyCreateIssuanceRequest(this.createIssuanceRequestOp) : super(OperationType(OperationType.CREATE_ISSUANCE_REQUEST));
   late CreateIssuanceRequestOp createIssuanceRequestOp;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     createIssuanceRequestOp.toXdr(stream);
   }
 }
 
 class OperationBodySetFees extends OperationBody {
-  OperationBodySetFees(this.setFeesOp)
-      : super(OperationType(OperationType.SET_FEES));
+  OperationBodySetFees(this.setFeesOp) : super(OperationType(OperationType.SET_FEES));
   late SetFeesOp setFeesOp;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     setFeesOp.toXdr(stream);
   }
 }
 
 class OperationBodyCreateWithdrawalRequest extends OperationBody {
-  OperationBodyCreateWithdrawalRequest(this.createWithdrawalRequestOp)
-      : super(OperationType(OperationType.CREATE_WITHDRAWAL_REQUEST));
+  OperationBodyCreateWithdrawalRequest(this.createWithdrawalRequestOp) : super(OperationType(OperationType.CREATE_WITHDRAWAL_REQUEST));
   late CreateWithdrawalRequestOp createWithdrawalRequestOp;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     createWithdrawalRequestOp.toXdr(stream);
   }
 }
 
 class OperationBodyManageBalance extends OperationBody {
-  OperationBodyManageBalance(this.manageBalanceOp)
-      : super(OperationType(OperationType.MANAGE_BALANCE));
+  OperationBodyManageBalance(this.manageBalanceOp) : super(OperationType(OperationType.MANAGE_BALANCE));
   late ManageBalanceOp manageBalanceOp;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     manageBalanceOp.toXdr(stream);
   }
 }
 
 class OperationBodyManageAsset extends OperationBody {
-  OperationBodyManageAsset(this.manageAssetOp)
-      : super(OperationType(OperationType.MANAGE_ASSET));
+  OperationBodyManageAsset(this.manageAssetOp) : super(OperationType(OperationType.MANAGE_ASSET));
   late ManageAssetOp manageAssetOp;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     manageAssetOp.toXdr(stream);
   }
 }
 
 class OperationBodyCreatePreissuanceRequest extends OperationBody {
-  OperationBodyCreatePreissuanceRequest(this.createPreIssuanceRequest)
-      : super(OperationType(OperationType.CREATE_PREISSUANCE_REQUEST));
+  OperationBodyCreatePreissuanceRequest(this.createPreIssuanceRequest) : super(OperationType(OperationType.CREATE_PREISSUANCE_REQUEST));
   late CreatePreIssuanceRequestOp createPreIssuanceRequest;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     createPreIssuanceRequest.toXdr(stream);
   }
 }
 
 class OperationBodyManageLimits extends OperationBody {
-  OperationBodyManageLimits(this.manageLimitsOp)
-      : super(OperationType(OperationType.MANAGE_LIMITS));
+  OperationBodyManageLimits(this.manageLimitsOp) : super(OperationType(OperationType.MANAGE_LIMITS));
   late ManageLimitsOp manageLimitsOp;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     manageLimitsOp.toXdr(stream);
   }
 }
 
 class OperationBodyManageAssetPair extends OperationBody {
-  OperationBodyManageAssetPair(this.manageAssetPairOp)
-      : super(OperationType(OperationType.MANAGE_ASSET_PAIR));
+  OperationBodyManageAssetPair(this.manageAssetPairOp) : super(OperationType(OperationType.MANAGE_ASSET_PAIR));
   late ManageAssetPairOp manageAssetPairOp;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     manageAssetPairOp.toXdr(stream);
   }
 }
 
 class OperationBodyManageOffer extends OperationBody {
-  OperationBodyManageOffer(this.manageOfferOp)
-      : super(OperationType(OperationType.MANAGE_OFFER));
+  OperationBodyManageOffer(this.manageOfferOp) : super(OperationType(OperationType.MANAGE_OFFER));
   late ManageOfferOp manageOfferOp;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     manageOfferOp.toXdr(stream);
   }
 }
 
 class OperationBodyManageInvoiceRequest extends OperationBody {
-  OperationBodyManageInvoiceRequest(this.manageInvoiceRequestOp)
-      : super(OperationType(OperationType.MANAGE_INVOICE_REQUEST));
+  OperationBodyManageInvoiceRequest(this.manageInvoiceRequestOp) : super(OperationType(OperationType.MANAGE_INVOICE_REQUEST));
   late ManageInvoiceRequestOp manageInvoiceRequestOp;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     manageInvoiceRequestOp.toXdr(stream);
   }
 }
 
 class OperationBodyReviewRequest extends OperationBody {
-  OperationBodyReviewRequest(this.reviewRequestOp)
-      : super(OperationType(OperationType.REVIEW_REQUEST));
+  OperationBodyReviewRequest(this.reviewRequestOp) : super(OperationType(OperationType.REVIEW_REQUEST));
   late ReviewRequestOp reviewRequestOp;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     reviewRequestOp.toXdr(stream);
   }
 }
 
 class OperationBodyCreateSaleRequest extends OperationBody {
-  OperationBodyCreateSaleRequest(this.createSaleCreationRequestOp)
-      : super(OperationType(OperationType.CREATE_SALE_REQUEST));
+  OperationBodyCreateSaleRequest(this.createSaleCreationRequestOp) : super(OperationType(OperationType.CREATE_SALE_REQUEST));
   late CreateSaleCreationRequestOp createSaleCreationRequestOp;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     createSaleCreationRequestOp.toXdr(stream);
   }
 }
 
 class OperationBodyCheckSaleState extends OperationBody {
-  OperationBodyCheckSaleState(this.checkSaleStateOp)
-      : super(OperationType(OperationType.CHECK_SALE_STATE));
+  OperationBodyCheckSaleState(this.checkSaleStateOp) : super(OperationType(OperationType.CHECK_SALE_STATE));
   late CheckSaleStateOp checkSaleStateOp;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     checkSaleStateOp.toXdr(stream);
   }
 }
 
 class OperationBodyPayout extends OperationBody {
-  OperationBodyPayout(this.payoutOp)
-      : super(OperationType(OperationType.PAYOUT));
+  OperationBodyPayout(this.payoutOp) : super(OperationType(OperationType.PAYOUT));
   late PayoutOp payoutOp;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     payoutOp.toXdr(stream);
   }
 }
 
 class OperationBodyCreateAmlAlert extends OperationBody {
-  OperationBodyCreateAmlAlert(this.createAMLAlertRequestOp)
-      : super(OperationType(OperationType.CREATE_AML_ALERT));
+  OperationBodyCreateAmlAlert(this.createAMLAlertRequestOp) : super(OperationType(OperationType.CREATE_AML_ALERT));
   late CreateAMLAlertRequestOp createAMLAlertRequestOp;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     createAMLAlertRequestOp.toXdr(stream);
   }
 }
 
 class OperationBodyManageKeyValue extends OperationBody {
-  OperationBodyManageKeyValue(this.manageKeyValueOp)
-      : super(OperationType(OperationType.MANAGE_KEY_VALUE));
+  OperationBodyManageKeyValue(this.manageKeyValueOp) : super(OperationType(OperationType.MANAGE_KEY_VALUE));
   late ManageKeyValueOp manageKeyValueOp;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     manageKeyValueOp.toXdr(stream);
   }
 }
 
 class OperationBodyCreateChangeRoleRequest extends OperationBody {
-  OperationBodyCreateChangeRoleRequest(this.createChangeRoleRequestOp)
-      : super(OperationType(OperationType.CREATE_CHANGE_ROLE_REQUEST));
+  OperationBodyCreateChangeRoleRequest(this.createChangeRoleRequestOp) : super(OperationType(OperationType.CREATE_CHANGE_ROLE_REQUEST));
   late CreateChangeRoleRequestOp createChangeRoleRequestOp;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     createChangeRoleRequestOp.toXdr(stream);
   }
 }
 
-class OperationBodyManageExternalSystemAccountIdPoolEntry
-    extends OperationBody {
-  OperationBodyManageExternalSystemAccountIdPoolEntry(
-      this.manageExternalSystemAccountIdPoolEntryOp)
-      : super(OperationType(
-            OperationType.MANAGE_EXTERNAL_SYSTEM_ACCOUNT_ID_POOL_ENTRY));
-  late ManageExternalSystemAccountIdPoolEntryOp
-      manageExternalSystemAccountIdPoolEntryOp;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+class OperationBodyManageExternalSystemAccountIdPoolEntry extends OperationBody {
+  OperationBodyManageExternalSystemAccountIdPoolEntry(this.manageExternalSystemAccountIdPoolEntryOp) : super(OperationType(OperationType.MANAGE_EXTERNAL_SYSTEM_ACCOUNT_ID_POOL_ENTRY));
+  late ManageExternalSystemAccountIdPoolEntryOp manageExternalSystemAccountIdPoolEntryOp;
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     manageExternalSystemAccountIdPoolEntryOp.toXdr(stream);
   }
 }
 
 class OperationBodyBindExternalSystemAccountId extends OperationBody {
-  OperationBodyBindExternalSystemAccountId(this.bindExternalSystemAccountIdOp)
-      : super(OperationType(OperationType.BIND_EXTERNAL_SYSTEM_ACCOUNT_ID));
+  OperationBodyBindExternalSystemAccountId(this.bindExternalSystemAccountIdOp) : super(OperationType(OperationType.BIND_EXTERNAL_SYSTEM_ACCOUNT_ID));
   late BindExternalSystemAccountIdOp bindExternalSystemAccountIdOp;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     bindExternalSystemAccountIdOp.toXdr(stream);
   }
 }
 
 class OperationBodyPayment extends OperationBody {
-  OperationBodyPayment(this.paymentOp)
-      : super(OperationType(OperationType.PAYMENT));
+  OperationBodyPayment(this.paymentOp) : super(OperationType(OperationType.PAYMENT));
   late PaymentOp paymentOp;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     paymentOp.toXdr(stream);
   }
 }
 
 class OperationBodyManageSale extends OperationBody {
-  OperationBodyManageSale(this.manageSaleOp)
-      : super(OperationType(OperationType.MANAGE_SALE));
+  OperationBodyManageSale(this.manageSaleOp) : super(OperationType(OperationType.MANAGE_SALE));
   late ManageSaleOp manageSaleOp;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     manageSaleOp.toXdr(stream);
   }
 }
 
 class OperationBodyCreateManageLimitsRequest extends OperationBody {
-  OperationBodyCreateManageLimitsRequest(this.createManageLimitsRequestOp)
-      : super(OperationType(OperationType.CREATE_MANAGE_LIMITS_REQUEST));
+  OperationBodyCreateManageLimitsRequest(this.createManageLimitsRequestOp) : super(OperationType(OperationType.CREATE_MANAGE_LIMITS_REQUEST));
   late CreateManageLimitsRequestOp createManageLimitsRequestOp;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     createManageLimitsRequestOp.toXdr(stream);
   }
 }
 
 class OperationBodyManageContractRequest extends OperationBody {
-  OperationBodyManageContractRequest(this.manageContractRequestOp)
-      : super(OperationType(OperationType.MANAGE_CONTRACT_REQUEST));
+  OperationBodyManageContractRequest(this.manageContractRequestOp) : super(OperationType(OperationType.MANAGE_CONTRACT_REQUEST));
   late ManageContractRequestOp manageContractRequestOp;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     manageContractRequestOp.toXdr(stream);
   }
 }
 
 class OperationBodyManageContract extends OperationBody {
-  OperationBodyManageContract(this.manageContractOp)
-      : super(OperationType(OperationType.MANAGE_CONTRACT));
+  OperationBodyManageContract(this.manageContractOp) : super(OperationType(OperationType.MANAGE_CONTRACT));
   late ManageContractOp manageContractOp;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     manageContractOp.toXdr(stream);
   }
 }
 
 class OperationBodyCancelSaleRequest extends OperationBody {
-  OperationBodyCancelSaleRequest(this.cancelSaleCreationRequestOp)
-      : super(OperationType(OperationType.CANCEL_SALE_REQUEST));
+  OperationBodyCancelSaleRequest(this.cancelSaleCreationRequestOp) : super(OperationType(OperationType.CANCEL_SALE_REQUEST));
   late CancelSaleCreationRequestOp cancelSaleCreationRequestOp;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     cancelSaleCreationRequestOp.toXdr(stream);
   }
 }
 
 class OperationBodyCreateAtomicSwapAskRequest extends OperationBody {
-  OperationBodyCreateAtomicSwapAskRequest(this.createAtomicSwapAskRequestOp)
-      : super(OperationType(OperationType.CREATE_ATOMIC_SWAP_ASK_REQUEST));
+  OperationBodyCreateAtomicSwapAskRequest(this.createAtomicSwapAskRequestOp) : super(OperationType(OperationType.CREATE_ATOMIC_SWAP_ASK_REQUEST));
   late CreateAtomicSwapAskRequestOp createAtomicSwapAskRequestOp;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     createAtomicSwapAskRequestOp.toXdr(stream);
   }
 }
 
 class OperationBodyCancelAtomicSwapAsk extends OperationBody {
-  OperationBodyCancelAtomicSwapAsk(this.cancelAtomicSwapAskOp)
-      : super(OperationType(OperationType.CANCEL_ATOMIC_SWAP_ASK));
+  OperationBodyCancelAtomicSwapAsk(this.cancelAtomicSwapAskOp) : super(OperationType(OperationType.CANCEL_ATOMIC_SWAP_ASK));
   late CancelAtomicSwapAskOp cancelAtomicSwapAskOp;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     cancelAtomicSwapAskOp.toXdr(stream);
   }
 }
 
 class OperationBodyCreateAtomicSwapBidRequest extends OperationBody {
-  OperationBodyCreateAtomicSwapBidRequest(this.createAtomicSwapBidRequestOp)
-      : super(OperationType(OperationType.CREATE_ATOMIC_SWAP_BID_REQUEST));
+  OperationBodyCreateAtomicSwapBidRequest(this.createAtomicSwapBidRequestOp) : super(OperationType(OperationType.CREATE_ATOMIC_SWAP_BID_REQUEST));
   late CreateAtomicSwapBidRequestOp createAtomicSwapBidRequestOp;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     createAtomicSwapBidRequestOp.toXdr(stream);
   }
 }
 
 class OperationBodyManageAccountRole extends OperationBody {
-  OperationBodyManageAccountRole(this.manageAccountRoleOp)
-      : super(OperationType(OperationType.MANAGE_ACCOUNT_ROLE));
+  OperationBodyManageAccountRole(this.manageAccountRoleOp) : super(OperationType(OperationType.MANAGE_ACCOUNT_ROLE));
   late ManageAccountRoleOp manageAccountRoleOp;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     manageAccountRoleOp.toXdr(stream);
   }
 }
 
 class OperationBodyManageAccountRule extends OperationBody {
-  OperationBodyManageAccountRule(this.manageAccountRuleOp)
-      : super(OperationType(OperationType.MANAGE_ACCOUNT_RULE));
+  OperationBodyManageAccountRule(this.manageAccountRuleOp) : super(OperationType(OperationType.MANAGE_ACCOUNT_RULE));
   late ManageAccountRuleOp manageAccountRuleOp;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     manageAccountRuleOp.toXdr(stream);
   }
 }
 
 class OperationBodyManageSigner extends OperationBody {
-  OperationBodyManageSigner(this.manageSignerOp)
-      : super(OperationType(OperationType.MANAGE_SIGNER));
+  OperationBodyManageSigner(this.manageSignerOp) : super(OperationType(OperationType.MANAGE_SIGNER));
   late ManageSignerOp manageSignerOp;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     manageSignerOp.toXdr(stream);
   }
 }
 
 class OperationBodyManageSignerRole extends OperationBody {
-  OperationBodyManageSignerRole(this.manageSignerRoleOp)
-      : super(OperationType(OperationType.MANAGE_SIGNER_ROLE));
+  OperationBodyManageSignerRole(this.manageSignerRoleOp) : super(OperationType(OperationType.MANAGE_SIGNER_ROLE));
   late ManageSignerRoleOp manageSignerRoleOp;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     manageSignerRoleOp.toXdr(stream);
   }
 }
 
 class OperationBodyManageSignerRule extends OperationBody {
-  OperationBodyManageSignerRule(this.manageSignerRuleOp)
-      : super(OperationType(OperationType.MANAGE_SIGNER_RULE));
+  OperationBodyManageSignerRule(this.manageSignerRuleOp) : super(OperationType(OperationType.MANAGE_SIGNER_RULE));
   late ManageSignerRuleOp manageSignerRuleOp;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     manageSignerRuleOp.toXdr(stream);
   }
@@ -25851,378 +22653,280 @@ class OperationBodyManageSignerRule extends OperationBody {
 class OperationBodyStamp extends OperationBody {
   OperationBodyStamp(this.stampOp) : super(OperationType(OperationType.STAMP));
   late StampOp stampOp;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     stampOp.toXdr(stream);
   }
 }
 
 class OperationBodyLicense extends OperationBody {
-  OperationBodyLicense(this.licenseOp)
-      : super(OperationType(OperationType.LICENSE));
+  OperationBodyLicense(this.licenseOp) : super(OperationType(OperationType.LICENSE));
   late LicenseOp licenseOp;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     licenseOp.toXdr(stream);
   }
 }
 
 class OperationBodyManageCreatePollRequest extends OperationBody {
-  OperationBodyManageCreatePollRequest(this.manageCreatePollRequestOp)
-      : super(OperationType(OperationType.MANAGE_CREATE_POLL_REQUEST));
+  OperationBodyManageCreatePollRequest(this.manageCreatePollRequestOp) : super(OperationType(OperationType.MANAGE_CREATE_POLL_REQUEST));
   late ManageCreatePollRequestOp manageCreatePollRequestOp;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     manageCreatePollRequestOp.toXdr(stream);
   }
 }
 
 class OperationBodyManagePoll extends OperationBody {
-  OperationBodyManagePoll(this.managePollOp)
-      : super(OperationType(OperationType.MANAGE_POLL));
+  OperationBodyManagePoll(this.managePollOp) : super(OperationType(OperationType.MANAGE_POLL));
   late ManagePollOp managePollOp;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     managePollOp.toXdr(stream);
   }
 }
 
 class OperationBodyManageVote extends OperationBody {
-  OperationBodyManageVote(this.manageVoteOp)
-      : super(OperationType(OperationType.MANAGE_VOTE));
+  OperationBodyManageVote(this.manageVoteOp) : super(OperationType(OperationType.MANAGE_VOTE));
   late ManageVoteOp manageVoteOp;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     manageVoteOp.toXdr(stream);
   }
 }
 
 class OperationBodyManageAccountSpecificRule extends OperationBody {
-  OperationBodyManageAccountSpecificRule(this.manageAccountSpecificRuleOp)
-      : super(OperationType(OperationType.MANAGE_ACCOUNT_SPECIFIC_RULE));
+  OperationBodyManageAccountSpecificRule(this.manageAccountSpecificRuleOp) : super(OperationType(OperationType.MANAGE_ACCOUNT_SPECIFIC_RULE));
   late ManageAccountSpecificRuleOp manageAccountSpecificRuleOp;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     manageAccountSpecificRuleOp.toXdr(stream);
   }
 }
 
 class OperationBodyCancelChangeRoleRequest extends OperationBody {
-  OperationBodyCancelChangeRoleRequest(this.cancelChangeRoleRequestOp)
-      : super(OperationType(OperationType.CANCEL_CHANGE_ROLE_REQUEST));
+  OperationBodyCancelChangeRoleRequest(this.cancelChangeRoleRequestOp) : super(OperationType(OperationType.CANCEL_CHANGE_ROLE_REQUEST));
   late CancelChangeRoleRequestOp cancelChangeRoleRequestOp;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     cancelChangeRoleRequestOp.toXdr(stream);
   }
 }
 
 class OperationBodyRemoveAssetPair extends OperationBody {
-  OperationBodyRemoveAssetPair(this.removeAssetPairOp)
-      : super(OperationType(OperationType.REMOVE_ASSET_PAIR));
+  OperationBodyRemoveAssetPair(this.removeAssetPairOp) : super(OperationType(OperationType.REMOVE_ASSET_PAIR));
   late RemoveAssetPairOp removeAssetPairOp;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     removeAssetPairOp.toXdr(stream);
   }
 }
 
 class OperationBodyInitiateKycRecovery extends OperationBody {
-  OperationBodyInitiateKycRecovery(this.initiateKYCRecoveryOp)
-      : super(OperationType(OperationType.INITIATE_KYC_RECOVERY));
+  OperationBodyInitiateKycRecovery(this.initiateKYCRecoveryOp) : super(OperationType(OperationType.INITIATE_KYC_RECOVERY));
   late InitiateKYCRecoveryOp initiateKYCRecoveryOp;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     initiateKYCRecoveryOp.toXdr(stream);
   }
 }
 
 class OperationBodyCreateKycRecoveryRequest extends OperationBody {
-  OperationBodyCreateKycRecoveryRequest(this.createKYCRecoveryRequestOp)
-      : super(OperationType(OperationType.CREATE_KYC_RECOVERY_REQUEST));
+  OperationBodyCreateKycRecoveryRequest(this.createKYCRecoveryRequestOp) : super(OperationType(OperationType.CREATE_KYC_RECOVERY_REQUEST));
   late CreateKYCRecoveryRequestOp createKYCRecoveryRequestOp;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     createKYCRecoveryRequestOp.toXdr(stream);
   }
 }
 
 class OperationBodyCreateManageOfferRequest extends OperationBody {
-  OperationBodyCreateManageOfferRequest(this.createManageOfferRequestOp)
-      : super(OperationType(OperationType.CREATE_MANAGE_OFFER_REQUEST));
+  OperationBodyCreateManageOfferRequest(this.createManageOfferRequestOp) : super(OperationType(OperationType.CREATE_MANAGE_OFFER_REQUEST));
   late CreateManageOfferRequestOp createManageOfferRequestOp;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     createManageOfferRequestOp.toXdr(stream);
   }
 }
 
 class OperationBodyCreatePaymentRequest extends OperationBody {
-  OperationBodyCreatePaymentRequest(this.createPaymentRequestOp)
-      : super(OperationType(OperationType.CREATE_PAYMENT_REQUEST));
+  OperationBodyCreatePaymentRequest(this.createPaymentRequestOp) : super(OperationType(OperationType.CREATE_PAYMENT_REQUEST));
   late CreatePaymentRequestOp createPaymentRequestOp;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     createPaymentRequestOp.toXdr(stream);
   }
 }
 
 class OperationBodyRemoveAsset extends OperationBody {
-  OperationBodyRemoveAsset(this.removeAssetOp)
-      : super(OperationType(OperationType.REMOVE_ASSET));
+  OperationBodyRemoveAsset(this.removeAssetOp) : super(OperationType(OperationType.REMOVE_ASSET));
   late RemoveAssetOp removeAssetOp;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     removeAssetOp.toXdr(stream);
   }
 }
 
 class OperationBodyOpenSwap extends OperationBody {
-  OperationBodyOpenSwap(this.openSwapOp)
-      : super(OperationType(OperationType.OPEN_SWAP));
+  OperationBodyOpenSwap(this.openSwapOp) : super(OperationType(OperationType.OPEN_SWAP));
   late OpenSwapOp openSwapOp;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     openSwapOp.toXdr(stream);
   }
 }
 
 class OperationBodyCloseSwap extends OperationBody {
-  OperationBodyCloseSwap(this.closeSwapOp)
-      : super(OperationType(OperationType.CLOSE_SWAP));
+  OperationBodyCloseSwap(this.closeSwapOp) : super(OperationType(OperationType.CLOSE_SWAP));
   late CloseSwapOp closeSwapOp;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     closeSwapOp.toXdr(stream);
   }
 }
 
 class OperationBodyCreateRedemptionRequest extends OperationBody {
-  OperationBodyCreateRedemptionRequest(this.createRedemptionRequestOp)
-      : super(OperationType(OperationType.CREATE_REDEMPTION_REQUEST));
+  OperationBodyCreateRedemptionRequest(this.createRedemptionRequestOp) : super(OperationType(OperationType.CREATE_REDEMPTION_REQUEST));
   late CreateRedemptionRequestOp createRedemptionRequestOp;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     createRedemptionRequestOp.toXdr(stream);
   }
 }
 
 class OperationBodyCreateData extends OperationBody {
-  OperationBodyCreateData(this.createDataOp)
-      : super(OperationType(OperationType.CREATE_DATA));
+  OperationBodyCreateData(this.createDataOp) : super(OperationType(OperationType.CREATE_DATA));
   late CreateDataOp createDataOp;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     createDataOp.toXdr(stream);
   }
 }
 
 class OperationBodyUpdateData extends OperationBody {
-  OperationBodyUpdateData(this.updateDataOp)
-      : super(OperationType(OperationType.UPDATE_DATA));
+  OperationBodyUpdateData(this.updateDataOp) : super(OperationType(OperationType.UPDATE_DATA));
   late UpdateDataOp updateDataOp;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     updateDataOp.toXdr(stream);
   }
 }
 
 class OperationBodyRemoveData extends OperationBody {
-  OperationBodyRemoveData(this.removeDataOp)
-      : super(OperationType(OperationType.REMOVE_DATA));
+  OperationBodyRemoveData(this.removeDataOp) : super(OperationType(OperationType.REMOVE_DATA));
   late RemoveDataOp removeDataOp;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     removeDataOp.toXdr(stream);
   }
 }
 
 class OperationBodyCreateDataCreationRequest extends OperationBody {
-  OperationBodyCreateDataCreationRequest(this.createDataCreationRequestOp)
-      : super(OperationType(OperationType.CREATE_DATA_CREATION_REQUEST));
+  OperationBodyCreateDataCreationRequest(this.createDataCreationRequestOp) : super(OperationType(OperationType.CREATE_DATA_CREATION_REQUEST));
   late CreateDataCreationRequestOp createDataCreationRequestOp;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     createDataCreationRequestOp.toXdr(stream);
   }
 }
 
 class OperationBodyCancelDataCreationRequest extends OperationBody {
-  OperationBodyCancelDataCreationRequest(this.cancelDataCreationRequestOp)
-      : super(OperationType(OperationType.CANCEL_DATA_CREATION_REQUEST));
+  OperationBodyCancelDataCreationRequest(this.cancelDataCreationRequestOp) : super(OperationType(OperationType.CANCEL_DATA_CREATION_REQUEST));
   late CancelDataCreationRequestOp cancelDataCreationRequestOp;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     cancelDataCreationRequestOp.toXdr(stream);
   }
 }
 
 class OperationBodyCreateDataUpdateRequest extends OperationBody {
-  OperationBodyCreateDataUpdateRequest(this.createDataUpdateRequestOp)
-      : super(OperationType(OperationType.CREATE_DATA_UPDATE_REQUEST));
+  OperationBodyCreateDataUpdateRequest(this.createDataUpdateRequestOp) : super(OperationType(OperationType.CREATE_DATA_UPDATE_REQUEST));
   late CreateDataUpdateRequestOp createDataUpdateRequestOp;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     createDataUpdateRequestOp.toXdr(stream);
   }
 }
 
 class OperationBodyCreateDataRemoveRequest extends OperationBody {
-  OperationBodyCreateDataRemoveRequest(this.createDataRemoveRequestOp)
-      : super(OperationType(OperationType.CREATE_DATA_REMOVE_REQUEST));
+  OperationBodyCreateDataRemoveRequest(this.createDataRemoveRequestOp) : super(OperationType(OperationType.CREATE_DATA_REMOVE_REQUEST));
   late CreateDataRemoveRequestOp createDataRemoveRequestOp;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     createDataRemoveRequestOp.toXdr(stream);
   }
 }
 
 class OperationBodyCancelDataUpdateRequest extends OperationBody {
-  OperationBodyCancelDataUpdateRequest(this.cancelDataUpdateRequestOp)
-      : super(OperationType(OperationType.CANCEL_DATA_UPDATE_REQUEST));
+  OperationBodyCancelDataUpdateRequest(this.cancelDataUpdateRequestOp) : super(OperationType(OperationType.CANCEL_DATA_UPDATE_REQUEST));
   late CancelDataUpdateRequestOp cancelDataUpdateRequestOp;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     cancelDataUpdateRequestOp.toXdr(stream);
   }
 }
 
 class OperationBodyCancelDataRemoveRequest extends OperationBody {
-  OperationBodyCancelDataRemoveRequest(this.cancelDataRemoveRequestOp)
-      : super(OperationType(OperationType.CANCEL_DATA_REMOVE_REQUEST));
+  OperationBodyCancelDataRemoveRequest(this.cancelDataRemoveRequestOp) : super(OperationType(OperationType.CANCEL_DATA_REMOVE_REQUEST));
   late CancelDataRemoveRequestOp cancelDataRemoveRequestOp;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     cancelDataRemoveRequestOp.toXdr(stream);
   }
 }
 
 class OperationBodyCreateDeferredPaymentCreationRequest extends OperationBody {
-  OperationBodyCreateDeferredPaymentCreationRequest(
-      this.createDeferredPaymentCreationRequestOp)
-      : super(OperationType(
-            OperationType.CREATE_DEFERRED_PAYMENT_CREATION_REQUEST));
-  late CreateDeferredPaymentCreationRequestOp
-      createDeferredPaymentCreationRequestOp;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  OperationBodyCreateDeferredPaymentCreationRequest(this.createDeferredPaymentCreationRequestOp) : super(OperationType(OperationType.CREATE_DEFERRED_PAYMENT_CREATION_REQUEST));
+  late CreateDeferredPaymentCreationRequestOp createDeferredPaymentCreationRequestOp;
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     createDeferredPaymentCreationRequestOp.toXdr(stream);
   }
 }
 
 class OperationBodyCancelDeferredPaymentCreationRequest extends OperationBody {
-  OperationBodyCancelDeferredPaymentCreationRequest(
-      this.cancelDeferredPaymentCreationRequestOp)
-      : super(OperationType(
-            OperationType.CANCEL_DEFERRED_PAYMENT_CREATION_REQUEST));
-  late CancelDeferredPaymentCreationRequestOp
-      cancelDeferredPaymentCreationRequestOp;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  OperationBodyCancelDeferredPaymentCreationRequest(this.cancelDeferredPaymentCreationRequestOp) : super(OperationType(OperationType.CANCEL_DEFERRED_PAYMENT_CREATION_REQUEST));
+  late CancelDeferredPaymentCreationRequestOp cancelDeferredPaymentCreationRequestOp;
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     cancelDeferredPaymentCreationRequestOp.toXdr(stream);
   }
 }
 
 class OperationBodyCreateCloseDeferredPaymentRequest extends OperationBody {
-  OperationBodyCreateCloseDeferredPaymentRequest(
-      this.createCloseDeferredPaymentRequestOp)
-      : super(
-            OperationType(OperationType.CREATE_CLOSE_DEFERRED_PAYMENT_REQUEST));
+  OperationBodyCreateCloseDeferredPaymentRequest(this.createCloseDeferredPaymentRequestOp) : super(OperationType(OperationType.CREATE_CLOSE_DEFERRED_PAYMENT_REQUEST));
   late CreateCloseDeferredPaymentRequestOp createCloseDeferredPaymentRequestOp;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     createCloseDeferredPaymentRequestOp.toXdr(stream);
   }
 }
 
 class OperationBodyCancelCloseDeferredPaymentRequest extends OperationBody {
-  OperationBodyCancelCloseDeferredPaymentRequest(
-      this.cancelCloseDeferredPaymentRequestOp)
-      : super(
-            OperationType(OperationType.CANCEL_CLOSE_DEFERRED_PAYMENT_REQUEST));
+  OperationBodyCancelCloseDeferredPaymentRequest(this.cancelCloseDeferredPaymentRequestOp) : super(OperationType(OperationType.CANCEL_CLOSE_DEFERRED_PAYMENT_REQUEST));
   late CancelCloseDeferredPaymentRequestOp cancelCloseDeferredPaymentRequestOp;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     cancelCloseDeferredPaymentRequestOp.toXdr(stream);
   }
 }
-
 class MemoType extends XdrEncodable {
   static const MEMO_NONE = 0;
   static const MEMO_TEXT = 1;
   static const MEMO_ID = 2;
   static const MEMO_HASH = 3;
   static const MEMO_RETURN = 4;
-  var value;
-
+  int value;
   MemoType(this.value);
-}
+  @override toXdr(XdrDataOutputStream stream) {
+    value.toXdr(stream);
+  }
 
+}
 abstract class Memo extends XdrEncodable {
   MemoType discriminant;
-
   Memo(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
@@ -26234,9 +22938,7 @@ class MemoMemoNone extends Memo {
 class MemoMemoText extends Memo {
   MemoMemoText(this.text) : super(MemoType(MemoType.MEMO_TEXT));
   late String text;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     text.toXdr(stream);
   }
@@ -26244,10 +22946,8 @@ class MemoMemoText extends Memo {
 
 class MemoMemoId extends Memo {
   MemoMemoId(this.id) : super(MemoType(MemoType.MEMO_ID));
-  late Uint64 id;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  late UINT64 id;
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     id.toXdr(stream);
   }
@@ -26255,10 +22955,8 @@ class MemoMemoId extends Memo {
 
 class MemoMemoHash extends Memo {
   MemoMemoHash(this.hash) : super(MemoType(MemoType.MEMO_HASH));
-  late Hash hash;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  late HASH hash;
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     hash.toXdr(stream);
   }
@@ -26266,10 +22964,8 @@ class MemoMemoHash extends Memo {
 
 class MemoMemoReturn extends Memo {
   MemoMemoReturn(this.retHash) : super(MemoType(MemoType.MEMO_RETURN));
-  late Hash retHash;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  late HASH retHash;
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     retHash.toXdr(stream);
   }
@@ -26287,17 +22983,16 @@ class MemoMemoReturn extends Memo {
 //  };
 
 //  ===========================================================================
-class TimeBounds extends XdrEncodable {
-  Uint64 minTime;
-  Uint64 maxTime;
+class TimeBounds extends XdrEncodable  {
+  UINT64 minTime;
+  UINT64 maxTime;
 
   TimeBounds(
-    this.minTime,
-    this.maxTime,
-  );
+      this.minTime,
+      this.maxTime,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     minTime.toXdr(stream);
     maxTime.toXdr(stream);
   }
@@ -26335,51 +23030,45 @@ class TimeBounds extends XdrEncodable {
 //  };
 
 //  ===========================================================================
-class Transaction extends XdrEncodable {
-  AccountID sourceAccount;
-  Salt salt;
+class Transaction extends XdrEncodable  {
+  ACCOUNTID sourceAccount;
+  SALT salt;
   TimeBounds timeBounds;
   Memo memo;
   List<Operation> operations;
   TransactionExt ext;
 
   Transaction(
-    this.sourceAccount,
-    this.salt,
-    this.timeBounds,
-    this.memo,
-    this.operations,
-    this.ext,
-  );
+      this.sourceAccount,
+      this.salt,
+      this.timeBounds,
+      this.memo,
+      this.operations,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     sourceAccount.toXdr(stream);
     salt.toXdr(stream);
     timeBounds.toXdr(stream);
     memo.toXdr(stream);
     operations.length.toXdr(stream);
-    operations.forEach((element) {
+    operations.forEach ((element) {
       element.toXdr(stream);
     });
     ext.toXdr(stream);
   }
 }
-
 abstract class TransactionExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   TransactionExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class TransactionExtEmptyVersion extends TransactionExt {
-  TransactionExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+  TransactionExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
 // === xdr source ============================================================
 
@@ -26391,25 +23080,23 @@ class TransactionExtEmptyVersion extends TransactionExt {
 //  };
 
 //  ===========================================================================
-class TransactionEnvelope extends XdrEncodable {
+class TransactionEnvelope extends XdrEncodable  {
   Transaction tx;
   List<DecoratedSignature> signatures;
 
   TransactionEnvelope(
-    this.tx,
-    this.signatures,
-  );
+      this.tx,
+      this.signatures,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     tx.toXdr(stream);
     signatures.length.toXdr(stream);
-    signatures.forEach((element) {
+    signatures.forEach ((element) {
       element.toXdr(stream);
     });
   }
 }
-
 class OperationResultCode extends XdrEncodable {
   static const opINNER = 0;
   static const opBAD_AUTH = -1;
@@ -26425,9 +23112,12 @@ class OperationResultCode extends XdrEncodable {
   static const opNOT_SUPPORTED = -11;
   static const opLICENSE_VIOLATION = -12;
   static const opSKIPPED = -13;
-  var value;
-
+  int value;
   OperationResultCode(this.value);
+  @override toXdr(XdrDataOutputStream stream) {
+    value.toXdr(stream);
+  }
+
 }
 // === xdr source ============================================================
 
@@ -26446,864 +23136,630 @@ class OperationResultCode extends XdrEncodable {
 //  };
 
 //  ===========================================================================
-class AccountRuleRequirement extends XdrEncodable {
+class AccountRuleRequirement extends XdrEncodable  {
   AccountRuleResource resource;
   AccountRuleAction action;
-  AccountID account;
+  ACCOUNTID account;
   EmptyExt ext;
 
   AccountRuleRequirement(
-    this.resource,
-    this.action,
-    this.account,
-    this.ext,
-  );
+      this.resource,
+      this.action,
+      this.account,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     resource.toXdr(stream);
     action.toXdr(stream);
     account.toXdr(stream);
     ext.toXdr(stream);
   }
 }
-
 abstract class OperationResult extends XdrEncodable {
   OperationResultCode discriminant;
-
   OperationResult(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class OperationResultOpinner extends OperationResult {
-  OperationResultOpinner(this.tr)
-      : super(OperationResultCode(OperationResultCode.opINNER));
+  OperationResultOpinner(this.tr) : super(OperationResultCode(OperationResultCode.opINNER));
   late OperationResultTr tr;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     tr.toXdr(stream);
   }
 }
 
 class OperationResultOpnoEntry extends OperationResult {
-  OperationResultOpnoEntry(this.entryType)
-      : super(OperationResultCode(OperationResultCode.opNO_ENTRY));
+  OperationResultOpnoEntry(this.entryType) : super(OperationResultCode(OperationResultCode.opNO_ENTRY));
   late LedgerEntryType entryType;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     entryType.toXdr(stream);
   }
 }
 
 class OperationResultOpnoRolePermission extends OperationResult {
-  OperationResultOpnoRolePermission(this.requirement)
-      : super(OperationResultCode(OperationResultCode.opNO_ROLE_PERMISSION));
+  OperationResultOpnoRolePermission(this.requirement) : super(OperationResultCode(OperationResultCode.opNO_ROLE_PERMISSION));
   late AccountRuleRequirement requirement;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     requirement.toXdr(stream);
   }
 }
-
 abstract class OperationResultTr extends XdrEncodable {
   OperationType discriminant;
-
   OperationResultTr(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class OperationResultTrCreateAccount extends OperationResultTr {
-  OperationResultTrCreateAccount(this.createAccountResult)
-      : super(OperationType(OperationType.CREATE_ACCOUNT));
+  OperationResultTrCreateAccount(this.createAccountResult) : super(OperationType(OperationType.CREATE_ACCOUNT));
   late CreateAccountResult createAccountResult;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     createAccountResult.toXdr(stream);
   }
 }
 
 class OperationResultTrCreateIssuanceRequest extends OperationResultTr {
-  OperationResultTrCreateIssuanceRequest(this.createIssuanceRequestResult)
-      : super(OperationType(OperationType.CREATE_ISSUANCE_REQUEST));
+  OperationResultTrCreateIssuanceRequest(this.createIssuanceRequestResult) : super(OperationType(OperationType.CREATE_ISSUANCE_REQUEST));
   late CreateIssuanceRequestResult createIssuanceRequestResult;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     createIssuanceRequestResult.toXdr(stream);
   }
 }
 
 class OperationResultTrSetFees extends OperationResultTr {
-  OperationResultTrSetFees(this.setFeesResult)
-      : super(OperationType(OperationType.SET_FEES));
+  OperationResultTrSetFees(this.setFeesResult) : super(OperationType(OperationType.SET_FEES));
   late SetFeesResult setFeesResult;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     setFeesResult.toXdr(stream);
   }
 }
 
 class OperationResultTrCreateWithdrawalRequest extends OperationResultTr {
-  OperationResultTrCreateWithdrawalRequest(this.createWithdrawalRequestResult)
-      : super(OperationType(OperationType.CREATE_WITHDRAWAL_REQUEST));
+  OperationResultTrCreateWithdrawalRequest(this.createWithdrawalRequestResult) : super(OperationType(OperationType.CREATE_WITHDRAWAL_REQUEST));
   late CreateWithdrawalRequestResult createWithdrawalRequestResult;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     createWithdrawalRequestResult.toXdr(stream);
   }
 }
 
 class OperationResultTrManageBalance extends OperationResultTr {
-  OperationResultTrManageBalance(this.manageBalanceResult)
-      : super(OperationType(OperationType.MANAGE_BALANCE));
+  OperationResultTrManageBalance(this.manageBalanceResult) : super(OperationType(OperationType.MANAGE_BALANCE));
   late ManageBalanceResult manageBalanceResult;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     manageBalanceResult.toXdr(stream);
   }
 }
 
 class OperationResultTrManageAsset extends OperationResultTr {
-  OperationResultTrManageAsset(this.manageAssetResult)
-      : super(OperationType(OperationType.MANAGE_ASSET));
+  OperationResultTrManageAsset(this.manageAssetResult) : super(OperationType(OperationType.MANAGE_ASSET));
   late ManageAssetResult manageAssetResult;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     manageAssetResult.toXdr(stream);
   }
 }
 
 class OperationResultTrCreatePreissuanceRequest extends OperationResultTr {
-  OperationResultTrCreatePreissuanceRequest(this.createPreIssuanceRequestResult)
-      : super(OperationType(OperationType.CREATE_PREISSUANCE_REQUEST));
+  OperationResultTrCreatePreissuanceRequest(this.createPreIssuanceRequestResult) : super(OperationType(OperationType.CREATE_PREISSUANCE_REQUEST));
   late CreatePreIssuanceRequestResult createPreIssuanceRequestResult;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     createPreIssuanceRequestResult.toXdr(stream);
   }
 }
 
 class OperationResultTrManageLimits extends OperationResultTr {
-  OperationResultTrManageLimits(this.manageLimitsResult)
-      : super(OperationType(OperationType.MANAGE_LIMITS));
+  OperationResultTrManageLimits(this.manageLimitsResult) : super(OperationType(OperationType.MANAGE_LIMITS));
   late ManageLimitsResult manageLimitsResult;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     manageLimitsResult.toXdr(stream);
   }
 }
 
 class OperationResultTrManageAssetPair extends OperationResultTr {
-  OperationResultTrManageAssetPair(this.manageAssetPairResult)
-      : super(OperationType(OperationType.MANAGE_ASSET_PAIR));
+  OperationResultTrManageAssetPair(this.manageAssetPairResult) : super(OperationType(OperationType.MANAGE_ASSET_PAIR));
   late ManageAssetPairResult manageAssetPairResult;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     manageAssetPairResult.toXdr(stream);
   }
 }
 
 class OperationResultTrManageOffer extends OperationResultTr {
-  OperationResultTrManageOffer(this.manageOfferResult)
-      : super(OperationType(OperationType.MANAGE_OFFER));
+  OperationResultTrManageOffer(this.manageOfferResult) : super(OperationType(OperationType.MANAGE_OFFER));
   late ManageOfferResult manageOfferResult;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     manageOfferResult.toXdr(stream);
   }
 }
 
 class OperationResultTrManageInvoiceRequest extends OperationResultTr {
-  OperationResultTrManageInvoiceRequest(this.manageInvoiceRequestResult)
-      : super(OperationType(OperationType.MANAGE_INVOICE_REQUEST));
+  OperationResultTrManageInvoiceRequest(this.manageInvoiceRequestResult) : super(OperationType(OperationType.MANAGE_INVOICE_REQUEST));
   late ManageInvoiceRequestResult manageInvoiceRequestResult;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     manageInvoiceRequestResult.toXdr(stream);
   }
 }
 
 class OperationResultTrReviewRequest extends OperationResultTr {
-  OperationResultTrReviewRequest(this.reviewRequestResult)
-      : super(OperationType(OperationType.REVIEW_REQUEST));
+  OperationResultTrReviewRequest(this.reviewRequestResult) : super(OperationType(OperationType.REVIEW_REQUEST));
   late ReviewRequestResult reviewRequestResult;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     reviewRequestResult.toXdr(stream);
   }
 }
 
 class OperationResultTrCreateSaleRequest extends OperationResultTr {
-  OperationResultTrCreateSaleRequest(this.createSaleCreationRequestResult)
-      : super(OperationType(OperationType.CREATE_SALE_REQUEST));
+  OperationResultTrCreateSaleRequest(this.createSaleCreationRequestResult) : super(OperationType(OperationType.CREATE_SALE_REQUEST));
   late CreateSaleCreationRequestResult createSaleCreationRequestResult;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     createSaleCreationRequestResult.toXdr(stream);
   }
 }
 
 class OperationResultTrCheckSaleState extends OperationResultTr {
-  OperationResultTrCheckSaleState(this.checkSaleStateResult)
-      : super(OperationType(OperationType.CHECK_SALE_STATE));
+  OperationResultTrCheckSaleState(this.checkSaleStateResult) : super(OperationType(OperationType.CHECK_SALE_STATE));
   late CheckSaleStateResult checkSaleStateResult;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     checkSaleStateResult.toXdr(stream);
   }
 }
 
 class OperationResultTrPayout extends OperationResultTr {
-  OperationResultTrPayout(this.payoutResult)
-      : super(OperationType(OperationType.PAYOUT));
+  OperationResultTrPayout(this.payoutResult) : super(OperationType(OperationType.PAYOUT));
   late PayoutResult payoutResult;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     payoutResult.toXdr(stream);
   }
 }
 
 class OperationResultTrCreateAmlAlert extends OperationResultTr {
-  OperationResultTrCreateAmlAlert(this.createAMLAlertRequestResult)
-      : super(OperationType(OperationType.CREATE_AML_ALERT));
+  OperationResultTrCreateAmlAlert(this.createAMLAlertRequestResult) : super(OperationType(OperationType.CREATE_AML_ALERT));
   late CreateAMLAlertRequestResult createAMLAlertRequestResult;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     createAMLAlertRequestResult.toXdr(stream);
   }
 }
 
 class OperationResultTrManageKeyValue extends OperationResultTr {
-  OperationResultTrManageKeyValue(this.manageKeyValueResult)
-      : super(OperationType(OperationType.MANAGE_KEY_VALUE));
+  OperationResultTrManageKeyValue(this.manageKeyValueResult) : super(OperationType(OperationType.MANAGE_KEY_VALUE));
   late ManageKeyValueResult manageKeyValueResult;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     manageKeyValueResult.toXdr(stream);
   }
 }
 
 class OperationResultTrCreateChangeRoleRequest extends OperationResultTr {
-  OperationResultTrCreateChangeRoleRequest(this.createChangeRoleRequestResult)
-      : super(OperationType(OperationType.CREATE_CHANGE_ROLE_REQUEST));
+  OperationResultTrCreateChangeRoleRequest(this.createChangeRoleRequestResult) : super(OperationType(OperationType.CREATE_CHANGE_ROLE_REQUEST));
   late CreateChangeRoleRequestResult createChangeRoleRequestResult;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     createChangeRoleRequestResult.toXdr(stream);
   }
 }
 
-class OperationResultTrManageExternalSystemAccountIdPoolEntry
-    extends OperationResultTr {
-  OperationResultTrManageExternalSystemAccountIdPoolEntry(
-      this.manageExternalSystemAccountIdPoolEntryResult)
-      : super(OperationType(
-            OperationType.MANAGE_EXTERNAL_SYSTEM_ACCOUNT_ID_POOL_ENTRY));
-  late ManageExternalSystemAccountIdPoolEntryResult
-      manageExternalSystemAccountIdPoolEntryResult;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+class OperationResultTrManageExternalSystemAccountIdPoolEntry extends OperationResultTr {
+  OperationResultTrManageExternalSystemAccountIdPoolEntry(this.manageExternalSystemAccountIdPoolEntryResult) : super(OperationType(OperationType.MANAGE_EXTERNAL_SYSTEM_ACCOUNT_ID_POOL_ENTRY));
+  late ManageExternalSystemAccountIdPoolEntryResult manageExternalSystemAccountIdPoolEntryResult;
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     manageExternalSystemAccountIdPoolEntryResult.toXdr(stream);
   }
 }
 
 class OperationResultTrBindExternalSystemAccountId extends OperationResultTr {
-  OperationResultTrBindExternalSystemAccountId(
-      this.bindExternalSystemAccountIdResult)
-      : super(OperationType(OperationType.BIND_EXTERNAL_SYSTEM_ACCOUNT_ID));
+  OperationResultTrBindExternalSystemAccountId(this.bindExternalSystemAccountIdResult) : super(OperationType(OperationType.BIND_EXTERNAL_SYSTEM_ACCOUNT_ID));
   late BindExternalSystemAccountIdResult bindExternalSystemAccountIdResult;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     bindExternalSystemAccountIdResult.toXdr(stream);
   }
 }
 
 class OperationResultTrPayment extends OperationResultTr {
-  OperationResultTrPayment(this.paymentResult)
-      : super(OperationType(OperationType.PAYMENT));
+  OperationResultTrPayment(this.paymentResult) : super(OperationType(OperationType.PAYMENT));
   late PaymentResult paymentResult;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     paymentResult.toXdr(stream);
   }
 }
 
 class OperationResultTrManageSale extends OperationResultTr {
-  OperationResultTrManageSale(this.manageSaleResult)
-      : super(OperationType(OperationType.MANAGE_SALE));
+  OperationResultTrManageSale(this.manageSaleResult) : super(OperationType(OperationType.MANAGE_SALE));
   late ManageSaleResult manageSaleResult;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     manageSaleResult.toXdr(stream);
   }
 }
 
 class OperationResultTrCreateManageLimitsRequest extends OperationResultTr {
-  OperationResultTrCreateManageLimitsRequest(
-      this.createManageLimitsRequestResult)
-      : super(OperationType(OperationType.CREATE_MANAGE_LIMITS_REQUEST));
+  OperationResultTrCreateManageLimitsRequest(this.createManageLimitsRequestResult) : super(OperationType(OperationType.CREATE_MANAGE_LIMITS_REQUEST));
   late CreateManageLimitsRequestResult createManageLimitsRequestResult;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     createManageLimitsRequestResult.toXdr(stream);
   }
 }
 
 class OperationResultTrManageContractRequest extends OperationResultTr {
-  OperationResultTrManageContractRequest(this.manageContractRequestResult)
-      : super(OperationType(OperationType.MANAGE_CONTRACT_REQUEST));
+  OperationResultTrManageContractRequest(this.manageContractRequestResult) : super(OperationType(OperationType.MANAGE_CONTRACT_REQUEST));
   late ManageContractRequestResult manageContractRequestResult;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     manageContractRequestResult.toXdr(stream);
   }
 }
 
 class OperationResultTrManageContract extends OperationResultTr {
-  OperationResultTrManageContract(this.manageContractResult)
-      : super(OperationType(OperationType.MANAGE_CONTRACT));
+  OperationResultTrManageContract(this.manageContractResult) : super(OperationType(OperationType.MANAGE_CONTRACT));
   late ManageContractResult manageContractResult;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     manageContractResult.toXdr(stream);
   }
 }
 
 class OperationResultTrCancelSaleRequest extends OperationResultTr {
-  OperationResultTrCancelSaleRequest(this.cancelSaleCreationRequestResult)
-      : super(OperationType(OperationType.CANCEL_SALE_REQUEST));
+  OperationResultTrCancelSaleRequest(this.cancelSaleCreationRequestResult) : super(OperationType(OperationType.CANCEL_SALE_REQUEST));
   late CancelSaleCreationRequestResult cancelSaleCreationRequestResult;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     cancelSaleCreationRequestResult.toXdr(stream);
   }
 }
 
 class OperationResultTrCreateAtomicSwapAskRequest extends OperationResultTr {
-  OperationResultTrCreateAtomicSwapAskRequest(
-      this.createAtomicSwapAskRequestResult)
-      : super(OperationType(OperationType.CREATE_ATOMIC_SWAP_ASK_REQUEST));
+  OperationResultTrCreateAtomicSwapAskRequest(this.createAtomicSwapAskRequestResult) : super(OperationType(OperationType.CREATE_ATOMIC_SWAP_ASK_REQUEST));
   late CreateAtomicSwapAskRequestResult createAtomicSwapAskRequestResult;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     createAtomicSwapAskRequestResult.toXdr(stream);
   }
 }
 
 class OperationResultTrCancelAtomicSwapAsk extends OperationResultTr {
-  OperationResultTrCancelAtomicSwapAsk(this.cancelAtomicSwapAskResult)
-      : super(OperationType(OperationType.CANCEL_ATOMIC_SWAP_ASK));
+  OperationResultTrCancelAtomicSwapAsk(this.cancelAtomicSwapAskResult) : super(OperationType(OperationType.CANCEL_ATOMIC_SWAP_ASK));
   late CancelAtomicSwapAskResult cancelAtomicSwapAskResult;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     cancelAtomicSwapAskResult.toXdr(stream);
   }
 }
 
 class OperationResultTrCreateAtomicSwapBidRequest extends OperationResultTr {
-  OperationResultTrCreateAtomicSwapBidRequest(
-      this.createAtomicSwapBidRequestResult)
-      : super(OperationType(OperationType.CREATE_ATOMIC_SWAP_BID_REQUEST));
+  OperationResultTrCreateAtomicSwapBidRequest(this.createAtomicSwapBidRequestResult) : super(OperationType(OperationType.CREATE_ATOMIC_SWAP_BID_REQUEST));
   late CreateAtomicSwapBidRequestResult createAtomicSwapBidRequestResult;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     createAtomicSwapBidRequestResult.toXdr(stream);
   }
 }
 
 class OperationResultTrManageAccountRole extends OperationResultTr {
-  OperationResultTrManageAccountRole(this.manageAccountRoleResult)
-      : super(OperationType(OperationType.MANAGE_ACCOUNT_ROLE));
+  OperationResultTrManageAccountRole(this.manageAccountRoleResult) : super(OperationType(OperationType.MANAGE_ACCOUNT_ROLE));
   late ManageAccountRoleResult manageAccountRoleResult;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     manageAccountRoleResult.toXdr(stream);
   }
 }
 
 class OperationResultTrManageAccountRule extends OperationResultTr {
-  OperationResultTrManageAccountRule(this.manageAccountRuleResult)
-      : super(OperationType(OperationType.MANAGE_ACCOUNT_RULE));
+  OperationResultTrManageAccountRule(this.manageAccountRuleResult) : super(OperationType(OperationType.MANAGE_ACCOUNT_RULE));
   late ManageAccountRuleResult manageAccountRuleResult;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     manageAccountRuleResult.toXdr(stream);
   }
 }
 
 class OperationResultTrManageSigner extends OperationResultTr {
-  OperationResultTrManageSigner(this.manageSignerResult)
-      : super(OperationType(OperationType.MANAGE_SIGNER));
+  OperationResultTrManageSigner(this.manageSignerResult) : super(OperationType(OperationType.MANAGE_SIGNER));
   late ManageSignerResult manageSignerResult;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     manageSignerResult.toXdr(stream);
   }
 }
 
 class OperationResultTrManageSignerRole extends OperationResultTr {
-  OperationResultTrManageSignerRole(this.manageSignerRoleResult)
-      : super(OperationType(OperationType.MANAGE_SIGNER_ROLE));
+  OperationResultTrManageSignerRole(this.manageSignerRoleResult) : super(OperationType(OperationType.MANAGE_SIGNER_ROLE));
   late ManageSignerRoleResult manageSignerRoleResult;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     manageSignerRoleResult.toXdr(stream);
   }
 }
 
 class OperationResultTrManageSignerRule extends OperationResultTr {
-  OperationResultTrManageSignerRule(this.manageSignerRuleResult)
-      : super(OperationType(OperationType.MANAGE_SIGNER_RULE));
+  OperationResultTrManageSignerRule(this.manageSignerRuleResult) : super(OperationType(OperationType.MANAGE_SIGNER_RULE));
   late ManageSignerRuleResult manageSignerRuleResult;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     manageSignerRuleResult.toXdr(stream);
   }
 }
 
 class OperationResultTrStamp extends OperationResultTr {
-  OperationResultTrStamp(this.stampResult)
-      : super(OperationType(OperationType.STAMP));
+  OperationResultTrStamp(this.stampResult) : super(OperationType(OperationType.STAMP));
   late StampResult stampResult;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     stampResult.toXdr(stream);
   }
 }
 
 class OperationResultTrLicense extends OperationResultTr {
-  OperationResultTrLicense(this.licenseResult)
-      : super(OperationType(OperationType.LICENSE));
+  OperationResultTrLicense(this.licenseResult) : super(OperationType(OperationType.LICENSE));
   late LicenseResult licenseResult;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     licenseResult.toXdr(stream);
   }
 }
 
 class OperationResultTrManagePoll extends OperationResultTr {
-  OperationResultTrManagePoll(this.managePollResult)
-      : super(OperationType(OperationType.MANAGE_POLL));
+  OperationResultTrManagePoll(this.managePollResult) : super(OperationType(OperationType.MANAGE_POLL));
   late ManagePollResult managePollResult;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     managePollResult.toXdr(stream);
   }
 }
 
 class OperationResultTrManageCreatePollRequest extends OperationResultTr {
-  OperationResultTrManageCreatePollRequest(this.manageCreatePollRequestResult)
-      : super(OperationType(OperationType.MANAGE_CREATE_POLL_REQUEST));
+  OperationResultTrManageCreatePollRequest(this.manageCreatePollRequestResult) : super(OperationType(OperationType.MANAGE_CREATE_POLL_REQUEST));
   late ManageCreatePollRequestResult manageCreatePollRequestResult;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     manageCreatePollRequestResult.toXdr(stream);
   }
 }
 
 class OperationResultTrManageVote extends OperationResultTr {
-  OperationResultTrManageVote(this.manageVoteResult)
-      : super(OperationType(OperationType.MANAGE_VOTE));
+  OperationResultTrManageVote(this.manageVoteResult) : super(OperationType(OperationType.MANAGE_VOTE));
   late ManageVoteResult manageVoteResult;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     manageVoteResult.toXdr(stream);
   }
 }
 
 class OperationResultTrManageAccountSpecificRule extends OperationResultTr {
-  OperationResultTrManageAccountSpecificRule(
-      this.manageAccountSpecificRuleResult)
-      : super(OperationType(OperationType.MANAGE_ACCOUNT_SPECIFIC_RULE));
+  OperationResultTrManageAccountSpecificRule(this.manageAccountSpecificRuleResult) : super(OperationType(OperationType.MANAGE_ACCOUNT_SPECIFIC_RULE));
   late ManageAccountSpecificRuleResult manageAccountSpecificRuleResult;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     manageAccountSpecificRuleResult.toXdr(stream);
   }
 }
 
 class OperationResultTrCancelChangeRoleRequest extends OperationResultTr {
-  OperationResultTrCancelChangeRoleRequest(this.cancelChangeRoleRequestResult)
-      : super(OperationType(OperationType.CANCEL_CHANGE_ROLE_REQUEST));
+  OperationResultTrCancelChangeRoleRequest(this.cancelChangeRoleRequestResult) : super(OperationType(OperationType.CANCEL_CHANGE_ROLE_REQUEST));
   late CancelChangeRoleRequestResult cancelChangeRoleRequestResult;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     cancelChangeRoleRequestResult.toXdr(stream);
   }
 }
 
 class OperationResultTrRemoveAssetPair extends OperationResultTr {
-  OperationResultTrRemoveAssetPair(this.removeAssetPairResult)
-      : super(OperationType(OperationType.REMOVE_ASSET_PAIR));
+  OperationResultTrRemoveAssetPair(this.removeAssetPairResult) : super(OperationType(OperationType.REMOVE_ASSET_PAIR));
   late RemoveAssetPairResult removeAssetPairResult;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     removeAssetPairResult.toXdr(stream);
   }
 }
 
 class OperationResultTrCreateKycRecoveryRequest extends OperationResultTr {
-  OperationResultTrCreateKycRecoveryRequest(this.createKYCRecoveryRequestResult)
-      : super(OperationType(OperationType.CREATE_KYC_RECOVERY_REQUEST));
+  OperationResultTrCreateKycRecoveryRequest(this.createKYCRecoveryRequestResult) : super(OperationType(OperationType.CREATE_KYC_RECOVERY_REQUEST));
   late CreateKYCRecoveryRequestResult createKYCRecoveryRequestResult;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     createKYCRecoveryRequestResult.toXdr(stream);
   }
 }
 
 class OperationResultTrInitiateKycRecovery extends OperationResultTr {
-  OperationResultTrInitiateKycRecovery(this.initiateKYCRecoveryResult)
-      : super(OperationType(OperationType.INITIATE_KYC_RECOVERY));
+  OperationResultTrInitiateKycRecovery(this.initiateKYCRecoveryResult) : super(OperationType(OperationType.INITIATE_KYC_RECOVERY));
   late InitiateKYCRecoveryResult initiateKYCRecoveryResult;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     initiateKYCRecoveryResult.toXdr(stream);
   }
 }
 
 class OperationResultTrCreateManageOfferRequest extends OperationResultTr {
-  OperationResultTrCreateManageOfferRequest(this.createManageOfferRequestResult)
-      : super(OperationType(OperationType.CREATE_MANAGE_OFFER_REQUEST));
+  OperationResultTrCreateManageOfferRequest(this.createManageOfferRequestResult) : super(OperationType(OperationType.CREATE_MANAGE_OFFER_REQUEST));
   late CreateManageOfferRequestResult createManageOfferRequestResult;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     createManageOfferRequestResult.toXdr(stream);
   }
 }
 
 class OperationResultTrCreatePaymentRequest extends OperationResultTr {
-  OperationResultTrCreatePaymentRequest(this.createPaymentRequestResult)
-      : super(OperationType(OperationType.CREATE_PAYMENT_REQUEST));
+  OperationResultTrCreatePaymentRequest(this.createPaymentRequestResult) : super(OperationType(OperationType.CREATE_PAYMENT_REQUEST));
   late CreatePaymentRequestResult createPaymentRequestResult;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     createPaymentRequestResult.toXdr(stream);
   }
 }
 
 class OperationResultTrRemoveAsset extends OperationResultTr {
-  OperationResultTrRemoveAsset(this.removeAssetResult)
-      : super(OperationType(OperationType.REMOVE_ASSET));
+  OperationResultTrRemoveAsset(this.removeAssetResult) : super(OperationType(OperationType.REMOVE_ASSET));
   late RemoveAssetResult removeAssetResult;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     removeAssetResult.toXdr(stream);
   }
 }
 
 class OperationResultTrOpenSwap extends OperationResultTr {
-  OperationResultTrOpenSwap(this.openSwapResult)
-      : super(OperationType(OperationType.OPEN_SWAP));
+  OperationResultTrOpenSwap(this.openSwapResult) : super(OperationType(OperationType.OPEN_SWAP));
   late OpenSwapResult openSwapResult;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     openSwapResult.toXdr(stream);
   }
 }
 
 class OperationResultTrCloseSwap extends OperationResultTr {
-  OperationResultTrCloseSwap(this.closeSwapResult)
-      : super(OperationType(OperationType.CLOSE_SWAP));
+  OperationResultTrCloseSwap(this.closeSwapResult) : super(OperationType(OperationType.CLOSE_SWAP));
   late CloseSwapResult closeSwapResult;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     closeSwapResult.toXdr(stream);
   }
 }
 
 class OperationResultTrCreateRedemptionRequest extends OperationResultTr {
-  OperationResultTrCreateRedemptionRequest(this.createRedemptionRequestResult)
-      : super(OperationType(OperationType.CREATE_REDEMPTION_REQUEST));
+  OperationResultTrCreateRedemptionRequest(this.createRedemptionRequestResult) : super(OperationType(OperationType.CREATE_REDEMPTION_REQUEST));
   late CreateRedemptionRequestResult createRedemptionRequestResult;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     createRedemptionRequestResult.toXdr(stream);
   }
 }
 
 class OperationResultTrCreateData extends OperationResultTr {
-  OperationResultTrCreateData(this.createDataResult)
-      : super(OperationType(OperationType.CREATE_DATA));
+  OperationResultTrCreateData(this.createDataResult) : super(OperationType(OperationType.CREATE_DATA));
   late CreateDataResult createDataResult;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     createDataResult.toXdr(stream);
   }
 }
 
 class OperationResultTrUpdateData extends OperationResultTr {
-  OperationResultTrUpdateData(this.updateDataResult)
-      : super(OperationType(OperationType.UPDATE_DATA));
+  OperationResultTrUpdateData(this.updateDataResult) : super(OperationType(OperationType.UPDATE_DATA));
   late UpdateDataResult updateDataResult;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     updateDataResult.toXdr(stream);
   }
 }
 
 class OperationResultTrRemoveData extends OperationResultTr {
-  OperationResultTrRemoveData(this.removeDataResult)
-      : super(OperationType(OperationType.REMOVE_DATA));
+  OperationResultTrRemoveData(this.removeDataResult) : super(OperationType(OperationType.REMOVE_DATA));
   late RemoveDataResult removeDataResult;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     removeDataResult.toXdr(stream);
   }
 }
 
 class OperationResultTrCreateDataCreationRequest extends OperationResultTr {
-  OperationResultTrCreateDataCreationRequest(
-      this.createDataCreationRequestResult)
-      : super(OperationType(OperationType.CREATE_DATA_CREATION_REQUEST));
+  OperationResultTrCreateDataCreationRequest(this.createDataCreationRequestResult) : super(OperationType(OperationType.CREATE_DATA_CREATION_REQUEST));
   late CreateDataCreationRequestResult createDataCreationRequestResult;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     createDataCreationRequestResult.toXdr(stream);
   }
 }
 
 class OperationResultTrCancelDataCreationRequest extends OperationResultTr {
-  OperationResultTrCancelDataCreationRequest(
-      this.cancelDataCreationRequestResult)
-      : super(OperationType(OperationType.CANCEL_DATA_CREATION_REQUEST));
+  OperationResultTrCancelDataCreationRequest(this.cancelDataCreationRequestResult) : super(OperationType(OperationType.CANCEL_DATA_CREATION_REQUEST));
   late CancelDataCreationRequestResult cancelDataCreationRequestResult;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     cancelDataCreationRequestResult.toXdr(stream);
   }
 }
 
 class OperationResultTrCreateDataUpdateRequest extends OperationResultTr {
-  OperationResultTrCreateDataUpdateRequest(this.createDataUpdateRequestResult)
-      : super(OperationType(OperationType.CREATE_DATA_UPDATE_REQUEST));
+  OperationResultTrCreateDataUpdateRequest(this.createDataUpdateRequestResult) : super(OperationType(OperationType.CREATE_DATA_UPDATE_REQUEST));
   late CreateDataUpdateRequestResult createDataUpdateRequestResult;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     createDataUpdateRequestResult.toXdr(stream);
   }
 }
 
 class OperationResultTrCreateDataRemoveRequest extends OperationResultTr {
-  OperationResultTrCreateDataRemoveRequest(this.createDataRemoveRequestResult)
-      : super(OperationType(OperationType.CREATE_DATA_REMOVE_REQUEST));
+  OperationResultTrCreateDataRemoveRequest(this.createDataRemoveRequestResult) : super(OperationType(OperationType.CREATE_DATA_REMOVE_REQUEST));
   late CreateDataRemoveRequestResult createDataRemoveRequestResult;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     createDataRemoveRequestResult.toXdr(stream);
   }
 }
 
 class OperationResultTrCancelDataUpdateRequest extends OperationResultTr {
-  OperationResultTrCancelDataUpdateRequest(this.cancelDataUpdateRequestResult)
-      : super(OperationType(OperationType.CANCEL_DATA_UPDATE_REQUEST));
+  OperationResultTrCancelDataUpdateRequest(this.cancelDataUpdateRequestResult) : super(OperationType(OperationType.CANCEL_DATA_UPDATE_REQUEST));
   late CancelDataUpdateRequestResult cancelDataUpdateRequestResult;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     cancelDataUpdateRequestResult.toXdr(stream);
   }
 }
 
 class OperationResultTrCancelDataRemoveRequest extends OperationResultTr {
-  OperationResultTrCancelDataRemoveRequest(this.cancelDataRemoveRequestResult)
-      : super(OperationType(OperationType.CANCEL_DATA_REMOVE_REQUEST));
+  OperationResultTrCancelDataRemoveRequest(this.cancelDataRemoveRequestResult) : super(OperationType(OperationType.CANCEL_DATA_REMOVE_REQUEST));
   late CancelDataRemoveRequestResult cancelDataRemoveRequestResult;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     cancelDataRemoveRequestResult.toXdr(stream);
   }
 }
 
-class OperationResultTrCreateDeferredPaymentCreationRequest
-    extends OperationResultTr {
-  OperationResultTrCreateDeferredPaymentCreationRequest(
-      this.createDeferredPaymentCreationRequestResult)
-      : super(OperationType(
-            OperationType.CREATE_DEFERRED_PAYMENT_CREATION_REQUEST));
-  late CreateDeferredPaymentCreationRequestResult
-      createDeferredPaymentCreationRequestResult;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+class OperationResultTrCreateDeferredPaymentCreationRequest extends OperationResultTr {
+  OperationResultTrCreateDeferredPaymentCreationRequest(this.createDeferredPaymentCreationRequestResult) : super(OperationType(OperationType.CREATE_DEFERRED_PAYMENT_CREATION_REQUEST));
+  late CreateDeferredPaymentCreationRequestResult createDeferredPaymentCreationRequestResult;
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     createDeferredPaymentCreationRequestResult.toXdr(stream);
   }
 }
 
-class OperationResultTrCancelDeferredPaymentCreationRequest
-    extends OperationResultTr {
-  OperationResultTrCancelDeferredPaymentCreationRequest(
-      this.cancelDeferredPaymentCreationRequestResult)
-      : super(OperationType(
-            OperationType.CANCEL_DEFERRED_PAYMENT_CREATION_REQUEST));
-  late CancelDeferredPaymentCreationRequestResult
-      cancelDeferredPaymentCreationRequestResult;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+class OperationResultTrCancelDeferredPaymentCreationRequest extends OperationResultTr {
+  OperationResultTrCancelDeferredPaymentCreationRequest(this.cancelDeferredPaymentCreationRequestResult) : super(OperationType(OperationType.CANCEL_DEFERRED_PAYMENT_CREATION_REQUEST));
+  late CancelDeferredPaymentCreationRequestResult cancelDeferredPaymentCreationRequestResult;
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     cancelDeferredPaymentCreationRequestResult.toXdr(stream);
   }
 }
 
-class OperationResultTrCreateCloseDeferredPaymentRequest
-    extends OperationResultTr {
-  OperationResultTrCreateCloseDeferredPaymentRequest(
-      this.createCloseDeferredPaymentRequestResult)
-      : super(
-            OperationType(OperationType.CREATE_CLOSE_DEFERRED_PAYMENT_REQUEST));
-  late CreateCloseDeferredPaymentRequestResult
-      createCloseDeferredPaymentRequestResult;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+class OperationResultTrCreateCloseDeferredPaymentRequest extends OperationResultTr {
+  OperationResultTrCreateCloseDeferredPaymentRequest(this.createCloseDeferredPaymentRequestResult) : super(OperationType(OperationType.CREATE_CLOSE_DEFERRED_PAYMENT_REQUEST));
+  late CreateCloseDeferredPaymentRequestResult createCloseDeferredPaymentRequestResult;
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     createCloseDeferredPaymentRequestResult.toXdr(stream);
   }
 }
 
-class OperationResultTrCancelCloseDeferredPaymentRequest
-    extends OperationResultTr {
-  OperationResultTrCancelCloseDeferredPaymentRequest(
-      this.cancelCloseDeferredPaymentRequestResult)
-      : super(
-            OperationType(OperationType.CANCEL_CLOSE_DEFERRED_PAYMENT_REQUEST));
-  late CancelCloseDeferredPaymentRequestResult
-      cancelCloseDeferredPaymentRequestResult;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+class OperationResultTrCancelCloseDeferredPaymentRequest extends OperationResultTr {
+  OperationResultTrCancelCloseDeferredPaymentRequest(this.cancelCloseDeferredPaymentRequestResult) : super(OperationType(OperationType.CANCEL_CLOSE_DEFERRED_PAYMENT_REQUEST));
+  late CancelCloseDeferredPaymentRequestResult cancelCloseDeferredPaymentRequestResult;
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     cancelCloseDeferredPaymentRequestResult.toXdr(stream);
   }
@@ -27326,9 +23782,12 @@ class TransactionResultCode extends XdrEncodable {
   static const txCOMMISSION_LINE_FULL = -13;
   static const txFEE_INCORRECT_PRECISION = -14;
   static const txNO_ROLE_PERMISSION = -15;
-  var value;
-
+  int value;
   TransactionResultCode(this.value);
+  @override toXdr(XdrDataOutputStream stream) {
+    value.toXdr(stream);
+  }
+
 }
 // === xdr source ============================================================
 
@@ -27347,39 +23806,33 @@ class TransactionResultCode extends XdrEncodable {
 //  };
 
 //  ===========================================================================
-class OperationFee extends XdrEncodable {
+class OperationFee extends XdrEncodable  {
   OperationType operationType;
-  Uint64 amount;
+  UINT64 amount;
   OperationFeeExt ext;
 
   OperationFee(
-    this.operationType,
-    this.amount,
-    this.ext,
-  );
+      this.operationType,
+      this.amount,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     operationType.toXdr(stream);
     amount.toXdr(stream);
     ext.toXdr(stream);
   }
 }
-
 abstract class OperationFeeExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   OperationFeeExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class OperationFeeExtEmptyVersion extends OperationFeeExt {
-  OperationFeeExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+  OperationFeeExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
 // === xdr source ============================================================
 
@@ -27409,75 +23862,59 @@ class OperationFeeExtEmptyVersion extends OperationFeeExt {
 //  };
 
 //  ===========================================================================
-class TransactionResult extends XdrEncodable {
-  Int64 feeCharged;
+class TransactionResult extends XdrEncodable  {
+  INT64 feeCharged;
   TransactionResultResult result;
   TransactionResultExt ext;
 
   TransactionResult(
-    this.feeCharged,
-    this.result,
-    this.ext,
-  );
+      this.feeCharged,
+      this.result,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     feeCharged.toXdr(stream);
     result.toXdr(stream);
     ext.toXdr(stream);
   }
 }
-
 abstract class TransactionResultResult extends XdrEncodable {
   TransactionResultCode discriminant;
-
   TransactionResultResult(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class TransactionResultResultTxsuccess extends TransactionResultResult {
-  TransactionResultResultTxsuccess(this.results)
-      : super(TransactionResultCode(TransactionResultCode.txSUCCESS));
+  TransactionResultResultTxsuccess(this.results) : super(TransactionResultCode(TransactionResultCode.txSUCCESS));
   late List<OperationResult> results;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     results.length.toXdr(stream);
-    results.forEach((element) {
+    results.forEach ((element) {
       element.toXdr(stream);
     });
   }
 }
 
 class TransactionResultResultTxfailed extends TransactionResultResult {
-  TransactionResultResultTxfailed(this.results)
-      : super(TransactionResultCode(TransactionResultCode.txFAILED));
+  TransactionResultResultTxfailed(this.results) : super(TransactionResultCode(TransactionResultCode.txFAILED));
   late List<OperationResult> results;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     results.length.toXdr(stream);
-    results.forEach((element) {
+    results.forEach ((element) {
       element.toXdr(stream);
     });
   }
 }
 
-class TransactionResultResultTxnoRolePermission
-    extends TransactionResultResult {
-  TransactionResultResultTxnoRolePermission(this.requirement)
-      : super(
-            TransactionResultCode(TransactionResultCode.txNO_ROLE_PERMISSION));
+class TransactionResultResultTxnoRolePermission extends TransactionResultResult {
+  TransactionResultResultTxnoRolePermission(this.requirement) : super(TransactionResultCode(TransactionResultCode.txNO_ROLE_PERMISSION));
   late AccountRuleRequirement requirement;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     requirement.toXdr(stream);
   }
@@ -27485,20 +23922,15 @@ class TransactionResultResultTxnoRolePermission
 
 abstract class TransactionResultExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   TransactionResultExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class TransactionResultExtEmptyVersion extends TransactionResultExt {
-  TransactionResultExtEmptyVersion()
-      : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
+  TransactionResultExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
-
 class LedgerVersion extends XdrEncodable {
   static const EMPTY_VERSION = 0;
   static const CHECK_SET_FEE_ACCOUNT_EXISTING = 1;
@@ -27532,18 +23964,17 @@ class LedgerVersion extends XdrEncodable {
   static const FIX_INVEST_TO_IMMEDIATE_SALE = 29;
   static const FIX_PAYMENT_TASKS_WILDCARD_VALUE = 30;
   static const FIX_CHANGE_ROLE_REQUEST_REQUESTOR = 31;
-  var value;
-
+  int value;
   LedgerVersion(this.value);
-}
+  @override toXdr(XdrDataOutputStream stream) {
+    value.toXdr(stream);
+  }
 
+}
 abstract class EmptyExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   EmptyExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
@@ -27552,45 +23983,42 @@ class EmptyExtEmptyVersion extends EmptyExt {
   EmptyExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
 
-typedef Hash = XdrByteArrayFixed32;
-typedef Uint256 = XdrByteArrayFixed32;
-typedef Uint32 = int;
-typedef Int32 = int;
-typedef Uint64 = int;
-typedef Int64 = int;
-
+typedef HASH = XdrByteArrayFixed32;
+typedef UINT256 = XdrByteArrayFixed32;
+typedef UINT32 = int;
+typedef INT32 = int;
+typedef UINT64 = Int64;
+typedef INT64 = Int64;
 class CryptoKeyType extends XdrEncodable {
   static const KEY_TYPE_ED25519 = 0;
-  var value;
-
+  int value;
   CryptoKeyType(this.value);
-}
+  @override toXdr(XdrDataOutputStream stream) {
+    value.toXdr(stream);
+  }
 
+}
 class PublicKeyType extends XdrEncodable {
   static const PUBLIC_KEY_TYPE_ED25519 = 0;
-  var value;
-
+  int value;
   PublicKeyType(this.value);
-}
+  @override toXdr(XdrDataOutputStream stream) {
+    value.toXdr(stream);
+  }
 
+}
 abstract class PublicKey extends XdrEncodable {
   CryptoKeyType discriminant;
-
   PublicKey(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
 
 class PublicKeyKeyTypeEd25519 extends PublicKey {
-  PublicKeyKeyTypeEd25519(this.ed25519)
-      : super(CryptoKeyType(CryptoKeyType.KEY_TYPE_ED25519));
-  late Uint256 ed25519;
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  PublicKeyKeyTypeEd25519(this.ed25519) : super(CryptoKeyType(CryptoKeyType.KEY_TYPE_ED25519));
+  late UINT256 ed25519;
+  @override toXdr(XdrDataOutputStream stream) {
     super.toXdr(stream);
     ed25519.toXdr(stream);
   }
@@ -27636,14 +24064,16 @@ class LedgerEntryType extends XdrEncodable {
   static const DATA = 39;
   static const CUSTOM = 40;
   static const DEFERRED_PAYMENT = 41;
-  var value;
-
+  int value;
   LedgerEntryType(this.value);
-}
+  @override toXdr(XdrDataOutputStream stream) {
+    value.toXdr(stream);
+  }
 
-typedef Signature = Uint8List;
-typedef SignatureHint = XdrByteArrayFixed4;
-typedef NodeID = PublicKey;
+}
+typedef SIGNATURE = Uint8List;
+typedef SIGNATUREHINT = XdrByteArrayFixed4;
+typedef NODEID = PublicKey;
 // === xdr source ============================================================
 
 //  struct Curve25519Secret
@@ -27652,15 +24082,14 @@ typedef NodeID = PublicKey;
 //  };
 
 //  ===========================================================================
-class Curve25519Secret extends XdrEncodable {
+class Curve25519Secret extends XdrEncodable  {
   XdrByteArrayFixed32 key;
 
   Curve25519Secret(
-    this.key,
-  );
+      this.key,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     key.toXdr(stream);
   }
 }
@@ -27672,15 +24101,14 @@ class Curve25519Secret extends XdrEncodable {
 //  };
 
 //  ===========================================================================
-class Curve25519Public extends XdrEncodable {
+class Curve25519Public extends XdrEncodable  {
   XdrByteArrayFixed32 key;
 
   Curve25519Public(
-    this.key,
-  );
+      this.key,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     key.toXdr(stream);
   }
 }
@@ -27692,15 +24120,14 @@ class Curve25519Public extends XdrEncodable {
 //  };
 
 //  ===========================================================================
-class HmacSha256Key extends XdrEncodable {
+class HmacSha256Key extends XdrEncodable  {
   XdrByteArrayFixed32 key;
 
   HmacSha256Key(
-    this.key,
-  );
+      this.key,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     key.toXdr(stream);
   }
 }
@@ -27712,29 +24139,27 @@ class HmacSha256Key extends XdrEncodable {
 //  };
 
 //  ===========================================================================
-class HmacSha256Mac extends XdrEncodable {
+class HmacSha256Mac extends XdrEncodable  {
   XdrByteArrayFixed32 mac;
 
   HmacSha256Mac(
-    this.mac,
-  );
+      this.mac,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     mac.toXdr(stream);
   }
 }
-
-typedef AccountID = PublicKey;
-typedef BalanceID = PublicKey;
-typedef Thresholds = XdrByteArrayFixed4;
-typedef String32 = String;
-typedef String64 = String;
-typedef String256 = String;
-typedef Longstring = String;
-typedef AssetCode = String;
-typedef Salt = Uint64;
-typedef DataValue = Uint8List;
+typedef ACCOUNTID = PublicKey;
+typedef BALANCEID = PublicKey;
+typedef THRESHOLDS = XdrByteArrayFixed4;
+typedef STRING32 = String;
+typedef STRING64 = String;
+typedef STRING256 = String;
+typedef LONGSTRING = String;
+typedef ASSETCODE = String;
+typedef SALT = UINT64;
+typedef DATAVALUE = Uint8List;
 // === xdr source ============================================================
 
 //  //: `Fee` is used to unite fixed and percent fee amounts
@@ -27754,32 +24179,27 @@ typedef DataValue = Uint8List;
 //  };
 
 //  ===========================================================================
-class Fee extends XdrEncodable {
-  Uint64 fixed;
-  Uint64 percent;
+class Fee extends XdrEncodable  {
+  UINT64 fixed;
+  UINT64 percent;
   FeeExt ext;
 
   Fee(
-    this.fixed,
-    this.percent,
-    this.ext,
-  );
+      this.fixed,
+      this.percent,
+      this.ext,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     fixed.toXdr(stream);
     percent.toXdr(stream);
     ext.toXdr(stream);
   }
 }
-
 abstract class FeeExt extends XdrEncodable {
   LedgerVersion discriminant;
-
   FeeExt(this.discriminant);
-
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     discriminant.toXdr(stream);
   }
 }
@@ -27787,7 +24207,6 @@ abstract class FeeExt extends XdrEncodable {
 class FeeExtEmptyVersion extends FeeExt {
   FeeExtEmptyVersion() : super(LedgerVersion(LedgerVersion.EMPTY_VERSION));
 }
-
 class OperationType extends XdrEncodable {
   static const CREATE_ACCOUNT = 1;
   static const CREATE_ISSUANCE_REQUEST = 3;
@@ -27852,9 +24271,12 @@ class OperationType extends XdrEncodable {
   static const CANCEL_DEFERRED_PAYMENT_CREATION_REQUEST = 67;
   static const CREATE_CLOSE_DEFERRED_PAYMENT_REQUEST = 68;
   static const CANCEL_CLOSE_DEFERRED_PAYMENT_REQUEST = 69;
-  var value;
-
+  int value;
   OperationType(this.value);
+  @override toXdr(XdrDataOutputStream stream) {
+    value.toXdr(stream);
+  }
+
 }
 // === xdr source ============================================================
 
@@ -27865,17 +24287,16 @@ class OperationType extends XdrEncodable {
 //  };
 
 //  ===========================================================================
-class DecoratedSignature extends XdrEncodable {
-  SignatureHint hint;
-  Signature signature;
+class DecoratedSignature extends XdrEncodable  {
+  SIGNATUREHINT hint;
+  SIGNATURE signature;
 
   DecoratedSignature(
-    this.hint,
-    this.signature,
-  );
+      this.hint,
+      this.signature,
+      );
 
-  @override
-  toXdr(XdrDataOutputStream stream) {
+  @override toXdr(XdrDataOutputStream stream) {
     hint.toXdr(stream);
     signature.toXdr(stream);
   }

@@ -1,10 +1,17 @@
 import 'dart:typed_data';
 
 import 'package:stellar/stellar.dart';
+import 'package:fixnum/fixnum.dart';
 
 extension XdrIntPrimitive on int {
   toXdr(XdrDataOutputStream stream) {
     stream.writeInt(this);
+  }
+}
+
+extension aa on Int64 {
+  toXdr(XdrDataOutputStream stream) {
+    stream.writeLong(this.toInt());
   }
 }
 
