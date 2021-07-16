@@ -1,7 +1,11 @@
 import 'dart:typed_data';
 
 import 'package:dart_wallet/extensions/xdr_primitives.dart';
+import 'package:dart_wallet/public_key_factory.dart';
 import 'package:dart_wallet/utils/xdr_primitives.dart';
+import 'package:dart_wallet/xdr/utils/dependencies.dart';
+import 'package:dart_wallet/xdr/xdr_types.dart' as types;
+import 'package:dart_wallet/xdr/xdr_types.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:stellar/stellar.dart';
 
@@ -63,5 +67,29 @@ void main() {
     var listResult = opaqueFromXdr(
         XdrDataInputStream(Uint8List.fromList(outputStream.bytes)));
     expect(list, listResult);
+  });
+
+  test('decode all required', () {
+    var sourceRequest = types.UpdateMaxIssuance(
+        "OLE", Int64(5495), types.UpdateMaxIssuanceExtEmptyVersion());
+    print(sourceRequest.toBase64());
+
+    var source = types.OperationBodyManageAsset(ManageAssetOp(
+        Int64(4020),
+        ManageAssetOpRequestUpdateMaxIssuance(sourceRequest),
+        ManageAssetOpExtEmptyVersion()));
+    print(source.toBase64());
+  });
+
+  test('decode with optionals', () {
+    var source = types.AccountEntry(
+        PublicKeyFactory.fromAccountId(
+            "GDLWLDE33BN7SG6V4P63V2HFA56JYRMODESBLR2JJ5F3ITNQDUVKS2JE"),
+        null,
+        Int64(404),
+        Int64(333),
+        types.AccountEntryExtEmptyVersion());
+
+    print(source.toBase64());
   });
 }

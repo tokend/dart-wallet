@@ -23,13 +23,13 @@ abstract class XdrFixedByteArray extends XdrEncodable {
   abstract int size;
   late Uint8List wrapped;
 
-  set aWrapped(Uint8List value) {
-    if (value.length == wrapped.length) {
+  set setWrapped (Uint8List value) {
+    if (value.length == size) {
       wrapped = value;
-    } else if (value.length > wrapped.length) {
+    } else if (value.length > size) {
       wrapped =
           Uint8List.fromList(value.getRange(0, wrapped.length - 1).toList());
-    } else if (value.length < wrapped.length) {
+    } else if (value.length < size) {
       wrapped = Uint8List(wrapped.length);
       for (int i = 0; i < value.length; i++) {
         wrapped[i] = value[i];
@@ -37,10 +37,12 @@ abstract class XdrFixedByteArray extends XdrEncodable {
     }
   }
 
-  XdrFixedByteArray(this.wrapped);
+  XdrFixedByteArray(Uint8List wrapped) {
+    this.setWrapped = wrapped;
+  }
 
   @override
   toXdr(XdrDataOutputStream stream) {
-    stream.writeIntArray(wrapped);
+    stream.write(wrapped);
   }
 }
