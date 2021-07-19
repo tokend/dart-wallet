@@ -3,7 +3,7 @@ import 'dart:typed_data';
 import 'package:crypto/crypto.dart';
 
 class Hashing {
-  Uint8List sha256hashing(Uint8List data) {
+  static Uint8List sha256hashing(Uint8List data) {
     try {
       return Uint8List.fromList(sha256.convert(data).bytes);
     } catch (e) {

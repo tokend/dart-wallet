@@ -38,7 +38,7 @@ class NetworkParams {
       {this.precision = DEFAULT_PRECISION, this.timeOffsetSeconds}) {
     this.precisionMultiplier = pow(10, precision).toInt();
     this.networkId =
-        Hashing().sha256hashing(Uint8List.fromList(passphrase.codeUnits));
+        Hashing.sha256hashing(Uint8List.fromList(passphrase.codeUnits));
     this.timeOffsetSeconds = timeOffsetSeconds;
   }
 

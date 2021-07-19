@@ -109,7 +109,7 @@ class Transaction {
   /// Return SHA-256 hash of given transaction signature base
   /// See [getSignatureBase]
   static Uint8List getHash(Uint8List signatureBase) {
-    return Hashing().sha256hashing(signatureBase);
+    return Hashing.sha256hashing(signatureBase);
   }
 
   /// Return base content for transaction signature
