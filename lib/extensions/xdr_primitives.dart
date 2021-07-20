@@ -1,6 +1,7 @@
 import 'dart:typed_data';
 
-import 'package:stellar/stellar.dart';
+import 'package:dart_wallet/xdr/utils/xdr_data_input_stream.dart';
+import 'package:dart_wallet/xdr/utils/xdr_data_output_stream.dart';
 import 'package:fixnum/fixnum.dart';
 
 extension XdrIntPrimitive on int {

@@ -1,5 +1,6 @@
 import 'dart:typed_data';
 
+import 'package:cryptography/cryptography.dart';
 import 'package:dart_crypto_kit/crypto_ecdsa/ecdsa_key_pair.dart';
 import 'package:dart_wallet/base32check.dart';
 import 'package:dart_wallet/extensions/erase_extensions.dart';
@@ -21,7 +22,7 @@ class Account {
   ///
   /// See <a href="https://tokend.gitbook.io/knowledge-base/technical-details/key-entities/accounts#account-id">AccountID in the Knowledge base</a>
   String get accountId =>
-      Base32Check.encodeAccountId(ecDSAKeyPair.publicKey.bytes);
+      Base32Check.encodeAccountId(Uint8List.fromList(ecDSAKeyPair.publicKey.bytes));
 
   /// Returns private key seed encoded by [Base32Check].
   ///
@@ -30,11 +31,11 @@ class Account {
       Uint8List.fromList(ecDSAKeyPair.privateKey!));
 
   /// Returns public key bytes.
-  Uint8List get publicKey => ecDSAKeyPair.publicKey.bytes;
+  List<int> get publicKey => ecDSAKeyPair.publicKey.bytes;
 
   /// @return public key wrapped into XDR.
   Types.PublicKey get xdrPublicKey =>
-      Types.PublicKeyKeyTypeEd25519(Types.UINT256(publicKey));
+      Types.PublicKeyKeyTypeEd25519(Types.UINT256(Uint8List.fromList(publicKey)));
 
   /// Signs provided data with the account's private key.
   /// @throws SignUnavailableException if account is not capable of signing.
@@ -53,7 +54,7 @@ class Account {
 
   /// Verifies provided data and signature with the account's public key.
   Future<bool> verifySignature(Uint8List data, Uint8List signature) {
-    return EcDSAKeyPair.verify(data, signature, publicKey);
+    return EcDSAKeyPair.verify(data, signature, SimplePublicKey(publicKey, type: KeyPairType.ed25519));
   }
 
   /// Signs provided data with the account's private key

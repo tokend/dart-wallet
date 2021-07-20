@@ -1,7 +1,8 @@
 import 'dart:typed_data';
 
+import 'package:dart_wallet/xdr/utils/xdr_data_input_stream.dart';
+import 'package:dart_wallet/xdr/utils/xdr_data_output_stream.dart';
 import 'package:dart_wallet/xdr/utils/xdr_encodable.dart';
-import 'package:stellar/stellar.dart';
 
 int intFromXdr(XdrDataInputStream stream) {
   return stream.readInt();

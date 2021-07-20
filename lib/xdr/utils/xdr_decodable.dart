@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import 'package:stellar/stellar.dart';
+import 'package:dart_wallet/xdr/utils/xdr_data_input_stream.dart';
 
 class XdrDecodable<T> {
   /// Decodes object of type [T] from XDR content of the [stream]

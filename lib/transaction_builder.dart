@@ -3,7 +3,6 @@ import 'package:dart_wallet/network_params.dart';
 import 'package:dart_wallet/public_key_factory.dart';
 import 'package:dart_wallet/transaction.dart' as Tr;
 import 'package:dart_wallet/xdr/utils/dependencies.dart';
-import 'package:stellar/stellar.dart';
 
 import 'xdr/xdr_types.dart' as Types;
 

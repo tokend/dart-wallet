@@ -1,11 +1,10 @@
-
 import 'dart:convert';
 
-import 'package:stellar/stellar.dart';
+import 'package:dart_wallet/xdr/utils/xdr_data_output_stream.dart';
 
 class XdrEncodable {
   /// Encodes object to xdr and writes it to specified XdrDataOutputStream
-  toXdr(XdrDataOutputStream stream){}
+  toXdr(XdrDataOutputStream stream) {}
 
   /// Returns base64 xdr representation of this object
   String toBase64() {

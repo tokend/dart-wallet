@@ -2,7 +2,6 @@ import 'dart:math';
 
 import 'package:dart_wallet/network_params.dart';
 import 'package:dart_wallet/utils/hashing.dart';
-import 'package:stellar/stellar.dart';
 
 import 'account.dart' as Account;
 import 'xdr/utils/dependencies.dart';

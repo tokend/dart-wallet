@@ -7,3 +7,5 @@ export 'package:dart_wallet/utils/xdr_primitives.dart';
 export 'package:dart_wallet/xdr/xdr_byte_array_fixed32.dart';
 export 'package:dart_wallet/xdr/xdr_byte_array_fixed16.dart';
 export 'package:dart_wallet/xdr/xdr_byte_array_fixed4.dart';
+export 'package:dart_wallet/xdr/utils/xdr_data_input_stream.dart';
+export 'package:dart_wallet/xdr/utils/xdr_data_output_stream.dart';

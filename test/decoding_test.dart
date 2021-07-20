@@ -7,7 +7,6 @@ import 'package:dart_wallet/xdr/utils/dependencies.dart';
 import 'package:dart_wallet/xdr/xdr_types.dart' as types;
 import 'package:dart_wallet/xdr/xdr_types.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:stellar/stellar.dart';
 
 void main() {
   test('C primitives', () {
