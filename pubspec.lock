@@ -147,7 +147,7 @@ packages:
       name: code_builder
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "4.0.0"
+    version: "4.1.0"
   collection:
     dependency: transitive
     description:
@@ -181,7 +181,7 @@ packages:
     description:
       path: "."
       ref: dev
-      resolved-ref: "95644edfc1a52db43c6f98fb09838780a8e18bb5"
+      resolved-ref: ff151a23e0d02eb68e903763697af644e3f1fcbc
       url: "https://github.com/tokend/dart-crypto-kit"
     source: git
     version: "0.0.1"

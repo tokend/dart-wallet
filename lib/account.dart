@@ -1,6 +1,5 @@
 import 'dart:typed_data';
 
-import 'package:cryptography/cryptography.dart';
 import 'package:dart_crypto_kit/crypto_ecdsa/ecdsa_key_pair.dart';
 import 'package:dart_wallet/base32check.dart';
 import 'package:dart_wallet/extensions/erase_extensions.dart';
@@ -21,21 +20,26 @@ class Account {
   /// Returns public key encoded by [Base32Check].
   ///
   /// See <a href="https://tokend.gitbook.io/knowledge-base/technical-details/key-entities/accounts#account-id">AccountID in the Knowledge base</a>
-  String get accountId =>
-      Base32Check.encodeAccountId(Uint8List.fromList(ecDSAKeyPair.publicKey.bytes));
+  String get accountId => Base32Check.encodeAccountId(
+      Uint8List.fromList(ecDSAKeyPair.publicKey.bytes));
 
   /// Returns private key seed encoded by [Base32Check].
   ///
   /// See <a href="https://tokend.gitbook.io/knowledge-base/technical-details/key-entities/accounts#account-secret-seed">Secret seed in the Knowledge base</a>
-  String get secretSeed => Base32Check.encodeSecretSeed(
-      Uint8List.fromList(ecDSAKeyPair.privateKey!));
+  String? get secretSeed {
+    if(ecDSAKeyPair.privateKey != null) {
+      return Base32Check.encodeSecretSeed(
+          Uint8List.fromList(ecDSAKeyPair.privateKey!));
+    }
+    return null;
+  }
 
   /// Returns public key bytes.
   List<int> get publicKey => ecDSAKeyPair.publicKey.bytes;
 
   /// @return public key wrapped into XDR.
-  Types.PublicKey get xdrPublicKey =>
-      Types.PublicKeyKeyTypeEd25519(Types.UINT256(Uint8List.fromList(publicKey)));
+  Types.PublicKey get xdrPublicKey => Types.PublicKeyKeyTypeEd25519(
+      Types.UINT256(Uint8List.fromList(publicKey)));
 
   /// Signs provided data with the account's private key.
   /// @throws SignUnavailableException if account is not capable of signing.
@@ -54,7 +58,7 @@ class Account {
 
   /// Verifies provided data and signature with the account's public key.
   Future<bool> verifySignature(Uint8List data, Uint8List signature) {
-    return EcDSAKeyPair.verify(data, signature, SimplePublicKey(publicKey, type: KeyPairType.ed25519));
+    return EcDSAKeyPair.verify(data, signature, ecDSAKeyPair.publicKey);
   }
 
   /// Signs provided data with the account's private key
@@ -66,9 +70,9 @@ class Account {
   }
 
   Types.SIGNATUREHINT _getSignatureHint() {
-    var signatureHintBytes = Uint8List(publicKey.length - 4);
-    signatureHintBytes.fillRange(0, signatureHintBytes.length);
-    return Types.SIGNATUREHINT(signatureHintBytes);
+    var signatureHintBytes =
+        publicKey.sublist(publicKey.length - 4, publicKey.length);
+    return Types.SIGNATUREHINT(Uint8List.fromList(signatureHintBytes));
   }
 
   /// Creates an account from a secret seed.
@@ -110,13 +114,13 @@ class Account {
   /// [publicKey] is 32 bytes of the public key.
   /// See [Account.publicKey]
   static Future<Account> fromPublicKey(Uint8List publicKey) async {
-    var keypair = await EcDSAKeyPair.fromPrivateKeySeed(publicKey);
+    var keypair = EcDSAKeyPair.fromPublicKeyBytes(publicKey);
     return Account(keypair);
   }
 
   /// Creates an account from an XDR-wrapped public key.
   /// @param publicKey XDR-wrapped public key.
-  static fromXdrPublicKey(Types.PublicKeyKeyTypeEd25519 publicKey) {
+  static Future<Account> fromXdrPublicKey(Types.PublicKeyKeyTypeEd25519 publicKey) {
     return Account.fromPublicKey(publicKey.ed25519.wrapped);
   }
 
