@@ -86,13 +86,13 @@ class TransactionBuilder {
   }
 
   /// Builds the result transaction.
-  Tr.Transaction build() {
+  Future<Tr.Transaction> build() async {
     var transaction = Tr.Transaction(
         _networkParams, _sourceAccountId, _operations,
         memo: _memo, timeBounds: _timeBounds, salt: salt);
 
-    _signers.forEach((signer) {
-      transaction.addSignature(signer);
+    await Future.forEach(_signers, (signer) async {
+      await transaction.addSignature(signer as Account.Account);
     });
 
     return transaction;

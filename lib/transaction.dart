@@ -76,14 +76,15 @@ class Transaction {
   }
 
   /// Adds signature from given signer to transaction signatures.
-  addSignature(Account.Account signer) {
-    addGivenSignature(
-        getSignature(signer, networkParams.networkId, _getXdrTransaction()));
+  addSignature(Account.Account signer) async {
+    var decoratedSig = await getSignature(
+        signer, networkParams.networkId, _getXdrTransaction());
+    addGivenSignature(decoratedSig);
   }
 
   /// Adds given signature to transaction signatures.
-  addGivenSignature(Future<Types.DecoratedSignature> decoratedSignature) {
-    decoratedSignature.then((value) => signatures.add(value));
+  addGivenSignature(Types.DecoratedSignature decoratedSignature) {
+    _signatures.add(decoratedSignature);
   }
 
   /// @return XDR-wrapped transaction with all signatures.
@@ -115,7 +116,7 @@ class Transaction {
   /// See NetworkParams.networkId
   static Uint8List getSignatureBase(
       Uint8List networkId, Types.Transaction xdrTransaction) {
-    var output = Uint8List(networkId.length);
+    List<int> output = List.empty(growable: true);
     output.addAll(networkId);
     output.add(Types.EnvelopeType(Types.EnvelopeType.TX).value);
 
@@ -123,6 +124,6 @@ class Transaction {
     xdrTransaction.toXdr(txXdrOutputStream);
     output.addAll(txXdrOutputStream.bytes);
 
-    return output;
+    return Uint8List.fromList(output);
   }
 }

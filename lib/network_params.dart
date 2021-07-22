@@ -35,7 +35,7 @@ class NetworkParams {
   /// [precision] decimal places in amounts, [DEFAULT_PRECISION] by default
   /// [timeOffsetSeconds] offset between device and server time in seconds, 0 by default
   NetworkParams(this.passphrase,
-      {this.precision = DEFAULT_PRECISION, this.timeOffsetSeconds}) {
+      {this.precision = DEFAULT_PRECISION, this.timeOffsetSeconds = 0}) {
     this.precisionMultiplier = pow(10, precision).toInt();
     this.networkId =
         Hashing.sha256hashing(Uint8List.fromList(passphrase.codeUnits));
