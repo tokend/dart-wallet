@@ -36,7 +36,8 @@ extension XdrBooleanPrimitive on bool {
 
 extension XdrOpaquePrimitive on Uint8List {
   toXdr(XdrDataOutputStream stream) {
-    stream.writeIntArray(this);
+    this.length.toXdr(stream);
+    stream.write(this);
   }
 
   Uint8List fromXdr(XdrDataInputStream stream) {

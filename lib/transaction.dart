@@ -55,7 +55,8 @@ class Transaction {
             Int64(networkParams.nowTimestamp + DEFAULT_LIFETIME_SECONDS));
     var isSaltValid = salt != Int64.MIN_VALUE;
     if (isSaltValid) {
-      this.salt = salt ?? Int64(Random().nextInt(9) & 0x7fffffffffffffff).abs();
+      this.salt =
+          salt?.abs() ?? Int64(Random().nextInt(9) & 0x7fffffffffffffff).abs();
     } else {
       throw ArgumentError("Can't use $salt as a salt");
     }
@@ -72,7 +73,7 @@ class Transaction {
     this.memo = transactionEnvelope.tx.memo;
     this.timeBounds = transactionEnvelope.tx.timeBounds;
     this.salt = transactionEnvelope.tx.salt;
-    this.signatures.addAll(transactionEnvelope.signatures);
+    this._signatures.addAll(transactionEnvelope.signatures);
   }
 
   /// Adds signature from given signer to transaction signatures.
@@ -89,7 +90,7 @@ class Transaction {
 
   /// @return XDR-wrapped transaction with all signatures.
   Types.TransactionEnvelope getEnvelope() {
-    return Types.TransactionEnvelope(_getXdrTransaction(), signatures);
+    return Types.TransactionEnvelope(_getXdrTransaction(), _signatures);
   }
 
   Types.Transaction _getXdrTransaction() {
@@ -106,10 +107,16 @@ class Transaction {
     return signDecorated;
   }
 
+  Uint8List hash() {
+    return getHash(
+        getSignatureBase(networkParams.networkId, _getXdrTransaction()));
+  }
+
   /// Return SHA-256 hash of given transaction signature base
   /// See [getSignatureBase]
   static Uint8List getHash(Uint8List signatureBase) {
-    return Hashing.sha256hashing(signatureBase);
+    var a = Hashing.sha256hashing(signatureBase);
+    return a;
   }
 
   /// Return base content for transaction signature

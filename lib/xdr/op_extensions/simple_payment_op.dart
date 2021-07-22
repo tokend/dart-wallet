@@ -14,7 +14,7 @@ class SimplePaymentOp extends PaymentOp {
             reference,
             PaymentOpExtEmptyVersion());
 
-  SimplePaymentOp.FromPubKeys(String sourceBalanceID, String destination,
+  SimplePaymentOp.fromPubKeys(String sourceBalanceID, String destination,
       UINT64 amount, PaymentFeeData feeData,
       {LONGSTRING subject = "", LONGSTRING reference = ""})
       : this(
