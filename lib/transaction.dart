@@ -88,7 +88,7 @@ class Transaction {
     _signatures.add(decoratedSignature);
   }
 
-  /// @return XDR-wrapped transaction with all signatures.
+  /// Returns XDR-wrapped transaction with all signatures.
   Types.TransactionEnvelope getEnvelope() {
     return Types.TransactionEnvelope(_getXdrTransaction(), _signatures);
   }
@@ -124,8 +124,10 @@ class Transaction {
   static Uint8List getSignatureBase(
       Uint8List networkId, Types.Transaction xdrTransaction) {
     List<int> output = List.empty(growable: true);
+    var envTypeArray = Uint8List.fromList(List.generate(4, (_) => 0));
+    envTypeArray[3] = Types.EnvelopeType(Types.EnvelopeType.TX).value;
     output.addAll(networkId);
-    output.add(Types.EnvelopeType(Types.EnvelopeType.TX).value);
+    output.addAll(envTypeArray);
 
     var txXdrOutputStream = XdrDataOutputStream();
     xdrTransaction.toXdr(txXdrOutputStream);

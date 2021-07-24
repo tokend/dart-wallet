@@ -78,7 +78,7 @@ Future<void> main() async {
     expect(Int64.MAX_VALUE, transaction.salt);
   });
 
-  test('long salt MinValue', () {
+  test('long MinValue salt', () {
     try {
       Tr.Transaction(
         _network,
