@@ -1,14 +1,54 @@
-# dart_wallet
+# TokenD Kotlin wallet
 
-A new Flutter package project.
+This library implements transactions and keys management for TokenD-related projects.
 
-## Getting Started
+## Usage examples
 
-This project is a starting point for a Dart
-[package](https://flutter.dev/developing-packages/),
-a library module containing code that can be shared easily across
-multiple Flutter or Dart projects.
+Key management and signing:
 
-For help getting started with Flutter, view our 
-[online documentation](https://flutter.dev/docs), which offers tutorials, 
-samples, guidance on mobile development, and a full API reference.
+```dart
+var SEED = "SBUFJEEK7FMWXPE4HGOWQZPHZ4V5TFKGSF664RAGT24NS662MKTQ7J6S";
+var DATA = Uint8List.fromList("TokenD is awesome".codeUnits);
+
+var decoratedSignature = Account.fromSecretSeed(SEED).then((acc) => acc
+        .signDecorated(DATA));
+```
+
+Transaction creation:
+
+```dart
+var SEED = "SBUFJEEK7FMWXPE4HGOWQZPHZ4V5TFKGSF664RAGT24NS662MKTQ7J6S";
+    var NETWORK = NetworkParams("Example Test Network");
+
+    var sourceAccount = await Account.fromSecretSeed(SEED);
+
+    var accountId = sourceAccount.accountId;
+    var operation =
+        CreateBalanceOp(PublicKeyFactory.fromAccountId(accountId), "OLE");
+
+
+    var transaction = await TransactionBuilder(NETWORK, PublicKeyFactory.fromAccountId(accountId))
+        .addOperation(OperationBodyManageBalance(operation)).setMemo(MemoMemoText("TokenD is awesome"))
+        .addSigner(sourceAccount)
+        .build();
+
+    var envelope = transaction.getEnvelope().toBase64();
+```
+
+Decoding:
+```dart
+var txResultEncoded = "AAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAJAAAAAAAAAADMOKDasWPzpJIqN9sWipdvcjEZRTnGBvUezXbEd6rKMAAAAAAAAAAA";
+var stream = XdrDataInputStream(base64Decode(txResultEncoded));
+var txResult = TransactionResult.fromXdr(stream);
+```
+
+## XDR Update
+XDR sources are located in [TokenD XDR repository](https://github.com/tokend/xdr/).
+You can generate new XDRs using our Docker-based XDR generator.
+[Docker](https://www.docker.com/) is required to perform this action.
+
+In order to generate new XDRs run `generateXDR` script with a source revision (tag or branch or commit) as an argument:
+
+```bash
+./generateXDR.sh master
+```

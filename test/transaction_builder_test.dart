@@ -2,6 +2,7 @@ import 'package:dart_wallet/account.dart';
 import 'package:dart_wallet/network_params.dart';
 import 'package:dart_wallet/public_key_factory.dart';
 import 'package:dart_wallet/transaction_builder.dart';
+import 'package:dart_wallet/xdr/op_extensions/create_balance_op.dart';
 import 'package:dart_wallet/xdr/utils/dependencies.dart';
 import 'package:dart_wallet/xdr/xdr_types.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -100,5 +101,25 @@ void main() {
 
     expect(1, transaction.signatures.length);
     expect(signerHint.hint.wrapped, transaction.signatures[0].hint.wrapped);
+  });
+
+  test('add signer', () async {
+    var SEED = "SBUFJEEK7FMWXPE4HGOWQZPHZ4V5TFKGSF664RAGT24NS662MKTQ7J6S";
+    var NETWORK = NetworkParams("Example Test Network");
+
+    var sourceAccount = await Account.fromSecretSeed(SEED);
+
+    var accountId = sourceAccount.accountId;
+    var operation =
+        CreateBalanceOp(PublicKeyFactory.fromAccountId(accountId), "OLE");
+
+    var transaction = await TransactionBuilder(
+            NETWORK, PublicKeyFactory.fromAccountId(accountId))
+        .addOperation(OperationBodyManageBalance(operation))
+        .setMemo(MemoMemoText("TokenD is awesome"))
+        .addSigner(sourceAccount)
+        .build();
+
+    var envelope = transaction.getEnvelope().toBase64();
   });
 }

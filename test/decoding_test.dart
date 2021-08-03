@@ -1,5 +1,7 @@
+import 'dart:convert';
 import 'dart:typed_data';
 
+import 'package:dart_wallet/base32check.dart';
 import 'package:dart_wallet/extensions/xdr_primitives.dart';
 import 'package:dart_wallet/public_key_factory.dart';
 import 'package:dart_wallet/utils/xdr_primitives.dart';
@@ -23,6 +25,13 @@ void main() {
     intResult =
         intFromXdr(XdrDataInputStream(Uint8List.fromList(outputStream.bytes)));
     expect(negativeInt, intResult);
+
+    var long = Int64(55);
+    outputStream = XdrDataOutputStream();
+    long.toXdr(outputStream);
+    var longResult =
+        longFromXdr(XdrDataInputStream(Uint8List.fromList(outputStream.bytes)));
+    expect(long, longResult);
 
     var trueBoolean = true;
     outputStream = XdrDataOutputStream();
@@ -71,13 +80,27 @@ void main() {
   test('decode all required', () {
     var sourceRequest = types.UpdateMaxIssuance(
         "OLE", Int64(5495), types.UpdateMaxIssuanceExtEmptyVersion());
-    print(sourceRequest.toBase64());
 
     var source = types.OperationBodyManageAsset(ManageAssetOp(
         Int64(4020),
         ManageAssetOpRequestUpdateMaxIssuance(sourceRequest),
         ManageAssetOpExtEmptyVersion()));
-    print(source.toBase64());
+
+    var stream = XdrDataInputStream(base64Decode(source.toBase64()));
+
+    var decoded = types.OperationBody.fromXdr(stream);
+    expect(source.discriminant.value, decoded.discriminant.value);
+
+    var decodedOp = (decoded as types.OperationBodyManageAsset).manageAssetOp;
+    expect(decodedOp.requestID, source.manageAssetOp.requestID);
+
+    var decodedRequest =
+        (decodedOp.request as types.ManageAssetOpRequestUpdateMaxIssuance)
+            .updateMaxIssuance;
+    expect(decodedRequest.assetCode, sourceRequest.assetCode);
+    expect(decodedRequest.maxIssuanceAmount, sourceRequest.maxIssuanceAmount);
+    expect(decodedRequest.ext.discriminant.value,
+        sourceRequest.ext.discriminant.value);
   });
 
   test('decode with optionals', () {
@@ -89,6 +112,37 @@ void main() {
         Int64(333),
         types.AccountEntryExtEmptyVersion());
 
-    print(source.toBase64());
+    var stream = XdrDataInputStream(base64Decode(source.toBase64()));
+
+    var decoded = types.AccountEntry.fromXdr(stream);
+    expect(source.sequentialID, decoded.sequentialID);
+    expect(source.referrer, null);
+  });
+
+  test('tx result', () {
+    var createdBalanceId =
+        "BDGDRIG2WFR7HJESFI35WFUKS5XXEMIZIU44MBXVD3GXNRDXVLFDBGJW";
+    var result =
+        "AAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAJAAAAAAAAAADMOKDasWPzpJIqN9sWipdvcjEZRTnGBvUezXbEd6rKMAAAAAAAAAAA";
+
+    var stream = XdrDataInputStream(base64Decode(result));
+
+    var decoded = TransactionResult.fromXdr(stream);
+
+    var decodedResultTr =
+        (((decoded.result as types.TransactionResultResultTxsuccess)
+                .results
+                .first) as types.OperationResultOpinner)
+            .tr;
+
+    var balanceID = (((decodedResultTr as types.OperationResultTrManageBalance)
+            .manageBalanceResult) as types.ManageBalanceResultSuccess)
+        .success
+        .balanceID;
+
+    var wrapped = (balanceID as types.PublicKeyKeyTypeEd25519).ed25519.wrapped;
+    var encodedBalanceId = Base32Check.encodeBalanceId(wrapped);
+
+    expect(createdBalanceId, encodedBalanceId);
   });
 }

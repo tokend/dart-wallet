@@ -10,7 +10,7 @@ extension XdrIntPrimitive on int {
   }
 }
 
-extension aa on Int64 {
+extension XdrLongPrimitive on Int64 {
   toXdr(XdrDataOutputStream stream) {
     stream.writeLong(this.toInt());
   }

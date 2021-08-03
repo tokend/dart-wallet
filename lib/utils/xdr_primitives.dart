@@ -1,8 +1,7 @@
 import 'dart:typed_data';
 
-import 'package:dart_wallet/xdr/utils/xdr_data_input_stream.dart';
-import 'package:dart_wallet/xdr/utils/xdr_data_output_stream.dart';
 import 'package:dart_wallet/xdr/utils/xdr_encodable.dart';
+import 'package:dart_wallet/xdr/utils/dependencies.dart';
 
 int intFromXdr(XdrDataInputStream stream) {
   return stream.readInt();
@@ -17,14 +16,20 @@ bool boolFromXdr(XdrDataInputStream stream) {
 }
 
 Uint8List opaqueFromXdr(XdrDataInputStream stream) {
-  return Uint8List.fromList(stream.readIntArray());
+  var size = stream.readInt();
+  return Uint8List.fromList(stream.readBytes(size));
+}
+
+Int64 longFromXdr(XdrDataInputStream stream) {
+  var r = stream.readLong();
+  return Int64(r);
 }
 
 abstract class XdrFixedByteArray extends XdrEncodable {
   abstract int size;
   late Uint8List wrapped;
 
-  set setWrapped (Uint8List value) {
+  set setWrapped(Uint8List value) {
     if (value.length == size) {
       wrapped = value;
     } else if (value.length > size) {
@@ -45,5 +50,9 @@ abstract class XdrFixedByteArray extends XdrEncodable {
   @override
   toXdr(XdrDataOutputStream stream) {
     stream.write(wrapped);
+  }
+
+  static XdrFixedByteArray fromXdr(XdrDataInputStream stream, int size) {
+    return XdrByteArrayFixed32(stream.readBytes(size));
   }
 }

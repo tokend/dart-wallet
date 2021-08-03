@@ -42,6 +42,21 @@ class NetworkParams {
     this.timeOffsetSeconds = timeOffsetSeconds;
   }
 
+  NetworkParams.fromJson(Map<String, dynamic> json)
+      : passphrase = json['passphrase'],
+        precision = json['precision'],
+        timeOffsetSeconds = json['timeOffsetSeconds'],
+        precisionMultiplier = json['precisionMultiplier'],
+        networkId = json['networkId'];
+
+  Map<String, dynamic> toJson() => {
+        'passphrase': passphrase,
+        'precision': precision,
+        'timeOffsetSeconds': timeOffsetSeconds,
+        'precisionMultiplier': precisionMultiplier,
+        'networkId': networkId,
+      };
+
   /// Converts given amount to network format.
   /// See [precision]
   int amountToPrecised(double amount) {
