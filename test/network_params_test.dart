@@ -1,7 +1,4 @@
-import 'dart:convert';
-
 import 'package:dart_wallet/network_params.dart';
-import 'package:dart_wallet/xdr/utils/dependencies.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
@@ -42,21 +39,5 @@ void main() {
     var isCorrect = (calculated - actual) >= correction - 1 &&
         (calculated - actual) <= correction + 1;
     expect(isCorrect, true);
-  });
-
-  test('serialization', () async {
-    var networkParams =
-        NetworkParams("Test phrase", precision: 10, timeOffsetSeconds: 42);
-
-    var encoded = json.encode(networkParams);
-    var encodedBytes = Uint8List.fromList(encoded.codeUnits);
-
-    String decodedJson = String.fromCharCodes(encodedBytes);
-    var decoded = json.decode(decodedJson);
-
-    expect(networkParams.networkId, decoded['networkId']);
-    expect(networkParams.passphrase, decoded['passphrase']);
-    expect(networkParams.precision, decoded['precision']);
-    expect(networkParams.timeOffsetSeconds, decoded['timeOffsetSeconds']);
   });
 }
