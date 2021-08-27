@@ -1,10 +1,10 @@
 import 'dart:typed_data';
 
-import 'package:base16/base16.dart';
+import 'package:convert/convert.dart';
 import 'package:dart_wallet/base32check.dart';
+import 'package:dart_wallet/utils/random.dart';
 import 'package:dart_wallet/version_byte.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:secure_random/secure_random.dart';
 
 void main() {
   var seedEncoded = 'SDJHRQF4GCMIIKAAAQ6IHY42X73FQFLHUULAPSKKD4DFDM7UXWWCRHBE';
@@ -12,7 +12,7 @@ void main() {
       'GDJHRQF4GCMIIKAAAQ6IHY42X73FQFLHUULAPSKKD4DFDM7UXWWCQDS3';
   var balanceIdEncoded =
       'BDJHRQF4GCMIIKAAAQ6IHY42X73FQFLHUULAPSKKD4DFDM7UXWWCQMUQ';
-  var bytes = Uint8List.fromList(base16decode(
+  var bytes = Uint8List.fromList(hex.decode(
       "D278C0BC3098842800043C83E39ABFF6581567A51607C94A1F0651B3F4BDAC28"));
 
   test('encodeSeed', () {
@@ -61,8 +61,7 @@ void main() {
   });
 
   test('randomData', () {
-    var sourceRandom = SecureRandom();
-    String s = sourceRandom.nextString(length: 50);
+    String s = Randomizer.getRandomString(50);
     var source = Uint8List.fromList(s.codeUnits);
     var encoded = Base32Check.encodeAccountId(source);
     var decoded = Base32Check.decodeAccountId(encoded);

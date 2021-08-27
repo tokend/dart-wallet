@@ -1,9 +1,9 @@
-import 'package:base16/base16.dart';
 import 'package:dart_wallet/account.dart' as Account;
 import 'package:dart_wallet/base32check.dart';
 import 'package:dart_wallet/xdr/utils/dependencies.dart';
 import 'package:dart_wallet/xdr/xdr_types.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:convert/convert.dart';
 
 void main() {
   var _accountId = "GB6ZRRKDAHUFQAGSJWMLCXL4W7OIEQNJL4NOISQUA6G23WK3OR3MGC4L";
@@ -14,9 +14,9 @@ void main() {
   test('sign', () {
     var expectedSig =
         "1B0EBBAE618B267668A8122ECCCD2A20480BC81951EB401E0F92B613483B798763D36AEB4B0404BC2A31FA1EAD47522BBA08705AB51BA205020E67D09AE87D0E";
-    Account.Account.fromSecretSeed(_seed).then((acc) => acc
-        .sign(_data)
-        .then((signature) => expect(base16decode(expectedSig), signature)));
+    Account.Account.fromSecretSeed(_seed).then((acc) => acc.sign(_data).then(
+        (signature) =>
+            expect(Uint8List.fromList(hex.decode(expectedSig)), signature)));
   });
 
   test('verify valid', () {
@@ -24,7 +24,7 @@ void main() {
         "1B0EBBAE618B267668A8122ECCCD2A20480BC81951EB401E0F92B613483B798763D36AEB4B0404BC2A31FA1EAD47522BBA08705AB51BA205020E67D09AE87D0E";
 
     Account.Account.fromAccountId(_accountId).then((acc) => acc
-        .verifySignature(_data, Uint8List.fromList(base16decode(sig)))
+        .verifySignature(_data, Uint8List.fromList(hex.decode(sig)))
         .then((isValid) => expect(isValid, true)));
   });
 

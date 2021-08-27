@@ -2,10 +2,10 @@ import 'dart:typed_data';
 
 import 'package:base32/base32.dart';
 import 'package:dart_wallet/extensions/erase_extensions.dart';
+import 'package:dart_wallet/extensions/number_extension.dart';
 import 'package:dart_wallet/version_byte.dart';
 import 'package:flutter/foundation.dart';
 import 'package:tuple/tuple.dart';
-import 'package:utility/utility.dart';
 
 /// Performs encoding and decoding of specific data to Base32Check.
 /// Base32Check is Base32 encoding with version byte and checksum:

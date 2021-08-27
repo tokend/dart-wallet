@@ -18,9 +18,7 @@ dependencies:
   secure_random: ^1.0.0
   cryptography: 2.0.0
   base32: 2.0.0
-  base16: ^2.0.2
   tuple: ^2.0.0
-  utility: any
   reflectable: any
 
 dev_dependencies:
